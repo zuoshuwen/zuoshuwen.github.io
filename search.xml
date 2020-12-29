@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello Sown</title>
-    <url>/Hello-Sown/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -20,47 +15,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/gunicorn/timeout/</url>
-    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<a id="more"></a>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>gunicorn</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
-      </tags>
+    <title>Hello Sown</title>
+    <url>/Hello-Sown/</url>
+    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>Go数据结构之数组与切片</title>
@@ -145,6 +102,142 @@
       <tags>
         <tag>数组</tag>
         <tag>切片</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之传统同步—(3)原子操作</title>
+    <url>/golang/ipc-atomic/</url>
+    <content><![CDATA[<p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
+<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
+<a id="more"></a>
+
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
+<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:24:56 counter: 100</span><br><span class="line">--- PASS: TestDemo1 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	var counter uint64 &#x3D; 100</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddUint64(&amp;counter, ^uint64(-(-1)-1))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadUint64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:32:05 counter: 0</span><br><span class="line">--- PASS: TestDemo2 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	var first int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 1; i &lt;&#x3D; 10000; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			if atomic.CompareAndSwapInt64(&amp;first, 0, int64(i)) &#123;</span><br><span class="line">				log.Println(&quot;抢先运行的是 goroutine&quot;, i)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;num:&quot;, atomic.LoadInt64(&amp;first))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:10 抢先运行的是 goroutine 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:12 num: 3</span><br><span class="line">--- PASS: TestDemo3 (2.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			atomic.StoreInt64(&amp;counter, int64(i))</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			log.Println(&quot;counter old:&quot;, atomic.SwapInt64(&amp;counter, int64(i)))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 9</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 5</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 4</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 7</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">--- PASS: TestDemo6 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
+<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	var value atomic.Value</span><br><span class="line">	var counter uint64 &#x3D; 1</span><br><span class="line"></span><br><span class="line">	value.Store(counter)</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(uint64(10))</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(100) &#x2F;&#x2F; 引发 panic</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo7</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 10</span><br><span class="line">--- FAIL: TestDemo7 (0.00s)</span><br><span class="line">panic: sync&#x2F;atomic: store of inconsistently typed value into Value [recovered]</span><br><span class="line">	panic: sync&#x2F;atomic: store of inconsistently typed value into Value</span><br><span class="line">                ...</span><br><span class="line">Process finished with exit code 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
+<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
+<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
+<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
+<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
+<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
+<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
+</ol>
+<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+        <tag>原子操作</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之传统同步—(1)互斥锁</title>
+    <url>/golang/ipc-mutex/</url>
+    <content><![CDATA[<p>先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种<strong>通信</strong>（IPC）：</p>
+<blockquote>
+<ul>
+<li><strong>进程间通信</strong>：管道、消息队列、信号等</li>
+<li><strong>线程间通信</strong>：互斥锁、条件变量等</li>
+</ul>
+</blockquote>
+<p>利用以上通信手段采取的同步措施，最终是为了达到以下两种目的：</p>
+<blockquote>
+<ul>
+<li><strong>维持共享数据一致性，并发安全</strong></li>
+<li><strong>控制流程管理，更好的协同工作</strong></li>
+</ul>
+</blockquote>
+<p>Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。</p>
+<a id="more"></a>
+
+<h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>接下来通过一个“做累加”的示例程序，展示<strong>竞争状态</strong>（race condition）。</p>
+<h4 id="不加锁"><a href="#不加锁" class="headerlink" title="不加锁"></a>不加锁</h4><p>开启 5000 个 goroutine，让每个 goroutine 给 counter 加 1，最终在所有 goroutine 都完成任务时 counter 的值应该为 5000，先试下不加锁的示例程序表现如何</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo1</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5000</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			counter++</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	t.Logf(<span class="string">&quot;counter = %d&quot;</span>, counter)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">    a1_test.go:18: counter &#x3D; 4663</span><br><span class="line">--- PASS: TestDemo1 (1.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+<p>多试几次，结果一直是小于 5000 的不定值。<br>竞争状态下程序行为的图像表示<br><img src="/images/golang/ipc-mutex-01.jpg" alt="ipc-mutex-01"></p>
+<h4 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h4><p>将刚刚的代码稍作改动</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo2</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex <span class="comment">// 声明锁</span></span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5000</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			mut.Lock() <span class="comment">// 加锁</span></span><br><span class="line">			counter++</span><br><span class="line">			mut.Unlock() <span class="comment">// 解锁</span></span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	t.Logf(<span class="string">&quot;counter = %d&quot;</span>, counter)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">    a1_test.go:35: counter &#x3D; 5000</span><br><span class="line">--- PASS: TestDemo2 (1.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+<p>counter = 5000，返回的结果对了。</p>
+<p>这就是<strong>互斥锁</strong>，在代码上创建一个<strong>临界区</strong>（critical section），保证串行操作（同一时间只有一个 goroutine 执行临界区代码）。</p>
+<h4 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h4><p>那么互斥锁是怎么串行的呢？把每一步的执行过程打印出来看下</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo3</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Unlock&quot;</span>)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	mut.Lock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Lock&quot;</span>)</span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	mut.Unlock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Unlock&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:00 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:00 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine B Unlock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A counter &#x3D; 2</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A Unlock</span><br><span class="line">--- PASS: TestDemo3 (5.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+<p>通过每个操作记录下来的时间可以看出，goroutine A 的 Lock 一直阻塞到了 goroutine B 的 Unlock。<br><img src="/images/golang/ipc-mutex-02.jpg" alt="ipc-mutex-01"></p>
+<h4 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h4><p>这时候有个疑问，那 goroutine B 上的锁，goroutine A 能解锁吗？修改一下刚才的代码，试一下</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo5</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		<span class="comment">//mut.Unlock()</span></span><br><span class="line">		<span class="comment">//log.Println(&quot;goroutine B Unlock&quot;)</span></span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	mut.Unlock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Unlock&quot;</span>)</span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	time.Sleep(<span class="number">2</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo5</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:03 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:03 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:04 goroutine A Unlock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:04 goroutine A counter &#x3D; 2</span><br><span class="line">--- PASS: TestDemo5 (3.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+<p>测试通过，未报错，counter 的值也被成功修改，证明B上的锁，是可以被A解开的。</p>
+<p>再进一步，goroutine A 不解锁，直接修改已经被 goroutine B 锁住的 counter 的值可以吗？试一下</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo6</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Unlock&quot;</span>)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	<span class="comment">//log.Println(&quot;goroutine A Unlock&quot;)</span></span><br><span class="line">	<span class="comment">//mut.Unlock()</span></span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	time.Sleep(<span class="number">10</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:43 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:43 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:44 goroutine A counter &#x3D; 2</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:48 goroutine B Unlock</span><br><span class="line">--- PASS: TestDemo6 (11.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+<p>测试通过，未报错，证明B上的锁，A可以不用解锁直接改。</p>
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="锁的两种通常处理方式"><a href="#锁的两种通常处理方式" class="headerlink" title="锁的两种通常处理方式"></a>锁的两种通常处理方式</h3><ul>
+<li>一种是没有获取到锁的线程就一直循环等待判断该资源是否已经释放锁，这种锁叫做<strong>自旋锁</strong>，它不用将线程阻塞起来(NON-BLOCKING)；</li>
+<li>还有一种处理方式就是把自己阻塞起来，等待重新调度请求，这种叫做互斥锁。</li>
+</ul>
+<h3 id="饥饿模式"><a href="#饥饿模式" class="headerlink" title="饥饿模式"></a>饥饿模式</h3><p>当互斥锁不断地试图获得一个永远无法获得的锁时，它可能会遇到饥饿问题。<br>在版本1.9中，Go通过添加一个新的饥饿模式来解决先前的问题，所有等待锁定超过一毫秒的 goroutine，也称为有界等待，将被标记为饥饿。当标记为饥饿时，解锁方法现在将把锁直接移交给第一位等待着。</p>
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><p>读写锁和上面的多也差不多，有这么几种情况</p>
+<ul>
+<li>在写锁已被锁定的情况下试图锁定写锁，会阻塞当前的 goroutine。</li>
+<li>在写锁已被锁定的情况下试图锁定读锁，会阻塞当前的 goroutine。</li>
+<li>在读锁已被锁定的情况下试图锁定写锁，会阻塞当前的 goroutine。</li>
+<li>在读锁已被锁定的情况下试图锁定读锁，不会阻塞当前的 goroutine。</li>
+</ul>
+<h3 id="panic错误"><a href="#panic错误" class="headerlink" title="panic错误"></a>panic错误</h3><p>无论是互斥锁还是读写锁在程序运行时一定是成对的，不然就会引发不可恢复的panic。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>锁一定要用对地方，特别是要注意Lock产生的阻塞对性能的影响。</li>
+<li>在各种程序的逻辑分支下，都要确保锁的成对出现。</li>
+<li>读写锁是对互斥锁的一个扩展，提高了程序的可读性。</li>
+<li>临界区是需要每个 goroutine 主动遵守的，说白了就是每个 goroutine 的代码都存在 Lock。</li>
+</ol>
+<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e001/a01_test.go">文章示例代码</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+        <tag>互斥锁</tag>
       </tags>
   </entry>
   <entry>
@@ -254,66 +347,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Go并发编程之传统同步—(3)原子操作</title>
-    <url>/golang/ipc-atomic/</url>
-    <content><![CDATA[<p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
-<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
-<a id="more"></a>
-
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
-<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:24:56 counter: 100</span><br><span class="line">--- PASS: TestDemo1 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	var counter uint64 &#x3D; 100</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddUint64(&amp;counter, ^uint64(-(-1)-1))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadUint64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:32:05 counter: 0</span><br><span class="line">--- PASS: TestDemo2 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	var first int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 1; i &lt;&#x3D; 10000; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			if atomic.CompareAndSwapInt64(&amp;first, 0, int64(i)) &#123;</span><br><span class="line">				log.Println(&quot;抢先运行的是 goroutine&quot;, i)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;num:&quot;, atomic.LoadInt64(&amp;first))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:10 抢先运行的是 goroutine 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:12 num: 3</span><br><span class="line">--- PASS: TestDemo3 (2.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			atomic.StoreInt64(&amp;counter, int64(i))</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			log.Println(&quot;counter old:&quot;, atomic.SwapInt64(&amp;counter, int64(i)))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 9</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 5</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 4</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 7</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">--- PASS: TestDemo6 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
-<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	var value atomic.Value</span><br><span class="line">	var counter uint64 &#x3D; 1</span><br><span class="line"></span><br><span class="line">	value.Store(counter)</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(uint64(10))</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(100) &#x2F;&#x2F; 引发 panic</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo7</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 10</span><br><span class="line">--- FAIL: TestDemo7 (0.00s)</span><br><span class="line">panic: sync&#x2F;atomic: store of inconsistently typed value into Value [recovered]</span><br><span class="line">	panic: sync&#x2F;atomic: store of inconsistently typed value into Value</span><br><span class="line">                ...</span><br><span class="line">Process finished with exit code 1</span><br></pre></td></tr></table></figure>
-
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
-<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
-<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
-<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
-<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
-<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
-<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
-</ol>
-<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-        <tag>原子操作</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go并发编程之并发模型—(1)概念</title>
     <url>/golang/parallel-concept/</url>
     <content><![CDATA[<p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
@@ -377,79 +410,46 @@
       </tags>
   </entry>
   <entry>
-    <title>Go并发编程之传统同步—(1)互斥锁</title>
-    <url>/golang/ipc-mutex/</url>
-    <content><![CDATA[<p>先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种<strong>通信</strong>（IPC）：</p>
-<blockquote>
-<ul>
-<li><strong>进程间通信</strong>：管道、消息队列、信号等</li>
-<li><strong>线程间通信</strong>：互斥锁、条件变量等</li>
-</ul>
-</blockquote>
-<p>利用以上通信手段采取的同步措施，最终是为了达到以下两种目的：</p>
-<blockquote>
-<ul>
-<li><strong>维持共享数据一致性，并发安全</strong></li>
-<li><strong>控制流程管理，更好的协同工作</strong></li>
-</ul>
-</blockquote>
-<p>Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。</p>
+    <title>Redash Gunicorn 超时</title>
+    <url>/gunicorn/timeout/</url>
+    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
 <a id="more"></a>
 
-<h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>接下来通过一个“做累加”的示例程序，展示<strong>竞争状态</strong>（race condition）。</p>
-<h4 id="不加锁"><a href="#不加锁" class="headerlink" title="不加锁"></a>不加锁</h4><p>开启 5000 个 goroutine，让每个 goroutine 给 counter 加 1，最终在所有 goroutine 都完成任务时 counter 的值应该为 5000，先试下不加锁的示例程序表现如何</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo1</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5000</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			counter++</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	t.Logf(<span class="string">&quot;counter = %d&quot;</span>, counter)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">    a1_test.go:18: counter &#x3D; 4663</span><br><span class="line">--- PASS: TestDemo1 (1.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-<p>多试几次，结果一直是小于 5000 的不定值。<br>竞争状态下程序行为的图像表示<br><img src="/images/golang/ipc-mutex-01.jpg" alt="ipc-mutex-01"></p>
-<h4 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h4><p>将刚刚的代码稍作改动</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo2</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex <span class="comment">// 声明锁</span></span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5000</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			mut.Lock() <span class="comment">// 加锁</span></span><br><span class="line">			counter++</span><br><span class="line">			mut.Unlock() <span class="comment">// 解锁</span></span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	t.Logf(<span class="string">&quot;counter = %d&quot;</span>, counter)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">    a1_test.go:35: counter &#x3D; 5000</span><br><span class="line">--- PASS: TestDemo2 (1.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-<p>counter = 5000，返回的结果对了。</p>
-<p>这就是<strong>互斥锁</strong>，在代码上创建一个<strong>临界区</strong>（critical section），保证串行操作（同一时间只有一个 goroutine 执行临界区代码）。</p>
-<h4 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h4><p>那么互斥锁是怎么串行的呢？把每一步的执行过程打印出来看下</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo3</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Unlock&quot;</span>)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	mut.Lock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Lock&quot;</span>)</span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	mut.Unlock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Unlock&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:00 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:00 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine B Unlock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A counter &#x3D; 2</span><br><span class="line">2020&#x2F;09&#x2F;30 22:14:05 goroutine A Unlock</span><br><span class="line">--- PASS: TestDemo3 (5.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-<p>通过每个操作记录下来的时间可以看出，goroutine A 的 Lock 一直阻塞到了 goroutine B 的 Unlock。<br><img src="/images/golang/ipc-mutex-02.jpg" alt="ipc-mutex-01"></p>
-<h4 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h4><p>这时候有个疑问，那 goroutine B 上的锁，goroutine A 能解锁吗？修改一下刚才的代码，试一下</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo5</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		<span class="comment">//mut.Unlock()</span></span><br><span class="line">		<span class="comment">//log.Println(&quot;goroutine B Unlock&quot;)</span></span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	mut.Unlock()</span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A Unlock&quot;</span>)</span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	time.Sleep(<span class="number">2</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo5</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:03 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:03 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:04 goroutine A Unlock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:04 goroutine A counter &#x3D; 2</span><br><span class="line">--- PASS: TestDemo5 (3.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-<p>测试通过，未报错，counter 的值也被成功修改，证明B上的锁，是可以被A解开的。</p>
-<p>再进一步，goroutine A 不解锁，直接修改已经被 goroutine B 锁住的 counter 的值可以吗？试一下</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestDemo6</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> mut sync.Mutex</span><br><span class="line">	counter := <span class="number">0</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Lock&quot;</span>)</span><br><span class="line">		counter = <span class="number">1</span></span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B counter =&quot;</span>, counter)</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		log.Println(<span class="string">&quot;goroutine B Unlock&quot;</span>)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	<span class="comment">//log.Println(&quot;goroutine A Unlock&quot;)</span></span><br><span class="line">	<span class="comment">//mut.Unlock()</span></span><br><span class="line">	counter = <span class="number">2</span></span><br><span class="line">	log.Println(<span class="string">&quot;goroutine A counter =&quot;</span>, counter)</span><br><span class="line">	time.Sleep(<span class="number">10</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:43 goroutine B Lock</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:43 goroutine B counter &#x3D; 1</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:44 goroutine A counter &#x3D; 2</span><br><span class="line">2020&#x2F;09&#x2F;30 22:15:48 goroutine B Unlock</span><br><span class="line">--- PASS: TestDemo6 (11.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-<p>测试通过，未报错，证明B上的锁，A可以不用解锁直接改。</p>
-<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="锁的两种通常处理方式"><a href="#锁的两种通常处理方式" class="headerlink" title="锁的两种通常处理方式"></a>锁的两种通常处理方式</h3><ul>
-<li>一种是没有获取到锁的线程就一直循环等待判断该资源是否已经释放锁，这种锁叫做<strong>自旋锁</strong>，它不用将线程阻塞起来(NON-BLOCKING)；</li>
-<li>还有一种处理方式就是把自己阻塞起来，等待重新调度请求，这种叫做互斥锁。</li>
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
 </ul>
-<h3 id="饥饿模式"><a href="#饥饿模式" class="headerlink" title="饥饿模式"></a>饥饿模式</h3><p>当互斥锁不断地试图获得一个永远无法获得的锁时，它可能会遇到饥饿问题。<br>在版本1.9中，Go通过添加一个新的饥饿模式来解决先前的问题，所有等待锁定超过一毫秒的 goroutine，也称为有界等待，将被标记为饥饿。当标记为饥饿时，解锁方法现在将把锁直接移交给第一位等待着。</p>
-<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><p>读写锁和上面的多也差不多，有这么几种情况</p>
-<ul>
-<li>在写锁已被锁定的情况下试图锁定写锁，会阻塞当前的 goroutine。</li>
-<li>在写锁已被锁定的情况下试图锁定读锁，会阻塞当前的 goroutine。</li>
-<li>在读锁已被锁定的情况下试图锁定写锁，会阻塞当前的 goroutine。</li>
-<li>在读锁已被锁定的情况下试图锁定读锁，不会阻塞当前的 goroutine。</li>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
 </ul>
-<h3 id="panic错误"><a href="#panic错误" class="headerlink" title="panic错误"></a>panic错误</h3><p>无论是互斥锁还是读写锁在程序运行时一定是成对的，不然就会引发不可恢复的panic。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>锁一定要用对地方，特别是要注意Lock产生的阻塞对性能的影响。</li>
-<li>在各种程序的逻辑分支下，都要确保锁的成对出现。</li>
-<li>读写锁是对互斥锁的一个扩展，提高了程序的可读性。</li>
-<li>临界区是需要每个 goroutine 主动遵守的，说白了就是每个 goroutine 的代码都存在 Lock。</li>
-</ol>
-<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e001/a01_test.go">文章示例代码</a></p>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
 ]]></content>
       <categories>
-        <category>golang</category>
+        <category>gunicorn</category>
       </categories>
       <tags>
-        <tag>同步</tag>
-        <tag>互斥锁</tag>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
       </tags>
   </entry>
 </search>
