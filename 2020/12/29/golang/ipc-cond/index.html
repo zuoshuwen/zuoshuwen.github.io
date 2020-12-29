@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","version":"8.1.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="回顾上篇文章 Go并发编程之传统同步—(1)互斥锁 其中说到，同步最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go并发编程之传统同步—(2)条件变量">
+<meta property="og:url" content="http://example.com/2020/12/29/golang/ipc-cond/index.html">
+<meta property="og:site_name" content="Sown">
+<meta property="og:description" content="回顾上篇文章 Go并发编程之传统同步—(1)互斥锁 其中说到，同步最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/golang/ipc-cond-01.jpg">
+<meta property="article:published_time" content="2020-12-29T02:05:14.000Z">
+<meta property="article:modified_time" content="2020-12-29T02:22:28.913Z">
+<meta property="article:author" content="sown">
+<meta property="article:tag" content="同步">
+<meta property="article:tag" content="条件变量">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/golang/ipc-cond-01.jpg">
+
+
+<link rel="canonical" href="http://example.com/2020/12/29/golang/ipc-cond/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Go并发编程之传统同步—(2)条件变量 | Sown</title>
+  
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Sown</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人技术博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E5%90%8C%E6%AD%A5"><span class="nav-number">1.</span> <span class="nav-text">传统同步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">条件变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%85%E7%94%A8%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">仅用互斥锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">1.1.2.</span> <span class="nav-text">优化互斥锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%EF%BC%9A%E5%8D%95%E5%8F%91%E9%80%9A%E7%9F%A5"><span class="nav-number">1.1.3.</span> <span class="nav-text">条件变量：单发通知</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%EF%BC%9A%E5%B9%BF%E6%92%AD%E9%80%9A%E7%9F%A5"><span class="nav-number">1.1.4.</span> <span class="nav-text">条件变量：广播通知</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%B6%E4%BC%B8"><span class="nav-number">2.</span> <span class="nav-text">延伸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E9%80%9A%E7%9F%A5"><span class="nav-number">2.1.</span> <span class="nav-text">发送通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E9%80%9A%E7%9F%A5"><span class="nav-number">2.2.</span> <span class="nav-text">等待通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubernetes"><span class="nav-number">2.3.</span> <span class="nav-text">kubernetes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sown</p>
+  <div class="site-description" itemprop="description">技术文章分享</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/29/golang/ipc-cond/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sown">
+      <meta itemprop="description" content="技术文章分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sown">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go并发编程之传统同步—(2)条件变量
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-12-29 10:05:14 / 修改时间：10:22:28" itemprop="dateCreated datePublished" datetime="2020-12-29T10:05:14+08:00">2020-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/golang/" itemprop="url" rel="index"><span itemprop="name">golang</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>回顾上篇文章 <a href="/2020/12/28/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 其中说到，同步最终是为了达到以下两种目的：</p>
+<blockquote>
+<ul>
+<li><strong>维持共享数据一致性，并发安全</strong></li>
+<li><strong>控制流程管理，更好的协同工作</strong></li>
+</ul>
+</blockquote>
+<p>示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？</p>
+<a id="more"></a>
+
+<h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>上篇文章的示例程序，仅仅实现了累加功能，但在现实的工作场景中，需求往往不可能这么简单，现在扩展一下这个程序，给它加上累减的功能。</p>
+<p>加上了累减的示例程序，可以抽象的理解为一个固定容量的“储水池”，可以注水、排水。</p>
+<h4 id="仅用互斥锁"><a href="#仅用互斥锁" class="headerlink" title="仅用互斥锁"></a>仅用互斥锁</h4><p>当水注满以后，停止注水，开始排水，当水排空以后，开始注水，反反复复…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	var mut sync.Mutex</span><br><span class="line">	maxSize :&#x3D; 10</span><br><span class="line">	counter :&#x3D; 0</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 排水口</span><br><span class="line">	go func() &#123;</span><br><span class="line">		for &#123;</span><br><span class="line">			mut.Lock()</span><br><span class="line">			if counter &#x3D;&#x3D; maxSize &#123;</span><br><span class="line">				for i :&#x3D; 0; i &lt; maxSize; i++ &#123;</span><br><span class="line">					counter--</span><br><span class="line">					log.Printf(&quot;OUTPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			mut.Unlock()</span><br><span class="line">			time.Sleep(1 * time.Second)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 注水口</span><br><span class="line">	for &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		if counter &#x3D;&#x3D; 0 &#123;</span><br><span class="line">			for i :&#x3D; 0; i &lt; maxSize; i++ &#123;</span><br><span class="line">				counter++</span><br><span class="line">				log.Printf(&quot; INPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		time.Sleep(1 * time.Second)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">                ···</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50  INPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50  INPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50 OUTPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50 OUTPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 13:52:50 OUTPUT counter &#x3D; 7</span><br><span class="line">                ···</span><br></pre></td></tr></table></figure>
+<p>看着没有什么问题，一切正常，但就是这样工作的策略效率太低。</p>
+<h4 id="优化互斥锁"><a href="#优化互斥锁" class="headerlink" title="优化互斥锁"></a>优化互斥锁</h4><p>优化策略，不用等注满水再排水，也不用放空之后，再注水，注水口和排水口一起工作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	var mut sync.Mutex</span><br><span class="line">	maxSize :&#x3D; 10</span><br><span class="line">	counter :&#x3D; 0</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 排水口</span><br><span class="line">	go func() &#123;</span><br><span class="line">		for &#123;</span><br><span class="line">			mut.Lock()</span><br><span class="line">			if counter !&#x3D; 0 &#123;</span><br><span class="line">				counter--</span><br><span class="line">			&#125;</span><br><span class="line">			log.Printf(&quot;OUTPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">			mut.Unlock()</span><br><span class="line">			time.Sleep(5 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠5秒</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 注水口</span><br><span class="line">	for &#123;</span><br><span class="line">		mut.Lock()</span><br><span class="line">		if counter !&#x3D; maxSize &#123;</span><br><span class="line">			counter++</span><br><span class="line">		&#125;</span><br><span class="line">		log.Printf(&quot; INPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">		mut.Unlock()</span><br><span class="line">		time.Sleep(1 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠1秒</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">                ···</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:46  INPUT counter &#x3D; 7</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:47  INPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:48 OUTPUT counter &#x3D; 7</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:48  INPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:49  INPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:50  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:51  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:52  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:53 OUTPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:53  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:54  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:55  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:56  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:57  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:58 OUTPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:58  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:11:59  INPUT counter &#x3D; 10</span><br><span class="line">                ···</span><br></pre></td></tr></table></figure>
+<p>通过日志输出，可以看到程序达到了需求，运作正常。</p>
+<p>但是，通过日志输出发现，当排水口效率低下的时候，注水口一直在轮询，这里频繁的上锁操作造成的开销很是浪费。</p>
+<h4 id="条件变量：单发通知"><a href="#条件变量：单发通知" class="headerlink" title="条件变量：单发通知"></a>条件变量：单发通知</h4><p>那有没有什么好的办法，省去不必要的轮询？如果注水口和排水口能互相“通知”就好了！这个功能，<strong>条件变量</strong>可以做到。</p>
+<p>条件变量总是与互斥锁组合使用，除了可以使用 Lock、Unlock，还有如下三个方法：</p>
+<blockquote>
+<ul>
+<li>Wait 等待通知</li>
+<li>Signal 单发通知</li>
+<li>Broadcast 广播通知</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	cond :&#x3D; sync.NewCond(new(sync.Mutex)) &#x2F;&#x2F; 初始化条件变量</span><br><span class="line">	maxSize :&#x3D; 10</span><br><span class="line">	counter :&#x3D; 0</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 排水口</span><br><span class="line">	go func() &#123;</span><br><span class="line">		for &#123;</span><br><span class="line">			cond.L.Lock() &#x2F;&#x2F; 上锁</span><br><span class="line">			if counter &#x3D;&#x3D; 0 &#123; &#x2F;&#x2F; 没水了</span><br><span class="line">				cond.Wait() &#x2F;&#x2F; 啥时候来水？等通知！</span><br><span class="line">			&#125;</span><br><span class="line">			counter--</span><br><span class="line">			log.Printf(&quot;OUTPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">			cond.Signal() &#x2F;&#x2F; 单发通知：已排水</span><br><span class="line">			cond.L.Unlock() &#x2F;&#x2F; 解锁</span><br><span class="line">			time.Sleep(5 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠5秒</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 注水口</span><br><span class="line">	for &#123;</span><br><span class="line">		cond.L.Lock() &#x2F;&#x2F; 上锁</span><br><span class="line">		if counter &#x3D;&#x3D; maxSize &#123; &#x2F;&#x2F; 水满了</span><br><span class="line">			cond.Wait() &#x2F;&#x2F; 啥时候排水？等待通知！</span><br><span class="line">		&#125;</span><br><span class="line">		counter++</span><br><span class="line">		log.Printf(&quot; INPUT counter &#x3D; %d&quot;, counter)</span><br><span class="line">		cond.Signal() &#x2F;&#x2F; 单发通知：已来水</span><br><span class="line">		cond.L.Unlock() &#x2F;&#x2F; 解锁</span><br><span class="line">		time.Sleep(1 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠1秒</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">                ···</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:22  INPUT counter &#x3D; 7</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:23  INPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:24 OUTPUT counter &#x3D; 7</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:24  INPUT counter &#x3D; 8</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:25  INPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:26  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:29 OUTPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:29  INPUT counter &#x3D; 10</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:34 OUTPUT counter &#x3D; 9</span><br><span class="line">2020&#x2F;10&#x2F;06 14:51:34  INPUT counter &#x3D; 10</span><br><span class="line">                ···</span><br></pre></td></tr></table></figure>
+<p>通过日志输出，可以看出来，注水口没有一直轮询了，而是等到排水口发通知后，再进行注水，注水口一直再等排水口。那么新的问题又来了，如何提高排水口的效率呢？</p>
+<h4 id="条件变量：广播通知"><a href="#条件变量：广播通知" class="headerlink" title="条件变量：广播通知"></a>条件变量：广播通知</h4><p>多制造出一个排水口，提高排水效率。</p>
+<p>那就不能继续使用单发通知了（Signal），因为单发通知只会通知到一个等待（Wait），针对多等待的这种情况，就需要使用广播通知（Broadcast）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	cond :&#x3D; sync.NewCond(new(sync.Mutex)) &#x2F;&#x2F; 初始化条件变量</span><br><span class="line">	maxSize :&#x3D; 10</span><br><span class="line">	counter :&#x3D; 0</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 排水口 1</span><br><span class="line">	go func() &#123;</span><br><span class="line">		for &#123;</span><br><span class="line">			cond.L.Lock() &#x2F;&#x2F; 上锁</span><br><span class="line">			if counter &#x3D;&#x3D; 0 &#123; &#x2F;&#x2F; 没水了</span><br><span class="line">			&#x2F;&#x2F;for counter &#x3D;&#x3D; 0 &#123; &#x2F;&#x2F; 没水了</span><br><span class="line">				cond.Wait() &#x2F;&#x2F; 啥时候来水？等通知！</span><br><span class="line">			&#125;</span><br><span class="line">			counter--</span><br><span class="line">			log.Printf(&quot;OUTPUT A counter &#x3D; %d&quot;, counter)</span><br><span class="line">			cond.Broadcast() &#x2F;&#x2F; 单发通知：已排水</span><br><span class="line">			cond.L.Unlock() &#x2F;&#x2F; 解锁</span><br><span class="line">			&#x2F;&#x2F;time.Sleep(2 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠5秒</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 排水口 2</span><br><span class="line">	go func() &#123;</span><br><span class="line">		for &#123;</span><br><span class="line">			cond.L.Lock() &#x2F;&#x2F; 上锁</span><br><span class="line">			if counter &#x3D;&#x3D; 0 &#123; &#x2F;&#x2F; 没水了</span><br><span class="line">			&#x2F;&#x2F;for counter &#x3D;&#x3D; 0 &#123; &#x2F;&#x2F; 没水了</span><br><span class="line">				cond.Wait() &#x2F;&#x2F; 啥时候来水？等通知！</span><br><span class="line">			&#125;</span><br><span class="line">			counter--</span><br><span class="line">			log.Printf(&quot;OUTPUT B counter &#x3D; %d&quot;, counter)</span><br><span class="line">			cond.Broadcast() &#x2F;&#x2F; 单发通知：已排水</span><br><span class="line">			cond.L.Unlock() &#x2F;&#x2F; 解锁</span><br><span class="line">			&#x2F;&#x2F;time.Sleep(2 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠5秒</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 注水口</span><br><span class="line">	for &#123;</span><br><span class="line">		cond.L.Lock() &#x2F;&#x2F; 上锁</span><br><span class="line">		if counter &#x3D;&#x3D; maxSize &#123; &#x2F;&#x2F; 水满了</span><br><span class="line">		&#x2F;&#x2F;for counter &#x3D;&#x3D; maxSize &#123; &#x2F;&#x2F; 水满了</span><br><span class="line">			cond.Wait() &#x2F;&#x2F; 啥时候排水？等待通知！</span><br><span class="line">		&#125;</span><br><span class="line">		counter++</span><br><span class="line">		log.Printf(&quot; INPUT   counter &#x3D; %d&quot;, counter)</span><br><span class="line">		cond.Broadcast() &#x2F;&#x2F; 单发通知：已来水</span><br><span class="line">		cond.L.Unlock() &#x2F;&#x2F; 解锁</span><br><span class="line">		&#x2F;&#x2F;time.Sleep(1 * time.Second) &#x2F;&#x2F; 为了演示效果，睡眠1秒</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo4</span><br><span class="line">                ···</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT B counter &#x3D; 2</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT B counter &#x3D; 1</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT B counter &#x3D; 0</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT A counter &#x3D; -1</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT A counter &#x3D; -2</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT A counter &#x3D; -3</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:30 OUTPUT A counter &#x3D; -4</span><br><span class="line">                ···</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:31 OUTPUT B counter &#x3D; -7605</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:31  INPUT   counter &#x3D; -7604</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:31 OUTPUT A counter &#x3D; -7605</span><br><span class="line">2020&#x2F;10&#x2F;07 20:57:31 OUTPUT A counter &#x3D; -7606</span><br><span class="line">                ···</span><br></pre></td></tr></table></figure>
+<p>通过日志输出可以看到，刚开始的时候还很正常，到后面的时候就变成负值了，一直在负增长，What？</p>
+<p>在 <a href="/2020/12/28/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 文章中，程序因为没有加上互斥锁，出现过 counter 值异常的情况。</p>
+<p>但这次程序这次加了互斥锁，按理说形成了一个临界区应该是没有问题了，所以问题应该不是出在临界区上，难道问题出在 <strong>Wait</strong> 上？</p>
+<p>通过IDE<strong>追踪一下Wait的源码</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">func (c *Cond) Wait() &#123;</span><br><span class="line">	&#x2F;&#x2F; 检查 c 是否是被复制的，如果是就 panic</span><br><span class="line">	c.checker.check()</span><br><span class="line">	&#x2F;&#x2F; 将当前 goroutine 加入等待队列</span><br><span class="line">	t :&#x3D; runtime_notifyListAdd(&amp;c.notify)</span><br><span class="line">	c.L.Unlock()</span><br><span class="line">	&#x2F;&#x2F; 等待当前 goroutine 被唤醒</span><br><span class="line">	runtime_notifyListWait(&amp;c.notify, t)</span><br><span class="line">	c.L.Lock()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原来 Wait 内部的执行流程是，先执行了解锁，然后进入等待状态，接到通知之后，再执行加锁操作。</p>
+<p>那按照这个代码逻辑结合输出日志，走一程序遍流程，看看能不能复现出 counter 为负值的情况：</p>
+<blockquote>
+<ol>
+<li><p>注水口将 counter 累加到 10 之后，发送广播通知（Broadcast）。</p>
+</li>
+<li><p>goroutine A 在“第1步”之前的时候进入了等待通知（Wait），现在接收到了广播通知（Broadcast），从 runtime_notifyListWait() 返回，并且成功执行了加锁（Lock）操作。</p>
+</li>
+<li><p>goroutine B 在“第1步”之前的时候进入了等待通知（Wait），现在接收到了广播通知（Broadcast），从 runtime_notifyListWait() 返回，在执行加锁（Lock）操作的时候，发现 goroutine A 先抢占了临界区，所以一直阻塞在 c.L.Lock()。</p>
+</li>
+<li><p>goroutine A 虽然完成任务后会释放锁，但是每次也成功将锁抢占，所以就这样 一直将 counter 减到了 0，然后发送广播通知（Broadcast）、解锁（Unlock）。</p>
+</li>
+<li><p>goroutine B 在 goroutine A 解锁后，成功获得锁并从 Lock 方法中返回，接下来跳出 Wait 方法、跳出 if 判断，执行 counter–（0–），这时候 counter 的值是 -1</p>
+</li>
+</ol>
+</blockquote>
+<p>图示</p>
+<p><img src="/images/golang/ipc-cond-01.jpg" alt="ipc-cond-01"></p>
+<p>问题就出现在第五步，只要 goroutine B 加锁成功的时候，再判断一下 counter 是否为 0 就好了。</p>
+<p>所以将 if counter == 0 改成 for counter == 0，这样上面的“第五步”就变成了</p>
+<blockquote>
+<p>5.goroutine B 在 goroutine A 解锁后，成功加锁（Lock）并从阻塞总返回，接下来跳出 Wait 方法、再次进入 for 循环，判断 counter == 0 结果为真，再次进入等待（Wait）。</p>
+</blockquote>
+<p>代码做出相应的修改后，再执行看结果，没有问题了。</p>
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="发送通知"><a href="#发送通知" class="headerlink" title="发送通知"></a>发送通知</h3><p>等待通知（Wait）肯定是要在临界区里面的，那发送通知（Signal、Broadcast）在哪里更好呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Luck()</span><br><span class="line">Wait()</span><br><span class="line">Broadcast()&#x2F;&#x2F; Signal()</span><br><span class="line">Unlock()</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 或者</span><br><span class="line"></span><br><span class="line">Luck()</span><br><span class="line">Wait()</span><br><span class="line">Unlock()</span><br><span class="line">Broadcast()&#x2F;&#x2F; Signal()</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 两种写法都不会报错 </span><br></pre></td></tr></table></figure>
+<p>在 go 的发送通知方法（Broadcast、Signal）上有这么一段话：</p>
+<blockquote>
+<p>// It is allowed but not required for the caller to hold c.L<br>// during the call.</p>
+</blockquote>
+<p>在我以往的 C 多线程开发的时候，发送通知总是在锁中的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pthread_mutex_lock(&amp;thread-&gt;mutex);</span><br><span class="line">&#x2F;&#x2F;              ...</span><br><span class="line">pthread_cond_signal(&amp;thread-&gt;cond);</span><br><span class="line">pthread_mutex_unlock(&amp;thread-&gt;mutex);</span><br></pre></td></tr></table></figure>
+<p>在 <a target="_blank" rel="noopener" href="https://linux.die.net/man/3/pthread_cond_signal">man</a> 手册中有写到：</p>
+<blockquote>
+<p>The pthread_cond_broadcast() or pthread_cond_signal() functions may be called by a thread whether or not it currently owns the mutex that threads calling pthread_cond_wait() or pthread_cond_timedwait() have associated with the condition variable during their waits; however, if predictable scheduling behavior is required, then that mutex shall be locked by the thread calling pthread_cond_broadcast() or pthread_cond_signal().</p>
+</blockquote>
+<p>个人对此并没有什么见解，就不乱下定论了，有想法的小伙伴可以在文章下面留言，一起讨论。</p>
+<h3 id="等待通知"><a href="#等待通知" class="headerlink" title="等待通知"></a>等待通知</h3><p>消息通知是有即时性的，如果没有 goroutine 在等待通知，那么这次通知直接被丢弃。</p>
+<h3 id="kubernetes"><a href="#kubernetes" class="headerlink" title="kubernetes"></a>kubernetes</h3><p><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/client-go/tools/cache/fifo.go">https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/client-go/tools/cache/fifo.go</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>Wait() 内会执行解锁、等待、加锁。</li>
+<li>Wait() 必须在 for 循环里面。</li>
+<li>Wait() 方法会把当前的 goroutine 添加到通知队列的队尾。</li>
+<li>单发通知，唤醒通知队列第一个排队的 goroutine。</li>
+<li>广播通知，唤醒通知队列里面全部的 goroutine。</li>
+<li>程序示例只是为了演示效果，实际的开发中，生产者和消费者应该是异步消费，不应该使用同一个互斥锁。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/zuoshuwen/go-example/blob/master/e002/a01_test.go">文章示例代码</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%90%8C%E6%AD%A5/" rel="tag"># 同步</a>
+              <a href="/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/" rel="tag"># 条件变量</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/28/golang/ipc-mutex/" rel="prev" title="Go并发编程之传统同步—(1)互斥锁">
+                  <i class="fa fa-chevron-left"></i> Go并发编程之传统同步—(1)互斥锁
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/29/golang/ipc-atomic/" rel="next" title="Go并发编程之传统同步—(3)原子操作">
+                  Go并发编程之传统同步—(3)原子操作 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sown</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+</body>
+</html>
