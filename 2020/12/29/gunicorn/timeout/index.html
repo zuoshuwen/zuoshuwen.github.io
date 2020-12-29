@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","version":"8.1.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 upstream prematurely closed connection while sending to client，第一反应应该是超时导致的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redash Gunicorn 超时">
+<meta property="og:url" content="http://example.com/2020/12/29/gunicorn/timeout/index.html">
+<meta property="og:site_name" content="Sown">
+<meta property="og:description" content="最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 upstream prematurely closed connection while sending to client，第一反应应该是超时导致的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-29T02:36:42.000Z">
+<meta property="article:modified_time" content="2020-12-29T02:42:01.305Z">
+<meta property="article:author" content="sown">
+<meta property="article:tag" content="gunicorn">
+<meta property="article:tag" content="timeout">
+<meta property="article:tag" content="redash">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2020/12/29/gunicorn/timeout/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Redash Gunicorn 超时 | Sown</title>
+  
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Sown</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人技术博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BF%AE%E6%94%B9Redash%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">1. 修改Redash配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BF%AE%E6%94%B9Nginx%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">2. 修改Nginx配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E4%BD%BF%E7%94%A8%E7%9A%84%E8%B5%84%E6%BA%90"><span class="nav-number">3.</span> <span class="nav-text">3. 查看进程使用的资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%BF%9B%E7%A8%8B%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.</span> <span class="nav-text">4. 进程跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%AE%BE%E7%BD%AEulimit%E5%8F%82%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">5. 设置ulimit参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%8D%95%E6%8D%89kill%E4%BF%A1%E5%8F%B7"><span class="nav-number">6.</span> <span class="nav-text">6. 捕捉kill信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%9F%A5%E7%9C%8Bgunicorn%E6%97%A5%E5%BF%97"><span class="nav-number">7.</span> <span class="nav-text">7. 查看gunicorn日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%9C%80%E7%BB%88%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">8.</span> <span class="nav-text">8.最终解决方案</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sown</p>
+  <div class="site-description" itemprop="description">技术文章分享</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/29/gunicorn/timeout/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sown">
+      <meta itemprop="description" content="技术文章分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sown">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redash Gunicorn 超时
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-12-29 10:36:42 / 修改时间：10:42:01" itemprop="dateCreated datePublished" datetime="2020-12-29T10:36:42+08:00">2020-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/gunicorn/" itemprop="url" rel="index"><span itemprop="name">gunicorn</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
+<a id="more"></a>
+
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
+</ul>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/gunicorn/" rel="tag"># gunicorn</a>
+              <a href="/tags/timeout/" rel="tag"># timeout</a>
+              <a href="/tags/redash/" rel="tag"># redash</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/29/golang/parallel-concept/" rel="prev" title="Go并发编程之并发模型—(1)概念">
+                  <i class="fa fa-chevron-left"></i> Go并发编程之并发模型—(1)概念
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sown</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+</body>
+</html>

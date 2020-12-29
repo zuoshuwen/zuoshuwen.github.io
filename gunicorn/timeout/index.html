@@ -23,21 +23,23 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","version":"8.1.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。">
+<meta name="description" content="最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 upstream prematurely closed connection while sending to client，第一反应应该是超时导致的。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go并发编程之并发模型—(1)概念">
-<meta property="og:url" content="http://example.com/golang/parallel-concept/index.html">
+<meta property="og:title" content="Redash Gunicorn 超时">
+<meta property="og:url" content="http://example.com/gunicorn/timeout/index.html">
 <meta property="og:site_name" content="Sown">
-<meta property="og:description" content="在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。">
+<meta property="og:description" content="最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 upstream prematurely closed connection while sending to client，第一反应应该是超时导致的。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-12-29T02:32:36.000Z">
-<meta property="article:modified_time" content="2020-12-29T02:33:56.858Z">
+<meta property="article:published_time" content="2020-12-29T02:36:42.000Z">
+<meta property="article:modified_time" content="2020-12-29T02:42:01.305Z">
 <meta property="article:author" content="sown">
-<meta property="article:tag" content="CSP">
+<meta property="article:tag" content="gunicorn">
+<meta property="article:tag" content="timeout">
+<meta property="article:tag" content="redash">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/golang/parallel-concept/">
+<link rel="canonical" href="http://example.com/gunicorn/timeout/">
 
 
 <script class="page-configurations">
@@ -49,7 +51,7 @@
     lang   : 'zh-CN'
   };
 </script>
-<title>Go并发编程之并发模型—(1)概念 | Sown</title>
+<title>Redash Gunicorn 超时 | Sown</title>
   
 
 
@@ -207,7 +209,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E6%80%81"><span class="nav-number">1.1.</span> <span class="nav-text">内核态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%80%81"><span class="nav-number">1.2.</span> <span class="nav-text">用户态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">系统调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.5.</span> <span class="nav-text">线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KSE"><span class="nav-number">1.6.</span> <span class="nav-text">KSE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E7%A8%8B"><span class="nav-number">1.7.</span> <span class="nav-text">协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.8.</span> <span class="nav-text">线程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%BA%A7%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.8.1.</span> <span class="nav-text">用户级线程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.8.2.</span> <span class="nav-text">系统级线程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%A4%E7%BA%A7%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B%EF%BC%88%E6%B7%B7%E5%90%88%E5%BC%8F%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B%EF%BC%89"><span class="nav-number">1.8.3.</span> <span class="nav-text">两级线程模型（混合式线程模型）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.9.</span> <span class="nav-text">并发模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B%E2%80%94CSP"><span class="nav-number">1.10.</span> <span class="nav-text">并发模型—CSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GO-%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.11.</span> <span class="nav-text">GO 线程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#M"><span class="nav-number">1.11.1.</span> <span class="nav-text">M</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#P"><span class="nav-number">1.11.2.</span> <span class="nav-text">P</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#G"><span class="nav-number">1.11.3.</span> <span class="nav-text">G</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GO%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.12.</span> <span class="nav-text">GO并发模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#channel"><span class="nav-number">1.12.1.</span> <span class="nav-text">channel</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95"><span class="nav-number">2.</span> <span class="nav-text">扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#goroutine-%E4%B8%8E-coroutine-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.1.</span> <span class="nav-text">goroutine 与 coroutine 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#coroutine"><span class="nav-number">2.1.1.</span> <span class="nav-text">coroutine</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#goroutine"><span class="nav-number">2.1.2.</span> <span class="nav-text">goroutine</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BF%AE%E6%94%B9Redash%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">1. 修改Redash配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BF%AE%E6%94%B9Nginx%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">2. 修改Nginx配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E4%BD%BF%E7%94%A8%E7%9A%84%E8%B5%84%E6%BA%90"><span class="nav-number">3.</span> <span class="nav-text">3. 查看进程使用的资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%BF%9B%E7%A8%8B%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.</span> <span class="nav-text">4. 进程跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%AE%BE%E7%BD%AEulimit%E5%8F%82%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">5. 设置ulimit参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%8D%95%E6%8D%89kill%E4%BF%A1%E5%8F%B7"><span class="nav-number">6.</span> <span class="nav-text">6. 捕捉kill信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%9F%A5%E7%9C%8Bgunicorn%E6%97%A5%E5%BF%97"><span class="nav-number">7.</span> <span class="nav-text">7. 查看gunicorn日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%9C%80%E7%BB%88%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">8.</span> <span class="nav-text">8.最终解决方案</span></a></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -285,7 +287,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/golang/parallel-concept/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/gunicorn/timeout/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -298,7 +300,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Go并发编程之并发模型—(1)概念
+          Redash Gunicorn 超时
         </h1>
 
         <div class="post-meta-container">
@@ -310,7 +312,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2020-12-29 10:32:36 / 修改时间：10:33:56" itemprop="dateCreated datePublished" datetime="2020-12-29T10:32:36+08:00">2020-12-29</time>
+      <time title="创建时间：2020-12-29 10:36:42 / 修改时间：10:42:01" itemprop="dateCreated datePublished" datetime="2020-12-29T10:36:42+08:00">2020-12-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -318,7 +320,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/golang/" itemprop="url" rel="index"><span itemprop="name">golang</span></a>
+          <a href="/categories/gunicorn/" itemprop="url" rel="index"><span itemprop="name">gunicorn</span></a>
         </span>
     </span>
 
@@ -332,58 +334,36 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+        <p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
 <a id="more"></a>
 
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
-<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
-<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
-<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
-<p>调度过程示例：</p>
-<ol>
-<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
-<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
-<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
-</ol>
-<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
-<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
-<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
-<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
-<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
-<p>常见的有：</p>
-<ul>
-<li>线程&amp;锁</li>
-<li>Actor</li>
-<li>CSP</li>
-<li>Lambda 架构</li>
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
 </ul>
-<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
-<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
-<blockquote>
-<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
-</blockquote>
-<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
-<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
-<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
-<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
-<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
-<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
-<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
-<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
-<p>Go 代码片段的封装。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go function ()&#123;</span><br><span class="line">&#x2F;&#x2F;  ...</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
-
-<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
-<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
-<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
-<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
-</ol>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
 
     </div>
 
@@ -393,21 +373,20 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/CSP/" rel="tag"># CSP</a>
+              <a href="/tags/gunicorn/" rel="tag"># gunicorn</a>
+              <a href="/tags/timeout/" rel="tag"># timeout</a>
+              <a href="/tags/redash/" rel="tag"># redash</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/golang/datastruct-arrayslice/" rel="prev" title="Go数据结构之数组与切片">
-                  <i class="fa fa-chevron-left"></i> Go数据结构之数组与切片
+                <a href="/golang/parallel-concept/" rel="prev" title="Go并发编程之并发模型—(1)概念">
+                  <i class="fa fa-chevron-left"></i> Go并发编程之并发模型—(1)概念
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/gunicorn/timeout/" rel="next" title="Redash Gunicorn 超时">
-                  Redash Gunicorn 超时 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
@@ -494,7 +473,7 @@ NexT.utils.loadComments('#gitalk-container', () => {
       repo        : 'zuoshuwen.github.io',
       owner       : 'zuoshuwen',
       admin       : ['zuoshuwen'],
-      id          : '469423d3446fc3569057e3ae69f05ffe',
+      id          : 'fda010fa90a176815afb749cf6a39d02',
         language: 'zh-CN',
       distractionFreeMode: true
     });
