@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello Sown</title>
+    <url>/Hello-Sown/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -15,9 +20,47 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Hello Sown</title>
-    <url>/Hello-Sown/</url>
-    <content><![CDATA[]]></content>
+    <title>Redash Gunicorn 超时</title>
+    <url>/gunicorn/timeout/</url>
+    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
+<a id="more"></a>
+
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
+</ul>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
+]]></content>
+      <categories>
+        <category>gunicorn</category>
+      </categories>
+      <tags>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
+      </tags>
   </entry>
   <entry>
     <title>Go数据结构之数组与切片</title>
@@ -407,49 +450,6 @@
       </categories>
       <tags>
         <tag>CSP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/gunicorn/timeout/</url>
-    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<a id="more"></a>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>gunicorn</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
       </tags>
   </entry>
 </search>
