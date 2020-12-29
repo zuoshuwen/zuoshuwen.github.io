@@ -20,6 +20,134 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Redash Gunicorn 超时</title>
+    <url>/gunicorn/timeout/</url>
+    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
+<a id="more"></a>
+
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
+</ul>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
+]]></content>
+      <categories>
+        <category>gunicorn</category>
+      </categories>
+      <tags>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go数据结构之数组与切片</title>
+    <url>/golang/datastruct-arrayslice/</url>
+    <content><![CDATA[<p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
+<p>切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。</p>
+<a id="more"></a>
+
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="声明-amp-初始化"><a href="#声明-amp-初始化" class="headerlink" title="声明&amp;初始化"></a>声明&amp;初始化</h3><p>在 Go 中声明即初始化，如果在声明的时候没有初始化值，那么就会赋值为声明类型的「零值」。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 [5]int        &#x2F;&#x2F; 只需设置长度，后面不可变</span><br><span class="line">	var array2 &#x3D; new([5]int) &#x2F;&#x2F; 返回指针</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 []int</span><br><span class="line">	var slice2 &#x3D; make([]int, 5, 5) &#x2F;&#x2F; 设置长度、容量，后面可变</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array2 val:&quot;, array2)      &#x2F;&#x2F; &amp;[0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;array2 len:&quot;, len(array2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array2 cap:&quot;, cap(array2)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; []</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 0</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 0</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在声明的时候就初始化：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 &#x3D; [5]int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	var array2 &#x3D; [...]int&#123;4: 1, 2: 5&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 &#x3D; []int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	var slice2 &#x3D; array1[:] &#x2F;&#x2F; 从数组截取来的切片</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array2 val:&quot;, array2)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;array2 len:&quot;, len(array2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array2 cap:&quot;, cap(array2)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-amp-更新元素值"><a href="#添加-amp-更新元素值" class="headerlink" title="添加&amp;更新元素值"></a>添加&amp;更新元素值</h3><p>数组因为长度固定，且的值都是初始化好了的，所以只有更新。</p>
+<p>切片更新操作和数据一样，只不过新增元素只能通过 append() 方法。</p>
+<blockquote>
+<p>append()：将元素追加大切片的末尾，如果容量不够，会进行扩容。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 &#x3D; [5]int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	array1[0] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line">	array1[4] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 &#x3D; []int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	array1[4] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line">	&#x2F;&#x2F;array1[5] &#x3D; 100 &#x2F;&#x2F; 报错</span><br><span class="line">	slice1 &#x3D; append(slice1, 1) &#x2F;&#x2F; 切片增加元素只能使用此方法</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [100 0 5 0 100]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [0 0 5 0 1 1]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 6</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>数组与切片，都可以使用表达式截取，截取之后的数据它的类型为切片。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; array1[3:]              &#x2F;&#x2F; 从 index 3 取到 index end</span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 7</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 7</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice2 :&#x3D; array1[3:4]             &#x2F;&#x2F; 从 index 3 取到 index 4</span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [3]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 1</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 7</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice3 :&#x3D; array1[3:6:6]           &#x2F;&#x2F; 从 index 3 取到 index 6，容量取到 index 6</span><br><span class="line">	t.Log(&quot;slice3 val:&quot;, slice3)      &#x2F;&#x2F; [3 0 5]</span><br><span class="line">	t.Log(&quot;slice3 len:&quot;, len(slice3)) &#x2F;&#x2F; 3</span><br><span class="line">	t.Log(&quot;slice3 cap:&quot;, cap(slice3)) &#x2F;&#x2F; 3</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice4 :&#x3D; array1[3:6:9]           &#x2F;&#x2F; 从 index 3 取到 index 6，容量取到 index 9</span><br><span class="line">	t.Log(&quot;slice4 val:&quot;, slice4)      &#x2F;&#x2F; [3 0 5]</span><br><span class="line">	t.Log(&quot;slice4 len:&quot;, len(slice4)) &#x2F;&#x2F; 3</span><br><span class="line">	t.Log(&quot;slice4 cap:&quot;, cap(slice4)) &#x2F;&#x2F; 6</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h3><p>使用 for、range</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 :&#x3D; make([]int, 5, 5)</span><br><span class="line">	for k, v :&#x3D; range array1 &#123;</span><br><span class="line">		fmt.Println(k, &quot;-&quot;, v)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println()</span><br><span class="line">	for k, v :&#x3D; range slice1 &#123;</span><br><span class="line">		fmt.Println(k, &quot;-&quot;, v)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p>数组与数组可以使用 == 比较，不能与 nil 比较</p>
+<p>切片与切片不能使用 == 比较，可以使用 reflect.DeepEqual 比较，可以与 nil 比较</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	array2 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 9&#125;</span><br><span class="line">	array3 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 9&#125;</span><br><span class="line"></span><br><span class="line">	t.Logf(&quot;array1 &#x3D;&#x3D; array2 %t\n&quot;, array1 &#x3D;&#x3D; array2) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;array2 &#x3D;&#x3D; array3 %t\n&quot;, array2 &#x3D;&#x3D; array3) &#x2F;&#x2F; true</span><br><span class="line">	&#x2F;&#x2F;t.Logf(&quot;%t\n&quot;, array2 &#x3D;&#x3D; nil) &#x2F;&#x2F; 会报错，数组不能与nil比</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; make([]int, 5, 5)</span><br><span class="line">	var slice2 []int</span><br><span class="line">	slice3 :&#x3D; []int&#123;4: 0&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; t.Logf(&quot;%t\n&quot;, slice1 &#x3D;&#x3D; slice2) &#x2F;&#x2F; 会报错，切片与切片不能比</span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; nil %t\n&quot;, slice1 &#x3D;&#x3D; nil) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice2 &#x3D;&#x3D; nil %t\n&quot;, slice2 &#x3D;&#x3D; nil) &#x2F;&#x2F; true</span><br><span class="line">	t.Logf(&quot;slice3 &#x3D;&#x3D; nil %t\n&quot;, slice3 &#x3D;&#x3D; nil) &#x2F;&#x2F; false</span><br><span class="line"></span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; slice2 %t\n&quot;, reflect.DeepEqual(slice1, slice2)) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice2 &#x3D;&#x3D; slice3 %t\n&quot;, reflect.DeepEqual(slice2, slice3)) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; slice3 %t\n&quot;, reflect.DeepEqual(slice1, slice3)) &#x2F;&#x2F; true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>需使用 append()、切片表达式 结合来完成</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 &#x3D; append(slice1[:2], slice1[3:]...)</span><br><span class="line">	t.Log(slice1)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="数组与切片的关系"><a href="#数组与切片的关系" class="headerlink" title="数组与切片的关系"></a>数组与切片的关系</h3><p><strong>数组为值类型，切片为引用类型</strong>，他们又有何关系呢？</p>
+<p>程序示例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo8(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; array1[:]</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	array1[9] &#x3D; 96969696 &#x2F;&#x2F; array1 的修改会影响到 slice1</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 96969696]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个示例程序中，可以说 slice1 是 array1 的引用。</p>
+<p>不光是在示例程序中，这种在数组上通过表达式截取出的切片，为数组的引用，就算在程序中，直接声明一个新切片（var slice1 []int），在切片的底层实现，其实也是引用了一个数组。</p>
+<p>他们的关系就是：<strong>数组是切片的底层实现，切片是数组的引用。</strong></p>
+<h3 id="切片扩容"><a href="#切片扩容" class="headerlink" title="切片扩容"></a>切片扩容</h3><p>在示例程序 TestDemo8 中，slice1 会一直引用 array1 么？</p>
+<p>一般情况下是这样，但有种情况下引用会发生变化，就是在 slice 发生扩容的情况下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo9(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 :&#x3D; array1[:] &#x2F;&#x2F; 从 array1 截取出 slice1</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	slice1 &#x3D; append(slice1, 9) &#x2F;&#x2F; 进行扩容后，slice1 指向了新的底层数组，不在是 array1 的引用</span><br><span class="line">	array1[9] &#x3D; 96969696</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4 9]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 11</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 20</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当切片添加新元素，发现容量不够时，会开辟一个新的底层数组，然后把旧数组的数据和添加的新元素一并拷贝到新数组中。</p>
+<h4 id="扩容策略："><a href="#扩容策略：" class="headerlink" title="扩容策略："></a>扩容策略：</h4><ul>
+<li>首先判断，如果新申请容量（cap）大于2倍的旧容量（old.cap），最终容量（newcap）就是新申请的容量（cap）</li>
+<li>否则判断，如果旧切片的长度小于1024，则最终容量(newcap)就是旧容量(old.cap)的两倍，即（newcap=doublecap）</li>
+<li>否则判断，如果旧切片长度大于等于1024，则最终容量（newcap）从旧容量（old.cap）开始循环增加原来的 1/4，即（newcap=old.cap,for {newcap += newcap/4}）直到最终容量（newcap）大于等于新申请的容量(cap)，即（newcap &gt;= cap）</li>
+<li>如果最终容量（cap）计算值溢出，则最终容量（cap）就是新申请容量（cap）</li>
+</ul>
+<h3 id="深复制"><a href="#深复制" class="headerlink" title="深复制"></a>深复制</h3><p>靠扩容解决引用问题，显得不是那么优雅。</p>
+<p>可以使用 copy() 进行深复制</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo10(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	var slice1 &#x3D; make([]int, 10, 10)</span><br><span class="line">	copy(slice1, array1[:]) &#x2F;&#x2F; 深复制，slice1 不会引用 array1</span><br><span class="line">	array1[9] &#x3D; 96969696</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 96969696]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="传递"><a href="#传递" class="headerlink" title="传递"></a>传递</h3><p>切片，如果不使用 copy() 进行深复制出一个新的切片，直接传递过去的切片底层还是同一个数组，当然，append() 发生了扩容之后，就不会是同一个数组了。</p>
+<p>数组，直接传递会变成两个数组，如果运用了指针，会指向同一个。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo11(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 切片，底层引用的还是同一个数组</span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v []int) &#123;</span><br><span class="line">		&#x2F;&#x2F;v &#x3D; append(v, 20) &#x2F;&#x2F; 扩容后底层数组就变了</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">		t.Log(v)</span><br><span class="line">	&#125;(slice1)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;slice1&quot;, slice1) &#x2F;&#x2F; slice1 [99999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片，copy() 深复制后，底层不是同一个数组</span><br><span class="line">	slice2 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice2Copy :&#x3D; make([]int, 10, 10)</span><br><span class="line">	copy(slice2Copy, slice2)</span><br><span class="line">	go func(v []int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(slice2Copy)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;slice2&quot;, slice2) &#x2F;&#x2F; slice2 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组，不是同一个</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v [10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(array1)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array1&quot;, array1) &#x2F;&#x2F; array1 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组，同一个</span><br><span class="line">	array2 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v *[10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(&amp;array2)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array2&quot;, array2) &#x2F;&#x2F; array2 [99999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组 同一个</span><br><span class="line">	array3 :&#x3D; new([10]int)</span><br><span class="line">	go func(v *[10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(array3)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array3&quot;, array3) &#x2F;&#x2F; array3 &amp;[99999 0 0 0 0 0 0 0 0 0]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果和下面一样</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo12(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	array2 :&#x3D; array1</span><br><span class="line">	array2[0] &#x3D; 999</span><br><span class="line">	t.Log(&quot;array1&quot;, array1) &#x2F;&#x2F; array1 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;array2&quot;, array2) &#x2F;&#x2F; array2 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice2 :&#x3D; slice1</span><br><span class="line">	slice2[0] &#x3D; 999</span><br><span class="line">	t.Log(&quot;slice1&quot;, slice1) &#x2F;&#x2F; slice1 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice2&quot;, slice2) &#x2F;&#x2F; slice2 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p>一段连续的内存空间。</p>
+<h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><p>make 只能用于 slice、map、channel，返回的初始化后的（非零）值。</p>
+<h3 id="引用类型"><a href="#引用类型" class="headerlink" title="引用类型"></a>引用类型</h3><ul>
+<li>切片</li>
+<li>字典</li>
+<li>通道</li>
+<li>函数</li>
+</ul>
+<h3 id="值类型"><a href="#值类型" class="headerlink" title="值类型"></a>值类型</h3><ul>
+<li>数组</li>
+<li>基础数据类型</li>
+<li>结构体类型</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>切片是数组的引用，数组是切片的底层实现。</li>
+<li>数组的长度(len)等于容量(cap)，切片的长度(len)小于等于容量(cap)。</li>
+<li>数组声明的时候默认就会初始化，值为类型的「零值」；切片声明的时候，如果不初始化，值是 nil。</li>
+<li>使用 copy() 深复制解决引用问题。</li>
+</ol>
+<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e005/a01_test.go">文章示例代码</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>数组</tag>
+        <tag>切片</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go并发编程之传统同步—(2)条件变量</title>
     <url>/golang/ipc-cond/</url>
     <content><![CDATA[<p>回顾上篇文章 <a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 其中说到，同步最终是为了达到以下两种目的：</p>
@@ -126,6 +254,129 @@
       </tags>
   </entry>
   <entry>
+    <title>Go并发编程之传统同步—(3)原子操作</title>
+    <url>/golang/ipc-atomic/</url>
+    <content><![CDATA[<p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
+<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
+<a id="more"></a>
+
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
+<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:24:56 counter: 100</span><br><span class="line">--- PASS: TestDemo1 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	var counter uint64 &#x3D; 100</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddUint64(&amp;counter, ^uint64(-(-1)-1))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadUint64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:32:05 counter: 0</span><br><span class="line">--- PASS: TestDemo2 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	var first int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 1; i &lt;&#x3D; 10000; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			if atomic.CompareAndSwapInt64(&amp;first, 0, int64(i)) &#123;</span><br><span class="line">				log.Println(&quot;抢先运行的是 goroutine&quot;, i)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;num:&quot;, atomic.LoadInt64(&amp;first))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:10 抢先运行的是 goroutine 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:12 num: 3</span><br><span class="line">--- PASS: TestDemo3 (2.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			atomic.StoreInt64(&amp;counter, int64(i))</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			log.Println(&quot;counter old:&quot;, atomic.SwapInt64(&amp;counter, int64(i)))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 9</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 5</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 4</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 7</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">--- PASS: TestDemo6 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
+<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	var value atomic.Value</span><br><span class="line">	var counter uint64 &#x3D; 1</span><br><span class="line"></span><br><span class="line">	value.Store(counter)</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(uint64(10))</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(100) &#x2F;&#x2F; 引发 panic</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo7</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 10</span><br><span class="line">--- FAIL: TestDemo7 (0.00s)</span><br><span class="line">panic: sync&#x2F;atomic: store of inconsistently typed value into Value [recovered]</span><br><span class="line">	panic: sync&#x2F;atomic: store of inconsistently typed value into Value</span><br><span class="line">                ...</span><br><span class="line">Process finished with exit code 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
+<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
+<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
+<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
+<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
+<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
+<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
+</ol>
+<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+        <tag>原子操作</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之并发模型—(1)概念</title>
+    <url>/golang/parallel-concept/</url>
+    <content><![CDATA[<p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+<a id="more"></a>
+
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
+<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
+<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
+<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
+<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
+<p>调度过程示例：</p>
+<ol>
+<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
+<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
+<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
+</ol>
+<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
+<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
+<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
+<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
+<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
+<p>常见的有：</p>
+<ul>
+<li>线程&amp;锁</li>
+<li>Actor</li>
+<li>CSP</li>
+<li>Lambda 架构</li>
+</ul>
+<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
+<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
+<blockquote>
+<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
+</blockquote>
+<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
+<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
+<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
+<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
+<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
+<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
+<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
+<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
+<p>Go 代码片段的封装。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go function ()&#123;</span><br><span class="line">&#x2F;&#x2F;  ...</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+
+<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
+<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
+<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
+<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>CSP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go并发编程之传统同步—(1)互斥锁</title>
     <url>/golang/ipc-mutex/</url>
     <content><![CDATA[<p>先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种<strong>通信</strong>（IPC）：</p>
@@ -199,257 +450,6 @@
       <tags>
         <tag>同步</tag>
         <tag>互斥锁</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之传统同步—(3)原子操作</title>
-    <url>/golang/ipc-atomic/</url>
-    <content><![CDATA[<p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
-<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
-<a id="more"></a>
-
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
-<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:24:56 counter: 100</span><br><span class="line">--- PASS: TestDemo1 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	var counter uint64 &#x3D; 100</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddUint64(&amp;counter, ^uint64(-(-1)-1))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;counter:&quot;, atomic.LoadUint64(&amp;counter))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:32:05 counter: 0</span><br><span class="line">--- PASS: TestDemo2 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	var first int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 1; i &lt;&#x3D; 10000; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			if atomic.CompareAndSwapInt64(&amp;first, 0, int64(i)) &#123;</span><br><span class="line">				log.Println(&quot;抢先运行的是 goroutine&quot;, i)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">	log.Println(&quot;num:&quot;, atomic.LoadInt64(&amp;first))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:10 抢先运行的是 goroutine 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:42:12 num: 3</span><br><span class="line">--- PASS: TestDemo3 (2.01s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 100; i++ &#123;</span><br><span class="line">		go func() &#123;</span><br><span class="line">			atomic.AddInt64(&amp;counter, 1)</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			atomic.StoreInt64(&amp;counter, int64(i))</span><br><span class="line">			log.Println(&quot;counter:&quot;, atomic.LoadInt64(&amp;counter))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	var counter int64 &#x3D; 0</span><br><span class="line"></span><br><span class="line">	for i :&#x3D; 0; i &lt; 10; i++ &#123;</span><br><span class="line">		go func(i int) &#123;</span><br><span class="line">			log.Println(&quot;counter old:&quot;, atomic.SwapInt64(&amp;counter, int64(i)))</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 9</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 5</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 1</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 2</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 3</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 6</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 4</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 7</span><br><span class="line">2020&#x2F;10&#x2F;11 00:43:36 counter old: 0</span><br><span class="line">--- PASS: TestDemo6 (2.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
-
-<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
-<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	var value atomic.Value</span><br><span class="line">	var counter uint64 &#x3D; 1</span><br><span class="line"></span><br><span class="line">	value.Store(counter)</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(uint64(10))</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	value.Store(100) &#x2F;&#x2F; 引发 panic</span><br><span class="line">	log.Println(&quot;counter:&quot;, value.Load())</span><br><span class="line"></span><br><span class="line">	time.Sleep(2 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x3D;&#x3D;&#x3D; RUN   TestDemo7</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 0</span><br><span class="line">2020&#x2F;10&#x2F;11 10:14:58 counter: 10</span><br><span class="line">--- FAIL: TestDemo7 (0.00s)</span><br><span class="line">panic: sync&#x2F;atomic: store of inconsistently typed value into Value [recovered]</span><br><span class="line">	panic: sync&#x2F;atomic: store of inconsistently typed value into Value</span><br><span class="line">                ...</span><br><span class="line">Process finished with exit code 1</span><br></pre></td></tr></table></figure>
-
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
-<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
-<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
-<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
-<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
-<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
-<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
-</ol>
-<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-        <tag>原子操作</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go数据结构之数组与切片</title>
-    <url>/golang/datastruct-arrayslice/</url>
-    <content><![CDATA[<p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
-<p>切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。</p>
-<a id="more"></a>
-
-<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="声明-amp-初始化"><a href="#声明-amp-初始化" class="headerlink" title="声明&amp;初始化"></a>声明&amp;初始化</h3><p>在 Go 中声明即初始化，如果在声明的时候没有初始化值，那么就会赋值为声明类型的「零值」。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo1(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 [5]int        &#x2F;&#x2F; 只需设置长度，后面不可变</span><br><span class="line">	var array2 &#x3D; new([5]int) &#x2F;&#x2F; 返回指针</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 []int</span><br><span class="line">	var slice2 &#x3D; make([]int, 5, 5) &#x2F;&#x2F; 设置长度、容量，后面可变</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array2 val:&quot;, array2)      &#x2F;&#x2F; &amp;[0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;array2 len:&quot;, len(array2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array2 cap:&quot;, cap(array2)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; []</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 0</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 0</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [0 0 0 0 0]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在声明的时候就初始化：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo2(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 &#x3D; [5]int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	var array2 &#x3D; [...]int&#123;4: 1, 2: 5&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 &#x3D; []int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	var slice2 &#x3D; array1[:] &#x2F;&#x2F; 从数组截取来的切片</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array2 val:&quot;, array2)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;array2 len:&quot;, len(array2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array2 cap:&quot;, cap(array2)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [0 0 5 0 1]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加-amp-更新元素值"><a href="#添加-amp-更新元素值" class="headerlink" title="添加&amp;更新元素值"></a>添加&amp;更新元素值</h3><p>数组因为长度固定，且的值都是初始化好了的，所以只有更新。</p>
-<p>切片更新操作和数据一样，只不过新增元素只能通过 append() 方法。</p>
-<blockquote>
-<p>append()：将元素追加大切片的末尾，如果容量不够，会进行扩容。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo3(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 数组</span><br><span class="line">	var array1 &#x3D; [5]int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	array1[0] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line">	array1[4] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片</span><br><span class="line">	var slice1 &#x3D; []int&#123;4: 1, 2: 5&#125;</span><br><span class="line">	array1[4] &#x3D; 100 &#x2F;&#x2F; 更新</span><br><span class="line">	&#x2F;&#x2F;array1[5] &#x3D; 100 &#x2F;&#x2F; 报错</span><br><span class="line">	slice1 &#x3D; append(slice1, 1) &#x2F;&#x2F; 切片增加元素只能使用此方法</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [100 0 5 0 100]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 5</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 5</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [0 0 5 0 1 1]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 6</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>数组与切片，都可以使用表达式截取，截取之后的数据它的类型为切片。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo4(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; array1[3:]              &#x2F;&#x2F; 从 index 3 取到 index end</span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 7</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 7</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice2 :&#x3D; array1[3:4]             &#x2F;&#x2F; 从 index 3 取到 index 4</span><br><span class="line">	t.Log(&quot;slice2 val:&quot;, slice2)      &#x2F;&#x2F; [3]</span><br><span class="line">	t.Log(&quot;slice2 len:&quot;, len(slice2)) &#x2F;&#x2F; 1</span><br><span class="line">	t.Log(&quot;slice2 cap:&quot;, cap(slice2)) &#x2F;&#x2F; 7</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice3 :&#x3D; array1[3:6:6]           &#x2F;&#x2F; 从 index 3 取到 index 6，容量取到 index 6</span><br><span class="line">	t.Log(&quot;slice3 val:&quot;, slice3)      &#x2F;&#x2F; [3 0 5]</span><br><span class="line">	t.Log(&quot;slice3 len:&quot;, len(slice3)) &#x2F;&#x2F; 3</span><br><span class="line">	t.Log(&quot;slice3 cap:&quot;, cap(slice3)) &#x2F;&#x2F; 3</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	slice4 :&#x3D; array1[3:6:9]           &#x2F;&#x2F; 从 index 3 取到 index 6，容量取到 index 9</span><br><span class="line">	t.Log(&quot;slice4 val:&quot;, slice4)      &#x2F;&#x2F; [3 0 5]</span><br><span class="line">	t.Log(&quot;slice4 len:&quot;, len(slice4)) &#x2F;&#x2F; 3</span><br><span class="line">	t.Log(&quot;slice4 cap:&quot;, cap(slice4)) &#x2F;&#x2F; 6</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h3><p>使用 for、range</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo5(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 :&#x3D; make([]int, 5, 5)</span><br><span class="line">	for k, v :&#x3D; range array1 &#123;</span><br><span class="line">		fmt.Println(k, &quot;-&quot;, v)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println()</span><br><span class="line">	for k, v :&#x3D; range slice1 &#123;</span><br><span class="line">		fmt.Println(k, &quot;-&quot;, v)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p>数组与数组可以使用 == 比较，不能与 nil 比较</p>
-<p>切片与切片不能使用 == 比较，可以使用 reflect.DeepEqual 比较，可以与 nil 比较</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo6(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	array2 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 9&#125;</span><br><span class="line">	array3 :&#x3D; [...]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 9&#125;</span><br><span class="line"></span><br><span class="line">	t.Logf(&quot;array1 &#x3D;&#x3D; array2 %t\n&quot;, array1 &#x3D;&#x3D; array2) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;array2 &#x3D;&#x3D; array3 %t\n&quot;, array2 &#x3D;&#x3D; array3) &#x2F;&#x2F; true</span><br><span class="line">	&#x2F;&#x2F;t.Logf(&quot;%t\n&quot;, array2 &#x3D;&#x3D; nil) &#x2F;&#x2F; 会报错，数组不能与nil比</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; make([]int, 5, 5)</span><br><span class="line">	var slice2 []int</span><br><span class="line">	slice3 :&#x3D; []int&#123;4: 0&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; t.Logf(&quot;%t\n&quot;, slice1 &#x3D;&#x3D; slice2) &#x2F;&#x2F; 会报错，切片与切片不能比</span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; nil %t\n&quot;, slice1 &#x3D;&#x3D; nil) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice2 &#x3D;&#x3D; nil %t\n&quot;, slice2 &#x3D;&#x3D; nil) &#x2F;&#x2F; true</span><br><span class="line">	t.Logf(&quot;slice3 &#x3D;&#x3D; nil %t\n&quot;, slice3 &#x3D;&#x3D; nil) &#x2F;&#x2F; false</span><br><span class="line"></span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; slice2 %t\n&quot;, reflect.DeepEqual(slice1, slice2)) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice2 &#x3D;&#x3D; slice3 %t\n&quot;, reflect.DeepEqual(slice2, slice3)) &#x2F;&#x2F; false</span><br><span class="line">	t.Logf(&quot;slice1 &#x3D;&#x3D; slice3 %t\n&quot;, reflect.DeepEqual(slice1, slice3)) &#x2F;&#x2F; true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>需使用 append()、切片表达式 结合来完成</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo7(t *testing.T) &#123;</span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 &#x3D; append(slice1[:2], slice1[3:]...)</span><br><span class="line">	t.Log(slice1)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="数组与切片的关系"><a href="#数组与切片的关系" class="headerlink" title="数组与切片的关系"></a>数组与切片的关系</h3><p><strong>数组为值类型，切片为引用类型</strong>，他们又有何关系呢？</p>
-<p>程序示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo8(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; array1[:]</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	array1[9] &#x3D; 96969696 &#x2F;&#x2F; array1 的修改会影响到 slice1</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 96969696]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这个示例程序中，可以说 slice1 是 array1 的引用。</p>
-<p>不光是在示例程序中，这种在数组上通过表达式截取出的切片，为数组的引用，就算在程序中，直接声明一个新切片（var slice1 []int），在切片的底层实现，其实也是引用了一个数组。</p>
-<p>他们的关系就是：<strong>数组是切片的底层实现，切片是数组的引用。</strong></p>
-<h3 id="切片扩容"><a href="#切片扩容" class="headerlink" title="切片扩容"></a>切片扩容</h3><p>在示例程序 TestDemo8 中，slice1 会一直引用 array1 么？</p>
-<p>一般情况下是这样，但有种情况下引用会发生变化，就是在 slice 发生扩容的情况下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo9(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice1 :&#x3D; array1[:] &#x2F;&#x2F; 从 array1 截取出 slice1</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	slice1 &#x3D; append(slice1, 9) &#x2F;&#x2F; 进行扩容后，slice1 指向了新的底层数组，不在是 array1 的引用</span><br><span class="line">	array1[9] &#x3D; 96969696</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4 9]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 11</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 20</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当切片添加新元素，发现容量不够时，会开辟一个新的底层数组，然后把旧数组的数据和添加的新元素一并拷贝到新数组中。</p>
-<h4 id="扩容策略："><a href="#扩容策略：" class="headerlink" title="扩容策略："></a>扩容策略：</h4><ul>
-<li>首先判断，如果新申请容量（cap）大于2倍的旧容量（old.cap），最终容量（newcap）就是新申请的容量（cap）</li>
-<li>否则判断，如果旧切片的长度小于1024，则最终容量(newcap)就是旧容量(old.cap)的两倍，即（newcap=doublecap）</li>
-<li>否则判断，如果旧切片长度大于等于1024，则最终容量（newcap）从旧容量（old.cap）开始循环增加原来的 1/4，即（newcap=old.cap,for {newcap += newcap/4}）直到最终容量（newcap）大于等于新申请的容量(cap)，即（newcap &gt;= cap）</li>
-<li>如果最终容量（cap）计算值溢出，则最终容量（cap）就是新申请容量（cap）</li>
-</ul>
-<h3 id="深复制"><a href="#深复制" class="headerlink" title="深复制"></a>深复制</h3><p>靠扩容解决引用问题，显得不是那么优雅。</p>
-<p>可以使用 copy() 进行深复制</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo10(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line"></span><br><span class="line">	var slice1 &#x3D; make([]int, 10, 10)</span><br><span class="line">	copy(slice1, array1[:]) &#x2F;&#x2F; 深复制，slice1 不会引用 array1</span><br><span class="line">	array1[9] &#x3D; 96969696</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;slice1 val:&quot;, slice1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice1 len:&quot;, len(slice1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;slice1 cap:&quot;, cap(slice1)) &#x2F;&#x2F; 10</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;&quot;)</span><br><span class="line"></span><br><span class="line">	t.Log(&quot;array1 val:&quot;, array1)      &#x2F;&#x2F; [9 1 7 3 0 5 6 2 8 96969696]</span><br><span class="line">	t.Log(&quot;array1 len:&quot;, len(array1)) &#x2F;&#x2F; 10</span><br><span class="line">	t.Log(&quot;array1 cap:&quot;, cap(array1)) &#x2F;&#x2F; 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="传递"><a href="#传递" class="headerlink" title="传递"></a>传递</h3><p>切片，如果不使用 copy() 进行深复制出一个新的切片，直接传递过去的切片底层还是同一个数组，当然，append() 发生了扩容之后，就不会是同一个数组了。</p>
-<p>数组，直接传递会变成两个数组，如果运用了指针，会指向同一个。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo11(t *testing.T) &#123;</span><br><span class="line">	&#x2F;&#x2F; 切片，底层引用的还是同一个数组</span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v []int) &#123;</span><br><span class="line">		&#x2F;&#x2F;v &#x3D; append(v, 20) &#x2F;&#x2F; 扩容后底层数组就变了</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">		t.Log(v)</span><br><span class="line">	&#125;(slice1)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;slice1&quot;, slice1) &#x2F;&#x2F; slice1 [99999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 切片，copy() 深复制后，底层不是同一个数组</span><br><span class="line">	slice2 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice2Copy :&#x3D; make([]int, 10, 10)</span><br><span class="line">	copy(slice2Copy, slice2)</span><br><span class="line">	go func(v []int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(slice2Copy)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;slice2&quot;, slice2) &#x2F;&#x2F; slice2 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组，不是同一个</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v [10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(array1)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array1&quot;, array1) &#x2F;&#x2F; array1 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组，同一个</span><br><span class="line">	array2 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	go func(v *[10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(&amp;array2)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array2&quot;, array2) &#x2F;&#x2F; array2 [99999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; 数组 同一个</span><br><span class="line">	array3 :&#x3D; new([10]int)</span><br><span class="line">	go func(v *[10]int) &#123;</span><br><span class="line">		v[0] &#x3D; 99999</span><br><span class="line">	&#125;(array3)</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	t.Log(&quot;array3&quot;, array3) &#x2F;&#x2F; array3 &amp;[99999 0 0 0 0 0 0 0 0 0]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>效果和下面一样</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func TestDemo12(t *testing.T) &#123;</span><br><span class="line">	array1 :&#x3D; [10]int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	array2 :&#x3D; array1</span><br><span class="line">	array2[0] &#x3D; 999</span><br><span class="line">	t.Log(&quot;array1&quot;, array1) &#x2F;&#x2F; array1 [9 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;array2&quot;, array2) &#x2F;&#x2F; array2 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line"></span><br><span class="line">	fmt.Println()</span><br><span class="line"></span><br><span class="line">	slice1 :&#x3D; []int&#123;9, 1, 7, 3, 0, 5, 6, 2, 8, 4&#125;</span><br><span class="line">	slice2 :&#x3D; slice1</span><br><span class="line">	slice2[0] &#x3D; 999</span><br><span class="line">	t.Log(&quot;slice1&quot;, slice1) &#x2F;&#x2F; slice1 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line">	t.Log(&quot;slice2&quot;, slice2) &#x2F;&#x2F; slice2 [999 1 7 3 0 5 6 2 8 4]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p>一段连续的内存空间。</p>
-<h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><p>make 只能用于 slice、map、channel，返回的初始化后的（非零）值。</p>
-<h3 id="引用类型"><a href="#引用类型" class="headerlink" title="引用类型"></a>引用类型</h3><ul>
-<li>切片</li>
-<li>字典</li>
-<li>通道</li>
-<li>函数</li>
-</ul>
-<h3 id="值类型"><a href="#值类型" class="headerlink" title="值类型"></a>值类型</h3><ul>
-<li>数组</li>
-<li>基础数据类型</li>
-<li>结构体类型</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>切片是数组的引用，数组是切片的底层实现。</li>
-<li>数组的长度(len)等于容量(cap)，切片的长度(len)小于等于容量(cap)。</li>
-<li>数组声明的时候默认就会初始化，值为类型的「零值」；切片声明的时候，如果不初始化，值是 nil。</li>
-<li>使用 copy() 深复制解决引用问题。</li>
-</ol>
-<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e005/a01_test.go">文章示例代码</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>数组</tag>
-        <tag>切片</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之并发模型—(1)概念</title>
-    <url>/golang/parallel-concept/</url>
-    <content><![CDATA[<p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
-<a id="more"></a>
-
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
-<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
-<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
-<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
-<p>调度过程示例：</p>
-<ol>
-<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
-<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
-<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
-</ol>
-<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
-<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
-<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
-<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
-<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
-<p>常见的有：</p>
-<ul>
-<li>线程&amp;锁</li>
-<li>Actor</li>
-<li>CSP</li>
-<li>Lambda 架构</li>
-</ul>
-<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
-<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
-<blockquote>
-<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
-</blockquote>
-<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
-<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
-<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
-<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
-<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
-<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
-<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
-<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
-<p>Go 代码片段的封装。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go function ()&#123;</span><br><span class="line">&#x2F;&#x2F;  ...</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
-
-<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
-<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
-<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
-<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>CSP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/gunicorn/timeout/</url>
-    <content><![CDATA[<p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<a id="more"></a>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ strace -T -tt -e trace&#x3D;all -p 进程ID</span><br></pre></td></tr></table></figure>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ auditctl -a exit,always -F arch&#x3D;b64 -S kill -F a1&#x3D;9</span><br></pre></td></tr></table></figure>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ausearch -sc kill</span><br></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">time-&gt;Fri Dec  6 16:13:26 2019</span><br><span class="line">type&#x3D;PROCTITLE msg&#x3D;audit(1575620006.444:103711): proctitle&#x3D;2F6F70742F6D6F64756C65732F7265646173682D372E302E302F7265646173682F62696E2F707974686F6E322E37002F6F70742F7265646173682F7265646173682F62696E2F67756E69636F726E002D62003132372E302E302E313A35303030002D2D6E616D6500726564617368002D770034002D2D6D61782D726571756573</span><br><span class="line">type&#x3D;OBJ_PID msg&#x3D;audit(1575620006.444:103711): opid&#x3D;11646 oauid&#x3D;0 ouid&#x3D;1001 oses&#x3D;14406 ocomm&#x3D;&quot;gunicorn&quot;</span><br><span class="line">type&#x3D;SYSCALL msg&#x3D;audit(1575620006.444:103711): arch&#x3D;c000003e syscall&#x3D;62 success&#x3D;yes exit&#x3D;0 a0&#x3D;2d7e a1&#x3D;9 a2&#x3D;0 a3&#x3D;0 items&#x3D;0 ppid&#x3D;11490 pid&#x3D;11494 auid&#x3D;0 uid&#x3D;1001 gid&#x3D;1001 euid&#x3D;1001 suid&#x3D;1001 fsuid&#x3D;1001 egid&#x3D;1001 sgid&#x3D;1001 fsgid&#x3D;1001 tty&#x3D;(none) ses&#x3D;14406 comm&#x3D;&quot;gunicorn&quot; exe&#x3D;&quot;&#x2F;opt&#x2F;modules&#x2F;redash-7.0.0&#x2F;redash&#x2F;bin&#x2F;python2.7&quot; key&#x3D;(null)</span><br></pre></td></tr></table></figure>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[CRITICAL] WORKER TIMEOUT (pid:15577)</span><br><span class="line">[INFO] Worker exiting (pid: 15577)</span><br><span class="line">[INFO] Booting worker with pid: 15646</span><br></pre></td></tr></table></figure>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>gunicorn</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
       </tags>
   </entry>
 </search>
