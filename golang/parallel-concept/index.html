@@ -277,7 +277,9 @@
 <p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
 <h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
 <p>Go 代码片段的封装。</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;<br><span class="hljs-comment">//  ...</span><br>&#125;()<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
+<span class="hljs-comment">//  ...</span>
+&#125;()</code></pre></div>
 
 <h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>

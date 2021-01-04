@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.6k 字
+      2.7k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      36
+      37
        分钟
     </span>
   
@@ -248,14 +248,101 @@
 <h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>上篇文章的示例程序，仅仅实现了累加功能，但在现实的工作场景中，需求往往不可能这么简单，现在扩展一下这个程序，给它加上累减的功能。</p>
 <p>加上了累减的示例程序，可以抽象的理解为一个固定容量的“储水池”，可以注水、排水。</p>
 <h4 id="仅用互斥锁"><a href="#仅用互斥锁" class="headerlink" title="仅用互斥锁"></a>仅用互斥锁</h4><p>当水注满以后，停止注水，开始排水，当水排空以后，开始注水，反反复复…</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> mut sync.Mutex<br>	maxSize := <span class="hljs-number">10</span><br>	counter := <span class="hljs-number">0</span><br><br>	<span class="hljs-comment">// 排水口</span><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			mut.Lock()<br>			<span class="hljs-keyword">if</span> counter == maxSize &#123;<br>				<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; maxSize; i++ &#123;<br>					counter--<br>					log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)<br>				&#125;<br>			&#125;<br>			mut.Unlock()<br>			time.Sleep(<span class="hljs-number">1</span> * time.Second)<br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-comment">// 注水口</span><br>	<span class="hljs-keyword">for</span> &#123;<br>		mut.Lock()<br>		<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123;<br>			<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; maxSize; i++ &#123;<br>				counter++<br>				log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)<br>			&#125;<br>		&#125;<br>		mut.Unlock()<br>		time.Sleep(<span class="hljs-number">1</span> * time.Second)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> mut sync.Mutex
+	maxSize := <span class="hljs-number">10</span>
+	counter := <span class="hljs-number">0</span>
+
+	<span class="hljs-comment">// 排水口</span>
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			mut.Lock()
+			<span class="hljs-keyword">if</span> counter == maxSize &#123;
+				<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; maxSize; i++ &#123;
+					counter--
+					log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)
+				&#125;
+			&#125;
+			mut.Unlock()
+			time.Sleep(<span class="hljs-number">1</span> * time.Second)
+		&#125;
+	&#125;()
+
+	<span class="hljs-comment">// 注水口</span>
+	<span class="hljs-keyword">for</span> &#123;
+		mut.Lock()
+		<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123;
+			<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; maxSize; i++ &#123;
+				counter++
+				log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)
+			&#125;
+		&#125;
+		mut.Unlock()
+		time.Sleep(<span class="hljs-number">1</span> * time.Second)
+	&#125;
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs awk">=== RUN   TestDemo1<br>                ···<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">7</span><br>                ···<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo1
+                ···
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">13</span>:<span class="hljs-number">52</span>:<span class="hljs-number">50</span> OUTPUT counter = <span class="hljs-number">7</span>
+                ···</code></pre></div>
 <p>看着没有什么问题，一切正常，但就是这样工作的策略效率太低。</p>
 <h4 id="优化互斥锁"><a href="#优化互斥锁" class="headerlink" title="优化互斥锁"></a>优化互斥锁</h4><p>优化策略，不用等注满水再排水，也不用放空之后，再注水，注水口和排水口一起工作。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> mut sync.Mutex<br>	maxSize := <span class="hljs-number">10</span><br>	counter := <span class="hljs-number">0</span><br><br>	<span class="hljs-comment">// 排水口</span><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			mut.Lock()<br>			<span class="hljs-keyword">if</span> counter != <span class="hljs-number">0</span> &#123;<br>				counter--<br>			&#125;<br>			log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)<br>			mut.Unlock()<br>			time.Sleep(<span class="hljs-number">5</span> * time.Second) <span class="hljs-comment">// 为了演示效果，睡眠5秒</span><br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-comment">// 注水口</span><br>	<span class="hljs-keyword">for</span> &#123;<br>		mut.Lock()<br>		<span class="hljs-keyword">if</span> counter != maxSize &#123;<br>			counter++<br>		&#125;<br>		log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)<br>		mut.Unlock()<br>		time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-comment">// 为了演示效果，睡眠1秒</span><br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> mut sync.Mutex
+	maxSize := <span class="hljs-number">10</span>
+	counter := <span class="hljs-number">0</span>
+
+	<span class="hljs-comment">// 排水口</span>
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			mut.Lock()
+			<span class="hljs-keyword">if</span> counter != <span class="hljs-number">0</span> &#123;
+				counter--
+			&#125;
+			log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)
+			mut.Unlock()
+			time.Sleep(<span class="hljs-number">5</span> * time.Second) <span class="hljs-comment">// 为了演示效果，睡眠5秒</span>
+		&#125;
+	&#125;()
+
+	<span class="hljs-comment">// 注水口</span>
+	<span class="hljs-keyword">for</span> &#123;
+		mut.Lock()
+		<span class="hljs-keyword">if</span> counter != maxSize &#123;
+			counter++
+		&#125;
+		log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)
+		mut.Unlock()
+		time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-comment">// 为了演示效果，睡眠1秒</span>
+	&#125;
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs awk">=== RUN   TestDemo2<br>                ···<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">46</span>  INPUT counter = <span class="hljs-number">7</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">47</span>  INPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">48</span> OUTPUT counter = <span class="hljs-number">7</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">48</span>  INPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">49</span>  INPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">51</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">52</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">53</span> OUTPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">53</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">54</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">55</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">56</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">57</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">58</span> OUTPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">58</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">59</span>  INPUT counter = <span class="hljs-number">10</span><br>                ···<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo2
+                ···
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">46</span>  INPUT counter = <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">47</span>  INPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">48</span> OUTPUT counter = <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">48</span>  INPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">49</span>  INPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">50</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">51</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">52</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">53</span> OUTPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">53</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">54</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">55</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">56</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">57</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">58</span> OUTPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">58</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">11</span>:<span class="hljs-number">59</span>  INPUT counter = <span class="hljs-number">10</span>
+                ···</code></pre></div>
 <p>通过日志输出，可以看到程序达到了需求，运作正常。</p>
 <p>但是，通过日志输出发现，当排水口效率低下的时候，注水口一直在轮询，这里频繁的上锁操作造成的开销很是浪费。</p>
 <h4 id="条件变量：单发通知"><a href="#条件变量：单发通知" class="headerlink" title="条件变量：单发通知"></a>条件变量：单发通知</h4><p>那有没有什么好的办法，省去不必要的轮询？如果注水口和排水口能互相“通知”就好了！这个功能，<strong>条件变量</strong>可以做到。</p>
@@ -267,20 +354,137 @@
 <li>Broadcast 广播通知</li>
 </ul>
 </blockquote>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo3(t *testing.T) &#123;<br>	cond := sync.NewCond(new(sync.Mutex)) <span class="hljs-regexp">//</span> 初始化条件变量<br>	maxSize := <span class="hljs-number">10</span><br>	counter := <span class="hljs-number">0</span><br><br>	<span class="hljs-regexp">//</span> 排水口<br>	go <span class="hljs-keyword">func</span>() &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁<br>			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了<br>				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！<br>			&#125;<br>			counter--<br>			log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)<br>			cond.Signal() <span class="hljs-regexp">//</span> 单发通知：已排水<br>			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁<br>			time.Sleep(<span class="hljs-number">5</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒<br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-regexp">//</span> 注水口<br>	<span class="hljs-keyword">for</span> &#123;<br>		cond.L.Lock() <span class="hljs-regexp">//</span> 上锁<br>		<span class="hljs-keyword">if</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了<br>			cond.Wait() <span class="hljs-regexp">//</span> 啥时候排水？等待通知！<br>		&#125;<br>		counter++<br>		log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)<br>		cond.Signal() <span class="hljs-regexp">//</span> 单发通知：已来水<br>		cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁<br>		time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">1</span>秒<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo3(t *testing.T) &#123;
+	cond := sync.NewCond(new(sync.Mutex)) <span class="hljs-regexp">//</span> 初始化条件变量
+	maxSize := <span class="hljs-number">10</span>
+	counter := <span class="hljs-number">0</span>
+
+	<span class="hljs-regexp">//</span> 排水口
+	go <span class="hljs-keyword">func</span>() &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁
+			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了
+				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！
+			&#125;
+			counter--
+			log.Printf(<span class="hljs-string">&quot;OUTPUT counter = %d&quot;</span>, counter)
+			cond.Signal() <span class="hljs-regexp">//</span> 单发通知：已排水
+			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁
+			time.Sleep(<span class="hljs-number">5</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒
+		&#125;
+	&#125;()
+
+	<span class="hljs-regexp">//</span> 注水口
+	<span class="hljs-keyword">for</span> &#123;
+		cond.L.Lock() <span class="hljs-regexp">//</span> 上锁
+		<span class="hljs-keyword">if</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了
+			cond.Wait() <span class="hljs-regexp">//</span> 啥时候排水？等待通知！
+		&#125;
+		counter++
+		log.Printf(<span class="hljs-string">&quot; INPUT counter = %d&quot;</span>, counter)
+		cond.Signal() <span class="hljs-regexp">//</span> 单发通知：已来水
+		cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁
+		time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">1</span>秒
+	&#125;
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs awk">=== RUN   TestDemo3<br>                ···<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">22</span>  INPUT counter = <span class="hljs-number">7</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">23</span>  INPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">24</span> OUTPUT counter = <span class="hljs-number">7</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">24</span>  INPUT counter = <span class="hljs-number">8</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">25</span>  INPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">26</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">29</span> OUTPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">29</span>  INPUT counter = <span class="hljs-number">10</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">34</span> OUTPUT counter = <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">34</span>  INPUT counter = <span class="hljs-number">10</span><br>                ···<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo3
+                ···
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">22</span>  INPUT counter = <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">23</span>  INPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">24</span> OUTPUT counter = <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">24</span>  INPUT counter = <span class="hljs-number">8</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">25</span>  INPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">26</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">29</span> OUTPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">29</span>  INPUT counter = <span class="hljs-number">10</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">34</span> OUTPUT counter = <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">06</span> <span class="hljs-number">14</span>:<span class="hljs-number">51</span>:<span class="hljs-number">34</span>  INPUT counter = <span class="hljs-number">10</span>
+                ···</code></pre></div>
 <p>通过日志输出，可以看出来，注水口没有一直轮询了，而是等到排水口发通知后，再进行注水，注水口一直再等排水口。那么新的问题又来了，如何提高排水口的效率呢？</p>
 <h4 id="条件变量：广播通知"><a href="#条件变量：广播通知" class="headerlink" title="条件变量：广播通知"></a>条件变量：广播通知</h4><p>多制造出一个排水口，提高排水效率。</p>
 <p>那就不能继续使用单发通知了（Signal），因为单发通知只会通知到一个等待（Wait），针对多等待的这种情况，就需要使用广播通知（Broadcast）。</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo4(t *testing.T) &#123;<br>	cond := sync.NewCond(new(sync.Mutex)) <span class="hljs-regexp">//</span> 初始化条件变量<br>	maxSize := <span class="hljs-number">10</span><br>	counter := <span class="hljs-number">0</span><br><br>	<span class="hljs-regexp">//</span> 排水口 <span class="hljs-number">1</span><br>	go <span class="hljs-keyword">func</span>() &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁<br>			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了<br>			<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了<br>				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！<br>			&#125;<br>			counter--<br>			log.Printf(<span class="hljs-string">&quot;OUTPUT A counter = %d&quot;</span>, counter)<br>			cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已排水<br>			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁<br>			<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">2</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒<br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-regexp">//</span> 排水口 <span class="hljs-number">2</span><br>	go <span class="hljs-keyword">func</span>() &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁<br>			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了<br>			<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了<br>				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！<br>			&#125;<br>			counter--<br>			log.Printf(<span class="hljs-string">&quot;OUTPUT B counter = %d&quot;</span>, counter)<br>			cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已排水<br>			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁<br>			<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">2</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒<br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-regexp">//</span> 注水口<br>	<span class="hljs-keyword">for</span> &#123;<br>		cond.L.Lock() <span class="hljs-regexp">//</span> 上锁<br>		<span class="hljs-keyword">if</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了<br>		<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了<br>			cond.Wait() <span class="hljs-regexp">//</span> 啥时候排水？等待通知！<br>		&#125;<br>		counter++<br>		log.Printf(<span class="hljs-string">&quot; INPUT   counter = %d&quot;</span>, counter)<br>		cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已来水<br>		cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁<br>		<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">1</span>秒<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo4(t *testing.T) &#123;
+	cond := sync.NewCond(new(sync.Mutex)) <span class="hljs-regexp">//</span> 初始化条件变量
+	maxSize := <span class="hljs-number">10</span>
+	counter := <span class="hljs-number">0</span>
+
+	<span class="hljs-regexp">//</span> 排水口 <span class="hljs-number">1</span>
+	go <span class="hljs-keyword">func</span>() &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁
+			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了
+			<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了
+				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！
+			&#125;
+			counter--
+			log.Printf(<span class="hljs-string">&quot;OUTPUT A counter = %d&quot;</span>, counter)
+			cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已排水
+			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁
+			<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">2</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒
+		&#125;
+	&#125;()
+
+	<span class="hljs-regexp">//</span> 排水口 <span class="hljs-number">2</span>
+	go <span class="hljs-keyword">func</span>() &#123;
+		<span class="hljs-keyword">for</span> &#123;
+			cond.L.Lock() <span class="hljs-regexp">//</span> 上锁
+			<span class="hljs-keyword">if</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了
+			<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == <span class="hljs-number">0</span> &#123; <span class="hljs-regexp">//</span> 没水了
+				cond.Wait() <span class="hljs-regexp">//</span> 啥时候来水？等通知！
+			&#125;
+			counter--
+			log.Printf(<span class="hljs-string">&quot;OUTPUT B counter = %d&quot;</span>, counter)
+			cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已排水
+			cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁
+			<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">2</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">5</span>秒
+		&#125;
+	&#125;()
+
+	<span class="hljs-regexp">//</span> 注水口
+	<span class="hljs-keyword">for</span> &#123;
+		cond.L.Lock() <span class="hljs-regexp">//</span> 上锁
+		<span class="hljs-keyword">if</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了
+		<span class="hljs-regexp">//</span><span class="hljs-keyword">for</span> counter == maxSize &#123; <span class="hljs-regexp">//</span> 水满了
+			cond.Wait() <span class="hljs-regexp">//</span> 啥时候排水？等待通知！
+		&#125;
+		counter++
+		log.Printf(<span class="hljs-string">&quot; INPUT   counter = %d&quot;</span>, counter)
+		cond.Broadcast() <span class="hljs-regexp">//</span> 单发通知：已来水
+		cond.L.Unlock() <span class="hljs-regexp">//</span> 解锁
+		<span class="hljs-regexp">//</span>time.Sleep(<span class="hljs-number">1</span> * time.Second) <span class="hljs-regexp">//</span> 为了演示效果，睡眠<span class="hljs-number">1</span>秒
+	&#125;
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs awk">=== RUN   TestDemo4<br>                ···<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">2</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">1</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">0</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">1</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">2</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">3</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">4</span><br>                ···<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT B counter = -<span class="hljs-number">7605</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span>  INPUT   counter = -<span class="hljs-number">7604</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT A counter = -<span class="hljs-number">7605</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT A counter = -<span class="hljs-number">7606</span><br>                ···<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo4
+                ···
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">2</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">1</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT B counter = <span class="hljs-number">0</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">1</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">2</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">3</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">30</span> OUTPUT A counter = -<span class="hljs-number">4</span>
+                ···
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT B counter = -<span class="hljs-number">7605</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span>  INPUT   counter = -<span class="hljs-number">7604</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT A counter = -<span class="hljs-number">7605</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">07</span> <span class="hljs-number">20</span>:<span class="hljs-number">57</span>:<span class="hljs-number">31</span> OUTPUT A counter = -<span class="hljs-number">7606</span>
+                ···</code></pre></div>
 <p>通过日志输出可以看到，刚开始的时候还很正常，到后面的时候就变成负值了，一直在负增长，What？</p>
 <p>在 <a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 文章中，程序因为没有加上互斥锁，出现过 counter 值异常的情况。</p>
 <p>但这次程序这次加了互斥锁，按理说形成了一个临界区应该是没有问题了，所以问题应该不是出在临界区上，难道问题出在 <strong>Wait</strong> 上？</p>
 <p>通过IDE<strong>追踪一下Wait的源码</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Cond)</span> <span class="hljs-title">Wait</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-comment">// 检查 c 是否是被复制的，如果是就 panic</span><br>	c.checker.check()<br>	<span class="hljs-comment">// 将当前 goroutine 加入等待队列</span><br>	t := runtime_notifyListAdd(&amp;c.notify)<br>	c.L.Unlock()<br>	<span class="hljs-comment">// 等待当前 goroutine 被唤醒</span><br>	runtime_notifyListWait(&amp;c.notify, t)<br>	c.L.Lock()<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Cond)</span> <span class="hljs-title">Wait</span><span class="hljs-params">()</span></span> &#123;
+	<span class="hljs-comment">// 检查 c 是否是被复制的，如果是就 panic</span>
+	c.checker.check()
+	<span class="hljs-comment">// 将当前 goroutine 加入等待队列</span>
+	t := runtime_notifyListAdd(&amp;c.notify)
+	c.L.Unlock()
+	<span class="hljs-comment">// 等待当前 goroutine 被唤醒</span>
+	runtime_notifyListWait(&amp;c.notify, t)
+	c.L.Lock()
+&#125;</code></pre></div>
 <p>原来 Wait 内部的执行流程是，先执行了解锁，然后进入等待状态，接到通知之后，再执行加锁操作。</p>
 <p>那按照这个代码逻辑结合输出日志，走一程序遍流程，看看能不能复现出 counter 为负值的情况：</p>
 <blockquote>
@@ -306,13 +510,28 @@
 </blockquote>
 <p>代码做出相应的修改后，再执行看结果，没有问题了。</p>
 <h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="发送通知"><a href="#发送通知" class="headerlink" title="发送通知"></a>发送通知</h3><p>等待通知（Wait）肯定是要在临界区里面的，那发送通知（Signal、Broadcast）在哪里更好呢？</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">Luck</span><span class="hljs-params">()</span></span><br><span class="hljs-function"><span class="hljs-title">Wait</span><span class="hljs-params">()</span></span><br><span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span><br><span class="hljs-function"><span class="hljs-title">Unlock</span><span class="hljs-params">()</span></span><br><br><span class="hljs-comment">// 或者</span><br><br><span class="hljs-function"><span class="hljs-title">Luck</span><span class="hljs-params">()</span></span><br><span class="hljs-function"><span class="hljs-title">Wait</span><span class="hljs-params">()</span></span><br><span class="hljs-function"><span class="hljs-title">Unlock</span><span class="hljs-params">()</span></span><br><span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span><br><br><span class="hljs-comment">// 两种写法都不会报错 </span><br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">Luck</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"><span class="hljs-title">Wait</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span>
+<span class="hljs-function"><span class="hljs-title">Unlock</span><span class="hljs-params">()</span></span>
+
+<span class="hljs-comment">// 或者</span>
+
+<span class="hljs-function"><span class="hljs-title">Luck</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"><span class="hljs-title">Wait</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"><span class="hljs-title">Unlock</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span>
+
+<span class="hljs-comment">// 两种写法都不会报错 </span></code></pre></div>
 <p>在 go 的发送通知方法（Broadcast、Signal）上有这么一段话：</p>
 <blockquote>
 <p>// It is allowed but not required for the caller to hold c.L<br>// during the call.</p>
 </blockquote>
 <p>在我以往的 C 多线程开发的时候，发送通知总是在锁中的：</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">pthread<span class="hljs-constructor">_mutex_lock(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">mutex</span>)</span>;<br><span class="hljs-comment">//              ...</span><br>pthread<span class="hljs-constructor">_cond_signal(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">cond</span>)</span>;<br>pthread<span class="hljs-constructor">_mutex_unlock(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">mutex</span>)</span>;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs reasonml">pthread<span class="hljs-constructor">_mutex_lock(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">mutex</span>)</span>;
+<span class="hljs-comment">//              ...</span>
+pthread<span class="hljs-constructor">_cond_signal(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">cond</span>)</span>;
+pthread<span class="hljs-constructor">_mutex_unlock(&amp;<span class="hljs-params">thread</span>-&gt;<span class="hljs-params">mutex</span>)</span>;</code></pre></div>
 <p>在 <a target="_blank" rel="noopener" href="https://linux.die.net/man/3/pthread_cond_signal">man</a> 手册中有写到：</p>
 <blockquote>
 <p>The pthread_cond_broadcast() or pthread_cond_signal() functions may be called by a thread whether or not it currently owns the mutex that threads calling pthread_cond_wait() or pthread_cond_timedwait() have associated with the condition variable during their waits; however, if predictable scheduling behavior is required, then that mutex shall be locked by the thread calling pthread_cond_broadcast() or pthread_cond_signal().</p>

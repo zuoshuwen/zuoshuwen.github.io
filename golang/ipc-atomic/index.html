@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16
+      17
        分钟
     </span>
   
@@ -241,36 +241,146 @@
 
 <h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
 <h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)<br>		&#125;()<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo1</span><br>2020/10/11 00:24:56 counter: 100<br><span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)<br>PASS<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo1</span>
+2020/10/11 00:24:56 counter: 100
+<span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)
+PASS</code></pre></div>
 
 <h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			atomic.AddUint64(&amp;counter, ^<span class="hljs-keyword">uint64</span>(-(<span class="hljs-number">-1</span>)<span class="hljs-number">-1</span>))<br>		&#125;()<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadUint64(&amp;counter))<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddUint64(&amp;counter, ^<span class="hljs-keyword">uint64</span>(-(<span class="hljs-number">-1</span>)<span class="hljs-number">-1</span>))
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadUint64(&amp;counter))
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo2</span><br>2020/10/11 00:32:05 counter: 0<br><span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)<br>PASS<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo2</span>
+2020/10/11 00:32:05 counter: 0
+<span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)
+PASS</code></pre></div>
 
 <h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> first <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10000</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;<br>			<span class="hljs-keyword">if</span> atomic.CompareAndSwapInt64(&amp;first, <span class="hljs-number">0</span>, <span class="hljs-keyword">int64</span>(i)) &#123;<br>				log.Println(<span class="hljs-string">&quot;抢先运行的是 goroutine&quot;</span>, i)<br>			&#125;<br>		&#125;(i)<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>	log.Println(<span class="hljs-string">&quot;num:&quot;</span>, atomic.LoadInt64(&amp;first))<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> first <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10000</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			<span class="hljs-keyword">if</span> atomic.CompareAndSwapInt64(&amp;first, <span class="hljs-number">0</span>, <span class="hljs-keyword">int64</span>(i)) &#123;
+				log.Println(<span class="hljs-string">&quot;抢先运行的是 goroutine&quot;</span>, i)
+			&#125;
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;num:&quot;</span>, atomic.LoadInt64(&amp;first))
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo3</span><br>2020/10/11 00:42:10 抢先运行的是 goroutine 3<br>2020/10/11 00:42:12 num: 3<br><span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)<br>PASS<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo3</span>
+2020/10/11 00:42:10 抢先运行的是 goroutine 3
+2020/10/11 00:42:12 num: 3
+<span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)
+PASS</code></pre></div>
 
 <h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)<br>			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))<br>		&#125;()<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
 
 <h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;<br>			atomic.StoreInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i))<br>			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))<br>		&#125;(i)<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			atomic.StoreInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i))
+			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
 
 <h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;<br>			log.Println(<span class="hljs-string">&quot;counter old:&quot;</span>, atomic.SwapInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i)))<br>		&#125;(i)<br>	&#125;<br><br>	time.Sleep(<span class="hljs-number">2</span> * time.Second)<br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			log.Println(<span class="hljs-string">&quot;counter old:&quot;</span>, atomic.SwapInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i)))
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs groovy">=== RUN   TestDemo6<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">9</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">5</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">1</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">2</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">3</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">6</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">4</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">7</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span><br>--- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)<br>PASS<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs groovy">=== RUN   TestDemo6
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">5</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">2</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">3</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">6</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">4</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
+--- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)
+PASS</code></pre></div>
 
 <h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
 <p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;<br>	var value atomic.Value<br>	var counter uint64 = <span class="hljs-number">1</span><br><br>	value.<span class="hljs-constructor">Store(<span class="hljs-params">counter</span>)</span><br>	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)<br><br>	value.<span class="hljs-constructor">Store(<span class="hljs-params">uint64</span>(10)</span>)<br>	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)<br><br>	value.<span class="hljs-constructor">Store(100)</span> <span class="hljs-comment">// 引发 panic</span><br>	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)<br><br>	time.<span class="hljs-constructor">Sleep(2 <span class="hljs-operator">*</span> <span class="hljs-params">time</span>.Second)</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
+	var value atomic.Value
+	var counter uint64 = <span class="hljs-number">1</span>
+
+	value.<span class="hljs-constructor">Store(<span class="hljs-params">counter</span>)</span>
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	value.<span class="hljs-constructor">Store(<span class="hljs-params">uint64</span>(10)</span>)
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	value.<span class="hljs-constructor">Store(100)</span> <span class="hljs-comment">// 引发 panic</span>
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	time.<span class="hljs-constructor">Sleep(2 <span class="hljs-operator">*</span> <span class="hljs-params">time</span>.Second)</span>
+&#125;</code></pre></div>
 <p>结果</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs awk">=== RUN   TestDemo7<br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">0</span><br><span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">10</span><br>--- FAIL: TestDemo7 (<span class="hljs-number">0.00</span>s)<br>panic: sync/atomic: store of inconsistently typed value into Value [recovered]<br>	panic: sync/atomic: store of inconsistently typed value into Value<br>                ...<br>Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo7
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">0</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">10</span>
+--- FAIL: TestDemo7 (<span class="hljs-number">0.00</span>s)
+panic: sync/atomic: store of inconsistently typed value into Value [recovered]
+	panic: sync/atomic: store of inconsistently typed value into Value
+                ...
+Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span></code></pre></div>
 
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
 <p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>

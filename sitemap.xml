@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://ilifes.com/golang/memory-manage/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/gunicorn/timeout/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://ilifes.com/golang/memory-leak/</loc>
     
     <lastmod>2021-01-04</lastmod>
@@ -47,13 +61,6 @@
     <loc>https://ilifes.com/about/index.html</loc>
     
     <lastmod>2021-01-04</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/gunicorn/timeout/</loc>
-    
-    <lastmod>2020-12-29</lastmod>
     
   </url>
   
@@ -130,14 +137,14 @@
   </url>
   
   <url>
-    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
+    <loc>https://ilifes.com/tags/%E4%BA%92%E6%96%A5%E9%94%81/</loc>
     <lastmod>2021-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://ilifes.com/tags/%E4%BA%92%E6%96%A5%E9%94%81/</loc>
+    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
     <lastmod>2021-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
