@@ -4,40 +4,54 @@
   <url>
     <loc>https://ilifes.com/golang/memory-leak/</loc>
     
-    <lastmod>2020-12-29</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/gunicorn/timeout/</loc>
-    
-    <lastmod>2020-12-29</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/golang/parallel-concept/</loc>
-    
-    <lastmod>2020-12-29</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/golang/datastruct-arrayslice/</loc>
-    
-    <lastmod>2020-12-29</lastmod>
+    <lastmod>2021-01-04</lastmod>
     
   </url>
   
   <url>
     <loc>https://ilifes.com/golang/ipc-atomic/</loc>
     
-    <lastmod>2020-12-29</lastmod>
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/golang/ipc-mutex/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
     
   </url>
   
   <url>
     <loc>https://ilifes.com/golang/ipc-cond/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/golang/parallel-concept/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/golang/datastruct-arrayslice/</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/about/index.html</loc>
+    
+    <lastmod>2021-01-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/gunicorn/timeout/</loc>
     
     <lastmod>2020-12-29</lastmod>
     
@@ -54,20 +68,6 @@
     <loc>https://ilifes.com/tags/index.html</loc>
     
     <lastmod>2020-12-29</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/golang/ipc-mutex/</loc>
-    
-    <lastmod>2020-12-28</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/about/index.html</loc>
-    
-    <lastmod>2020-12-28</lastmod>
     
   </url>
   
@@ -100,27 +100,6 @@
     <priority>1.0</priority>
   </url>
 
-  
-  <url>
-    <loc>https://ilifes.com/tags/gunicorn/</loc>
-    <lastmod>2021-01-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/timeout/</loc>
-    <lastmod>2021-01-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/redash/</loc>
-    <lastmod>2021-01-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E6%95%B0%E7%BB%84/</loc>
@@ -172,6 +151,27 @@
   </url>
   
   <url>
+    <loc>https://ilifes.com/tags/gunicorn/</loc>
+    <lastmod>2021-01-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/timeout/</loc>
+    <lastmod>2021-01-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/redash/</loc>
+    <lastmod>2021-01-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://ilifes.com/tags/%E5%86%85%E5%AD%98/</loc>
     <lastmod>2021-01-04</lastmod>
     <changefreq>daily</changefreq>
@@ -195,14 +195,14 @@
 
   
   <url>
-    <loc>https://ilifes.com/categories/gunicorn/</loc>
+    <loc>https://ilifes.com/categories/golang/</loc>
     <lastmod>2021-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://ilifes.com/categories/golang/</loc>
+    <loc>https://ilifes.com/categories/gunicorn/</loc>
     <lastmod>2021-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>

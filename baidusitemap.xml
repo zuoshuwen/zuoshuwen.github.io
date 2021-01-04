@@ -2,31 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ilifes.com/golang/memory-leak/</loc>
-    <lastmod>2020-12-29</lastmod>
+    <lastmod>2021-01-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-atomic/</loc>
+    <lastmod>2021-01-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-mutex/</loc>
+    <lastmod>2021-01-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-cond/</loc>
+    <lastmod>2021-01-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/parallel-concept/</loc>
+    <lastmod>2021-01-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/datastruct-arrayslice/</loc>
+    <lastmod>2021-01-04</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/gunicorn/timeout/</loc>
     <lastmod>2020-12-29</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/parallel-concept/</loc>
-    <lastmod>2020-12-29</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/datastruct-arrayslice/</loc>
-    <lastmod>2020-12-29</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/ipc-atomic/</loc>
-    <lastmod>2020-12-29</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/ipc-cond/</loc>
-    <lastmod>2020-12-29</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/ipc-mutex/</loc>
-    <lastmod>2020-12-28</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/Hello-Sown/</loc>

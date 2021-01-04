@@ -235,7 +235,7 @@
             <h1 style="display: none">Go并发编程之并发模型—(1)概念</h1>
             
             <div class="markdown-body">
-              <p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
 <a id="more"></a>
 
 <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
@@ -277,7 +277,7 @@
 <p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
 <h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
 <p>Go 代码片段的封装。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go function ()&#123;</span><br><span class="line">&#x2F;&#x2F;  ...</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;<br><span class="hljs-comment">//  ...</span><br>&#125;()<br></code></pre></td></tr></table></figure>
 
 <h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
