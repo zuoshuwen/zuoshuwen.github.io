@@ -4,13 +4,31 @@
   
   
   <entry>
-    <title>Go内存管理</title>
+    <title>Go 内存管理</title>
     <link href="/golang/memory-manage/"/>
     <url>/golang/memory-manage/</url>
     
-    <content type="html"><![CDATA[]]></content>
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>go 最初是基于 <a href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> 开发的内存分配器，到目前的 1.15 版本，宏观设计上大致相同。</p><h1 id="分配器结构"><a href="#分配器结构" class="headerlink" title="分配器结构"></a>分配器结构</h1><h2 id="page"><a href="#page" class="headerlink" title="page"></a>page</h2><h2 id="mspan"><a href="#mspan" class="headerlink" title="mspan"></a>mspan</h2><h2 id="pageCache"><a href="#pageCache" class="headerlink" title="pageCache"></a>pageCache</h2><div class="code-wrapper"><pre><div class="caption"><span>proc.go</span></div><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">schedinit</span><span class="hljs-params">()</span></span> &#123;...mallocinit()...</code></pre></div><p>malloc.go<br>func mallocinit() {<br>…<br>// Initialize the heap.<br>mheap_.init()<br>mcache0 = allocmcache()<br>…</p><h2 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h2><h2 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h2><h2 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h2><h1 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h1><h2 id="小内存"><a href="#小内存" class="headerlink" title="小内存"></a>小内存</h2><h3 id="span-class-size-class"><a href="#span-class-size-class" class="headerlink" title="span class size class"></a>span class size class</h3><h2 id="大内存"><a href="#大内存" class="headerlink" title="大内存"></a>大内存</h2><h1 id="释放"><a href="#释放" class="headerlink" title="释放"></a>释放</h1><h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><h2 id="mspan-amp-amp-基数树（radix-tree）"><a href="#mspan-amp-amp-基数树（radix-tree）" class="headerlink" title="mspan &amp;&amp; 基数树（radix tree）"></a>mspan &amp;&amp; 基数树（radix tree）</h2><h2 id="bitmap"><a href="#bitmap" class="headerlink" title="bitmap"></a>bitmap</h2>]]></content>
     
     
+    <categories>
+      
+      <category>golang</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>内存</tag>
+      
+      <tag>TCMalloc</tag>
+      
+      <tag>基数树</tag>
+      
+      <tag>radix tree</tag>
+      
+    </tags>
     
   </entry>
   

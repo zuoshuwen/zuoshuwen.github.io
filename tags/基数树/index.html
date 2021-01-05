@@ -17,25 +17,9 @@
   <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <title>Go 内存管理 - Sown</title>
+  <title>标签 - 基数树 - Sown</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
@@ -63,7 +47,7 @@
 
 
 <body>
-  <header style="height: 70vh;">
+  <header style="height: 80vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -162,58 +146,17 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Go 内存管理">
+            <span class="h2" id="subtitle" title="标签 - 基数树">
               
             </span>
 
             
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-01-04 19:08" pubdate>
-        2021年1月4日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      80 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      1
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
           </div>
 
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
           
         </div>
       </div>
@@ -222,130 +165,40 @@
 
   <main>
     
+      <div class="container nopadding-x-md">
+        <div class="py-5" id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<div class="list-group">
+  <p class="h4">共计 1 篇文章</p>
+  <hr>
+  
+  
+    
       
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Go 内存管理</h1>
-            
-            <div class="markdown-body">
-              <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>go 最初是基于 <a target="_blank" rel="noopener" href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> 开发的内存分配器，到目前的 1.15 版本，宏观设计上大致相同。</p>
-<h1 id="分配器结构"><a href="#分配器结构" class="headerlink" title="分配器结构"></a>分配器结构</h1><h2 id="page"><a href="#page" class="headerlink" title="page"></a>page</h2><h2 id="mspan"><a href="#mspan" class="headerlink" title="mspan"></a>mspan</h2><h2 id="pageCache"><a href="#pageCache" class="headerlink" title="pageCache"></a>pageCache</h2><div class="code-wrapper"><pre><div class="caption"><span>proc.go</span></div><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">schedinit</span><span class="hljs-params">()</span></span> &#123;
-...
-mallocinit()
-...</code></pre></div>
+      <p class="h5">2021</p>
+    
+    <a href="/golang/memory-manage/" class="list-group-item list-group-item-action">
+      <span class="archive-post-title">Go 内存管理</span>
+      <time style="float: right;">01-04</time>
+    </a>
+  
+</div>
 
 
-<p>malloc.go<br>func mallocinit() {<br>…<br>// Initialize the heap.<br>mheap_.init()<br>mcache0 = allocmcache()<br>…</p>
-<h2 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h2><h2 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h2><h2 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h2><h1 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h1><h2 id="小内存"><a href="#小内存" class="headerlink" title="小内存"></a>小内存</h2><h3 id="span-class-size-class"><a href="#span-class-size-class" class="headerlink" title="span class size class"></a>span class size class</h3><h2 id="大内存"><a href="#大内存" class="headerlink" title="大内存"></a>大内存</h2><h1 id="释放"><a href="#释放" class="headerlink" title="释放"></a>释放</h1><h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><h2 id="mspan-amp-amp-基数树（radix-tree）"><a href="#mspan-amp-amp-基数树（radix-tree）" class="headerlink" title="mspan &amp;&amp; 基数树（radix tree）"></a>mspan &amp;&amp; 基数树（radix tree）</h2><h2 id="bitmap"><a href="#bitmap" class="headerlink" title="bitmap"></a>bitmap</h2>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/golang/">golang</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/%E5%86%85%E5%AD%98/">内存</a>
-                    
-                      <a class="hover-with-bg" href="/tags/TCMalloc/">TCMalloc</a>
-                    
-                      <a class="hover-with-bg" href="/tags/%E5%9F%BA%E6%95%B0%E6%A0%91/">基数树</a>
-                    
-                      <a class="hover-with-bg" href="/tags/radix-tree/">radix tree</a>
-                    
-                  </div>
-                
+
+
+
               </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/golang/memory-leak/">
-                        <span class="hidden-mobile">实战Go内存泄露(转载)</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
             </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                
-  <div id="gitalk-container"></div>
-  <script type="text/javascript">
-    Fluid.utils.waitElementVisible('gitalk-container', function() {
-      Fluid.utils.createCssLink('/css/gitalk.css')
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
-        var gitalk = new Gitalk({
-          clientID: '1545f02c9a677f0bd433',
-          clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
-          repo: 'zuoshuwen.github.io',
-          owner: 'zuoshuwen',
-          admin: ["zuoshuwen"],
-          id: '9f4ddfc183ab26ffc65dc0593577a365',
-          language: 'zh-CN',
-          labels: ["Gitalk"],
-          perPage: 10,
-          pagerDirection: 'last',
-          createIssueManually: true,
-          distractionFreeMode: false
-        });
-        gitalk.render('gitalk-container');
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
+          </div>
         </div>
       </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
     
 
     
@@ -460,15 +313,9 @@ mallocinit()
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
 
 
 
