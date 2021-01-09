@@ -190,14 +190,11 @@
           
             
           
-          前言go 最初是基于 TCMalloc 开发的内存分配器，到目前的 1.15 版本，宏观设计上大致相同。
-分配器结构pagemspanpageCacheproc.gofunc schedinit() &#123;
-...
-mallocinit()
-...
+          前言本文以 go 1.15 为例，就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，变化还是很频繁的。但是大体上不会有太大的变化，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。mspan 的实现和管理，也就是 radix tree 和 bitmap。
+内存虚拟内存
 
-
-malloc.gofunc mallocinit() {…// Initialize the heap.mheap_.init()mcach
+访问内存，实际访问的是虚拟内存
+虚拟内存通过页表查看，当前要访问的虚拟内存地址
         </a>
       </p>
 

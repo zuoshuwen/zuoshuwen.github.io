@@ -4,7 +4,7 @@
   <url>
     <loc>https://ilifes.com/golang/memory-manage/</loc>
     
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-08</lastmod>
     
   </url>
   
@@ -102,7 +102,7 @@
 
   <url>
     <loc>https://ilifes.com/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -110,112 +110,112 @@
   
   <url>
     <loc>https://ilifes.com/tags/%E6%95%B0%E7%BB%84/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E5%88%87%E7%89%87/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E5%90%8C%E6%AD%A5/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/</loc>
-    <lastmod>2021-01-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E4%BA%92%E6%96%A5%E9%94%81/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://ilifes.com/tags/%E5%86%85%E5%AD%98/</loc>
-    <lastmod>2021-01-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/TCMalloc/</loc>
-    <lastmod>2021-01-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/%E5%9F%BA%E6%95%B0%E6%A0%91/</loc>
-    <lastmod>2021-01-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/radix-tree/</loc>
-    <lastmod>2021-01-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/CSP/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/gunicorn/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/timeout/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/redash/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/%E5%86%85%E5%AD%98/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/TCMalloc/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/%E5%9F%BA%E6%95%B0%E6%A0%91/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/radix-tree/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ilifes.com/tags/CSP/</loc>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/%E6%B3%84%E6%BC%8F/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/tags/pprof/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -224,14 +224,14 @@
   
   <url>
     <loc>https://ilifes.com/categories/golang/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://ilifes.com/categories/gunicorn/</loc>
-    <lastmod>2021-01-05</lastmod>
+    <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
