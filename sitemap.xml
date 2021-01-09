@@ -2,13 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://ilifes.com/golang/memory-manage/</loc>
-    
-    <lastmod>2021-01-08</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://ilifes.com/gunicorn/timeout/</loc>
     
     <lastmod>2021-01-04</lastmod>
@@ -109,6 +102,13 @@
 
   
   <url>
+    <loc>https://ilifes.com/tags/%E5%86%85%E5%AD%98/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://ilifes.com/tags/%E6%95%B0%E7%BB%84/</loc>
     <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
@@ -137,6 +137,13 @@
   </url>
   
   <url>
+    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
+    <lastmod>2021-01-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://ilifes.com/tags/%E4%BA%92%E6%96%A5%E9%94%81/</loc>
     <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
@@ -144,7 +151,7 @@
   </url>
   
   <url>
-    <loc>https://ilifes.com/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/</loc>
+    <loc>https://ilifes.com/tags/CSP/</loc>
     <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -166,41 +173,6 @@
   
   <url>
     <loc>https://ilifes.com/tags/redash/</loc>
-    <lastmod>2021-01-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/%E5%86%85%E5%AD%98/</loc>
-    <lastmod>2021-01-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/TCMalloc/</loc>
-    <lastmod>2021-01-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/%E5%9F%BA%E6%95%B0%E6%A0%91/</loc>
-    <lastmod>2021-01-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/radix-tree/</loc>
-    <lastmod>2021-01-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://ilifes.com/tags/CSP/</loc>
     <lastmod>2021-01-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
