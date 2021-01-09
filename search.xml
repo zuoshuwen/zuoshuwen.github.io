@@ -20,6 +20,54 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Redash Gunicorn 超时</title>
+    <url>/gunicorn/timeout/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
+<a id="more"></a>
+
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
+</ul>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
+<p>输出：</p>
+<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
+<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
+<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
+<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
+]]></content>
+      <categories>
+        <category>gunicorn</category>
+      </categories>
+      <tags>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go数据结构之数组与切片</title>
     <url>/golang/datastruct-arrayslice/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
@@ -362,176 +410,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Go并发编程之传统同步—(3)原子操作</title>
-    <url>/golang/ipc-atomic/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
-<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
-<a id="more"></a>
-
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
-<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
-			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
-		&#125;()
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
-&#125;</code></pre></div>
-<p>结果</p>
-<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo1</span>
-2020/10/11 00:24:56 counter: 100
-<span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)
-PASS</code></pre></div>
-
-<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
-			atomic.AddUint64(&amp;counter, ^<span class="hljs-keyword">uint64</span>(-(<span class="hljs-number">-1</span>)<span class="hljs-number">-1</span>))
-		&#125;()
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadUint64(&amp;counter))
-&#125;</code></pre></div>
-<p>结果</p>
-<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo2</span>
-2020/10/11 00:32:05 counter: 0
-<span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)
-PASS</code></pre></div>
-
-<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> first <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10000</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
-			<span class="hljs-keyword">if</span> atomic.CompareAndSwapInt64(&amp;first, <span class="hljs-number">0</span>, <span class="hljs-keyword">int64</span>(i)) &#123;
-				log.Println(<span class="hljs-string">&quot;抢先运行的是 goroutine&quot;</span>, i)
-			&#125;
-		&#125;(i)
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-	log.Println(<span class="hljs-string">&quot;num:&quot;</span>, atomic.LoadInt64(&amp;first))
-&#125;</code></pre></div>
-<p>结果</p>
-<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo3</span>
-2020/10/11 00:42:10 抢先运行的是 goroutine 3
-2020/10/11 00:42:12 num: 3
-<span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)
-PASS</code></pre></div>
-
-<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
-			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
-			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
-		&#125;()
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-&#125;</code></pre></div>
-
-<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
-			atomic.StoreInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i))
-			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
-		&#125;(i)
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-&#125;</code></pre></div>
-
-<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
-	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
-
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
-		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
-			log.Println(<span class="hljs-string">&quot;counter old:&quot;</span>, atomic.SwapInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i)))
-		&#125;(i)
-	&#125;
-
-	time.Sleep(<span class="hljs-number">2</span> * time.Second)
-&#125;</code></pre></div>
-<p>结果</p>
-<div class="code-wrapper"><pre><code class="hljs groovy">=== RUN   TestDemo6
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">9</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">5</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">1</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">2</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">3</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">6</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">4</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">7</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
---- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)
-PASS</code></pre></div>
-
-<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
-<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
-<div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
-	var value atomic.Value
-	var counter uint64 = <span class="hljs-number">1</span>
-
-	value.<span class="hljs-constructor">Store(<span class="hljs-params">counter</span>)</span>
-	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
-
-	value.<span class="hljs-constructor">Store(<span class="hljs-params">uint64</span>(10)</span>)
-	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
-
-	value.<span class="hljs-constructor">Store(100)</span> <span class="hljs-comment">// 引发 panic</span>
-	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
-
-	time.<span class="hljs-constructor">Sleep(2 <span class="hljs-operator">*</span> <span class="hljs-params">time</span>.Second)</span>
-&#125;</code></pre></div>
-<p>结果</p>
-<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo7
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">0</span>
-<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">10</span>
---- FAIL: TestDemo7 (<span class="hljs-number">0.00</span>s)
-panic: sync/atomic: store of inconsistently typed value into Value [recovered]
-	panic: sync/atomic: store of inconsistently typed value into Value
-                ...
-Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span></code></pre></div>
-
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
-<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
-<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
-<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
-<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
-<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
-<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
-</ol>
-<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-        <tag>原子操作</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go并发编程之传统同步—(2)条件变量</title>
     <url>/golang/ipc-cond/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>回顾上篇文章 <a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 其中说到，同步最终是为了达到以下两种目的：</p>
@@ -857,6 +735,176 @@ pthread<span class="hljs-constructor">_mutex_unlock(&amp;<span class="hljs-param
       </tags>
   </entry>
   <entry>
+    <title>Go并发编程之传统同步—(3)原子操作</title>
+    <url>/golang/ipc-atomic/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
+<p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
+<a id="more"></a>
+
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
+<h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo1</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+&#125;</code></pre></div>
+<p>结果</p>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo1</span>
+2020/10/11 00:24:56 counter: 100
+<span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)
+PASS</code></pre></div>
+
+<h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddUint64(&amp;counter, ^<span class="hljs-keyword">uint64</span>(-(<span class="hljs-number">-1</span>)<span class="hljs-number">-1</span>))
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadUint64(&amp;counter))
+&#125;</code></pre></div>
+<p>结果</p>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo2</span>
+2020/10/11 00:32:05 counter: 0
+<span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)
+PASS</code></pre></div>
+
+<h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> first <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">10000</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			<span class="hljs-keyword">if</span> atomic.CompareAndSwapInt64(&amp;first, <span class="hljs-number">0</span>, <span class="hljs-keyword">int64</span>(i)) &#123;
+				log.Println(<span class="hljs-string">&quot;抢先运行的是 goroutine&quot;</span>, i)
+			&#125;
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+	log.Println(<span class="hljs-string">&quot;num:&quot;</span>, atomic.LoadInt64(&amp;first))
+&#125;</code></pre></div>
+<p>结果</p>
+<div class="code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-section">=== RUN   TestDemo3</span>
+2020/10/11 00:42:10 抢先运行的是 goroutine 3
+2020/10/11 00:42:12 num: 3
+<span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)
+PASS</code></pre></div>
+
+<h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+			atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)
+			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+		&#125;()
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
+
+<h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			atomic.StoreInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i))
+			log.Println(<span class="hljs-string">&quot;counter:&quot;</span>, atomic.LoadInt64(&amp;counter))
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
+
+<h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
+	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
+
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span></span> &#123;
+			log.Println(<span class="hljs-string">&quot;counter old:&quot;</span>, atomic.SwapInt64(&amp;counter, <span class="hljs-keyword">int64</span>(i)))
+		&#125;(i)
+	&#125;
+
+	time.Sleep(<span class="hljs-number">2</span> * time.Second)
+&#125;</code></pre></div>
+<p>结果</p>
+<div class="code-wrapper"><pre><code class="hljs groovy">=== RUN   TestDemo6
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">9</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">5</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">2</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">3</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">6</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">4</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">7</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">00</span>:<span class="hljs-number">43</span>:<span class="hljs-number">36</span> counter <span class="hljs-attr">old:</span> <span class="hljs-number">0</span>
+--- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)
+PASS</code></pre></div>
+
+<h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
+<p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
+<div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
+	var value atomic.Value
+	var counter uint64 = <span class="hljs-number">1</span>
+
+	value.<span class="hljs-constructor">Store(<span class="hljs-params">counter</span>)</span>
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	value.<span class="hljs-constructor">Store(<span class="hljs-params">uint64</span>(10)</span>)
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	value.<span class="hljs-constructor">Store(100)</span> <span class="hljs-comment">// 引发 panic</span>
+	log.<span class="hljs-constructor">Println(<span class="hljs-string">&quot;counter:&quot;</span>, <span class="hljs-params">value</span>.Load()</span>)
+
+	time.<span class="hljs-constructor">Sleep(2 <span class="hljs-operator">*</span> <span class="hljs-params">time</span>.Second)</span>
+&#125;</code></pre></div>
+<p>结果</p>
+<div class="code-wrapper"><pre><code class="hljs awk">=== RUN   TestDemo7
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">0</span>
+<span class="hljs-number">2020</span><span class="hljs-regexp">/10/</span><span class="hljs-number">11</span> <span class="hljs-number">10</span>:<span class="hljs-number">14</span>:<span class="hljs-number">58</span> counter: <span class="hljs-number">10</span>
+--- FAIL: TestDemo7 (<span class="hljs-number">0.00</span>s)
+panic: sync/atomic: store of inconsistently typed value into Value [recovered]
+	panic: sync/atomic: store of inconsistently typed value into Value
+                ...
+Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span></code></pre></div>
+
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
+<p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
+<h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
+<h4 id="单生产、消费者"><a href="#单生产、消费者" class="headerlink" title="单生产、消费者"></a>单生产、消费者</h4><p>单生产者、单消费者可以做到免锁访问环形缓冲区（Ring Buffer）。<br>比如，Linux kernel 中的 kfifo 的实现。</p>
+<h4 id="RCU（Read-Copy-Update）"><a href="#RCU（Read-Copy-Update）" class="headerlink" title="RCU（Read Copy Update）"></a>RCU（Read Copy Update）</h4><p>新旧副本切换机制，对于旧副本可以采用延迟释放的做法。</p>
+<h4 id="CAS（Compare-And-Swap）"><a href="#CAS（Compare-And-Swap）" class="headerlink" title="CAS（Compare And Swap）"></a>CAS（Compare And Swap）</h4><p>如无锁栈，无锁队列等待</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>原子操作性能是高于互斥锁的，但带来的复杂性也会提高，真正用好并不容易。</li>
+<li>互斥锁、条件变量，方法内部的实现也都用到了原子操作，特别是CAS。</li>
+</ol>
+<p><a href="https://github.com/zuoshuwen/go-example/blob/master/e003/a01_test.go">文章示例代码</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+        <tag>原子操作</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go并发编程之传统同步—(1)互斥锁</title>
     <url>/golang/ipc-mutex/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种<strong>通信</strong>（IPC）：</p>
@@ -1097,54 +1145,6 @@ PASS</code></pre></div>
       </categories>
       <tags>
         <tag>CSP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/gunicorn/timeout/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<a id="more"></a>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
-<p>输出：</p>
-<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
-<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
-<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
-<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>gunicorn</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
       </tags>
   </entry>
   <entry>
