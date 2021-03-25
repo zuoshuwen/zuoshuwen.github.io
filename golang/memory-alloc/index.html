@@ -1,0 +1,710 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="后端技术、笔记、教程">
+  <meta name="author" content="sown">
+  <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
+  
+  <title>Go内存管理、分配 - Sown</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Sown</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/golang/a/">
+                <i class="iconfont icon-books"></i>
+                Go
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/images/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Go内存管理、分配">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-04 19:08" pubdate>
+        2021年1月4日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      36
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Go内存管理、分配</h1>
+            
+            <div class="markdown-body">
+              <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。</p>
+<h1 id="系统内存"><a href="#系统内存" class="headerlink" title="系统内存"></a>系统内存</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><img src="/images/golang/memory-manage-vm-01.png" srcset="/img/loading.gif" lazyload alt="虚拟内存"><br>虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实际上，它通常是被分隔成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。<br>目前，大多数操作系统都使用了虚拟内存，如Windows家族的“虚拟内存”；Linux的“交换空间”等。</p>
+<ul>
+<li>访问内存，实际访问的是虚拟内存</li>
+<li>虚拟内存通过页表查看，当前要访问的虚拟内存地址，是否已经加载到了物理内存，如果已经在物理内存，则取物理内存数据，如果没有对应的物理内存，则从磁盘加载数据到物理内存，并把物理内存地址和虚拟内存地址更新到页表。</li>
+<li>每个进程都要各自的虚拟内存，内存的并发访问问题的粒度从多进程级别，可以降低到多线程级别。</li>
+</ul>
+<h2 id="堆、栈"><a href="#堆、栈" class="headerlink" title="堆、栈"></a>堆、栈</h2><p><img src="/images/golang/memory-manage-vm-02.png" srcset="/img/loading.gif" lazyload alt="堆、栈"></p>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
+<li>栈在高地址，从高地址向低地址增长；堆在低地址，从低地址向高地址增长。</li>
+<li>栈的内存不需要回收；堆需要回收，无论是主动free、垃圾回收。</li>
+<li>栈上的内存有更好的局部性；堆上内存访访问2块数据可能在不同的页上。</li>
+<li>栈是操作系统管理的；堆是用户管理的</li>
+<li>栈是静态内存分配；堆是动态内存分配</li>
+</ul>
+<h3 id="栈还有以下特点"><a href="#栈还有以下特点" class="headerlink" title="栈还有以下特点"></a>栈还有以下特点</h3><ul>
+<li>LIFO，每当一个函数声明一个新变量时，它就被“推”到堆栈的最顶层块上。然后，每当一个函数退出时，最上面的块就会被清除</li>
+<li>每个线程一个 stack</li>
+</ul>
+<h2 id="释放内存"><a href="#释放内存" class="headerlink" title="释放内存"></a>释放内存</h2><h3 id="1-手动管理"><a href="#1-手动管理" class="headerlink" title="1. 手动管理"></a>1. 手动管理</h3><p>代表语言有 C、C++，需要调用 alloc, realloc, calloc, free 等函数</p>
+<h3 id="2-垃圾回收（GC）"><a href="#2-垃圾回收（GC）" class="headerlink" title="2. 垃圾回收（GC）"></a>2. 垃圾回收（GC）</h3><p>在计算机科学中，垃圾回收（英语：Garbage Collection，缩写为GC）是指一种自动的存储器管理机制。当某个程序占用的一部分内存空间不再被这个程序访问时，这个程序会借助垃圾回收算法向操作系统归还这部分内存空间。垃圾回收器可以减轻程序员的负担，也减少程序中的错误。垃圾回收最早起源于LISP语言。</p>
+<h4 id="2-1-标记和扫描GC-Mark-sweep"><a href="#2-1-标记和扫描GC-Mark-sweep" class="headerlink" title="2.1 标记和扫描GC(Mark-sweep)"></a>2.1 标记和扫描GC(Mark-sweep)</h4><p>代表语言有 Golang<br>标记和扫描GC，也称为跟踪GC。<br>它通常是一个两阶段的算法，首先将仍然被引用的对象标记为“活的”，然后在下一阶段释放不活的对象的内存。从根变量开始遍历所有引用的对象，标记引用的对象，没有被标记的进行回收</p>
+<ul>
+<li>优点：解决了引用计数的缺点。</li>
+<li>缺点：需要 STW，暂时停掉程序运行。</li>
+</ul>
+<h4 id="2-2-引用计数GC"><a href="#2-2-引用计数GC" class="headerlink" title="2.2 引用计数GC"></a>2.2 引用计数GC</h4><p>代表语言有 PHP, Perl, and Python<br>在这种方法中，每个对象获得一个引用计数，该引用计数随着对它的引用的改变而增加或减少，当计数变为零时，垃圾收集就完成了，缺点是不能处理循环引用。</p>
+<ul>
+<li>优点：对象回收快，不会出现内存耗尽或达到某个阈值时才回收。</li>
+<li>缺点：不能很好的处理循环引用，而实时维护引用计数也是有损耗的。</li>
+</ul>
+<h4 id="2-3-标记-压缩-Mark-compact"><a href="#2-3-标记-压缩-Mark-compact" class="headerlink" title="2.3 标记-压缩(Mark-compact)"></a>2.3 标记-压缩(Mark-compact)</h4><h4 id="2-4-半空间复制（Semispace-copy）"><a href="#2-4-半空间复制（Semispace-copy）" class="headerlink" title="2.4 半空间复制（Semispace copy）"></a>2.4 半空间复制（Semispace copy）</h4><h4 id="2-5-分代GC"><a href="#2-5-分代GC" class="headerlink" title="2.5 分代GC"></a>2.5 分代GC</h4><p>代表语言 Java，按照对象生命周期长短划分不同的代空间，生命周期长的放入老年代，短的放入新生代，不同代有不同的回收算法和回收频率。</p>
+<ul>
+<li>优点：回收性能好</li>
+<li>缺点：算法复杂</li>
+</ul>
+<h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" srcset="/img/loading.gif" lazyload alt="TCMalloc"></p>
+<p>内存分配策略的实现，我们也可以叫它内存分配器，相当于在用户编写的程序与虚拟内存中间建立了”内存池”，而避免手写内存池。</p>
+<p>下面是比较成熟的内存池实现库</p>
+<ul>
+<li>glibc 的 ptmalloc2</li>
+<li>google 的 tcmalloc</li>
+<li>facebook 的 jemalloc</li>
+</ul>
+<p>Golang 正是使用了 <a target="_blank" rel="noopener" href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> 的设计思想。</p>
+<h2 id="Page"><a href="#Page" class="headerlink" title="Page"></a>Page</h2><p>操作系统对内存管理以页为单位，TCMalloc 也是这样，只不过 TCMalloc 里的 Page 大小与操作系统里的大小并不一定相等，而是倍数关系，x64 下 Page 大小是 8KB。</p>
+<h2 id="Span"><a href="#Span" class="headerlink" title="Span"></a>Span</h2><p>一组连续的 Page 被称为 Span，比如可以有 2 个页大小的 Span，也可以有 16 页大小的 Span，Span 比 Page 高一个层级，是为了方便管理一定大小的内存区域，Span 是 TCMalloc 中内存管理的基本单位。</p>
+<h2 id="ThreadCache"><a href="#ThreadCache" class="headerlink" title="ThreadCache"></a>ThreadCache</h2><p>每个线程各自的 Cache，一个Cache包含多个空闲内存块链表，每个链表连接的都是内存块，同一个链表上内存块的大小是相同的，也可以说按内存块大小，给内存块分了个类，这样可以根据申请的内存大小，快速从合适的链表选择空闲内存块。由于每个线程有自己的 ThreadCache，所以 ThreadCache 访问是无锁的。</p>
+<h2 id="CentralCache"><a href="#CentralCache" class="headerlink" title="CentralCache"></a>CentralCache</h2><p>是所有线程共享的缓存，也是保存的空闲内存块链表，链表的数量与 ThreadCache 中链表数量相同，当 ThreadCache 内存块不足时，可以从 CentralCache 取，当 ThreadCache 内存块多时，可以放回 CentralCache。由于 CentralCache 是共享的，所以它的访问是要加锁的。</p>
+<h2 id="PageHeap"><a href="#PageHeap" class="headerlink" title="PageHeap"></a>PageHeap</h2><p>PageHeap 是堆内存的抽象，PageHeap 存的也是若干链表，链表保存的是 Span，当 CentralCache 没有内存的时，会从 PageHeap 取，把1个 Span 拆成若干内存块，添加到对应大小的链表中，当 CentralCache 内存多的时候，会放回 PageHeap。毫无疑问，PageHeap 也是要加锁的。</p>
+<h2 id="对象大小"><a href="#对象大小" class="headerlink" title="对象大小"></a>对象大小</h2><ul>
+<li>小对象大小：0~256KB</li>
+<li>中对象大小：257~1024kb</li>
+<li>大对象大小：&gt; 1024kb</li>
+</ul>
+<h1 id="GOMalloc"><a href="#GOMalloc" class="headerlink" title="GOMalloc"></a>GOMalloc</h1><p><img src="/images/golang/memory-manage-gomalloc-01.png" srcset="/img/loading.gif" lazyload alt="Golang内存管理"></p>
+<h2 id="大小维度"><a href="#大小维度" class="headerlink" title="大小维度"></a>大小维度</h2><h2 id="object-size"><a href="#object-size" class="headerlink" title="object size"></a>object size</h2><p>是申请对象的大小，比如，申请一个 8byte object size。</p>
+<h2 id="size-class"><a href="#size-class" class="headerlink" title="size class"></a>size class</h2><p><code>object size</code> 的分类、级别，比如 8byte ~ 16byte，16byte ~ 32byte，32byte ~ 48byte …，共 67 个<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go">_NumSizeClasses = <span class="hljs-number">67</span></code></pre></div>
+
+<h2 id="span-class"><a href="#span-class" class="headerlink" title="span class"></a>span class</h2><p><code>span</code> 的分类、级别，共 134 个，是 size class 的一倍<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go">numSpanClasses = _NumSizeClasses &lt;&lt; <span class="hljs-number">1</span></code></pre></div>
+<p>其中 67 个是 scan (对象中含有指针的），另外 67 个是 noscan（对象中不含有指针的）</p>
+<h1 id="分配器结构"><a href="#分配器结构" class="headerlink" title="分配器结构"></a>分配器结构</h1><h2 id="page"><a href="#page" class="headerlink" title="page"></a>page</h2><p>与 TCMalloc 中的 Page 定义相同。</p>
+<h2 id="mspan"><a href="#mspan" class="headerlink" title="mspan"></a>mspan</h2><p>与 TCMalloc 中的 Span 定义相同。<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mspan <span class="hljs-keyword">struct</span> &#123;
+    allocBits  *gcBits
+	gcmarkBits *gcBits
+&#125;</code></pre></div>
+
+<h2 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h2><p>与 TCMalloc 中的 ThreadCache 定义相同，但在 Golang 中每个 P（MPG中的P）拥有独立的 mcache，可以做到无锁访问。<br>在 mcache 中缓存着 134 个 mspan， 在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcache <span class="hljs-keyword">struct</span> &#123;
+    alloc [numSpanClasses]*mspan</code></pre></div>
+
+<h2 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h2><p>所有 P 的共享缓存，访问是要加锁的。<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcentral <span class="hljs-keyword">struct</span> &#123;
+    nonempty mSpanList <span class="hljs-comment">// 有空闲对象的 mspan 链表</span>
+	empty    mSpanList <span class="hljs-comment">// 没有空闲对象或 span 已经被 mcache 缓存的 span 链表</span></code></pre></div>
+<p>那 mcentral 有多少个呢？往下看 mheap</p>
+<h2 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h2><p>mcentral 被 mheap 所管理，也是 134 个</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mheap <span class="hljs-keyword">struct</span> &#123;
+    arenas [<span class="hljs-number">1</span> &lt;&lt; arenaL1Bits]*[<span class="hljs-number">1</span> &lt;&lt; arenaL2Bits]*heapArena
+    
+    central [numSpanClasses]<span class="hljs-keyword">struct</span> &#123;
+    mcentral mcentral
+    pad      [cpu.CacheLinePadSize - unsafe.Sizeof(mcentral&#123;&#125;)%cpu.CacheLinePadSize]<span class="hljs-keyword">byte</span>
+    &#125;</code></pre></div>
+
+<h2 id="pageCache"><a href="#pageCache" class="headerlink" title="pageCache"></a>pageCache</h2><p>在向mheap申请small内存的时候，会先访问 P 中的 pcache，P 结构如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> p <span class="hljs-keyword">struct</span> &#123;
+    pcache      pageCache
+&#125;</code></pre></div>
+<p>pageCache结构如下</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> pageCache <span class="hljs-keyword">struct</span> &#123;
+	base  <span class="hljs-keyword">uintptr</span> <span class="hljs-comment">// base address of the chunk</span>
+	cache <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing free pages (1 means free)</span>
+	scav  <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing scavenged pages (1 means scavenged)</span>
+&#125;</code></pre></div>
+
+<h2 id="fixalloc"><a href="#fixalloc" class="headerlink" title="fixalloc"></a>fixalloc</h2><p>基于自由列表的固定大小的分配器</p>
+<h1 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h1><h2 id="小内存"><a href="#小内存" class="headerlink" title="小内存"></a>小内存</h2><p>mcache-&gt;mcentral-&gt;mheap位图查找-&gt;pageCache → mheap基数树查找→操作系统分配</p>
+<h2 id="大内存"><a href="#大内存" class="headerlink" title="大内存"></a>大内存</h2><p>大对象是大小大于32KB的内存，不与 mcache 和 mcentral 沟通，并直接通过 mheap 进行分配。经历mheap基数树查找→操作系统分配 的过程。每一个大对象是一个特殊的span, 它的class是0。</p>
+<h2 id="寻找-span"><a href="#寻找-span" class="headerlink" title="寻找 span"></a>寻找 span</h2><ol>
+<li>计算对象所需内存大小size</li>
+<li>根据size到size class映射，计算出所需的size class</li>
+<li>根据size class和对象是否包含指针计算出span class</li>
+<li>获取该span class指向的span。</li>
+</ol>
+<p>以分配一个不包含指针的，大小为24Byte的对象为例。</p>
+<p>根据映射表：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// class  bytes/obj  bytes/span  objects  tail waste  max waste</span>
+<span class="hljs-comment">//     1          8        8192     1024           0     87.50%</span>
+<span class="hljs-comment">//     2         16        8192      512           0     43.75%</span>
+<span class="hljs-comment">//     3         32        8192      256           0     46.88%</span>
+<span class="hljs-comment">//     4         48        8192      170          32     31.52%</span>
+<span class="hljs-comment">//     5         64        8192      128           0     23.44%</span>
+<span class="hljs-comment">//     6         80        8192      102          32     19.07%</span>
+<span class="hljs-comment">//     7         96        8192       85          32     15.95%</span>
+<span class="hljs-comment">//     8        112        8192       73          16     13.56%</span>
+<span class="hljs-comment">//     9        128        8192       64           0     11.72%</span>
+<span class="hljs-comment">//    10        144        8192       56         128     11.82%</span>
+<span class="hljs-comment">//    11        160        8192       51          32      9.73%</span></code></pre></div>
+<p>size class 3，它的对象大小范围是(16,32]Byte，24Byte刚好在此区间，所以此对象的size class为3。<br>Size class到span class的计算如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// noscan为true代表对象不包含指针</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeSpanClass</span><span class="hljs-params">(sizeclass <span class="hljs-keyword">uint8</span>, noscan <span class="hljs-keyword">bool</span>)</span> <span class="hljs-title">spanClass</span></span> &#123;
+	<span class="hljs-keyword">return</span> spanClass(sizeclass&lt;&lt;<span class="hljs-number">1</span>) | spanClass(bool2int(noscan))
+&#125;</code></pre></div>
+<p>所以，对应的span class为：</p>
+<div class="code-wrapper"><pre><code class="hljs go">span class = <span class="hljs-number">3</span> &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span> = <span class="hljs-number">7</span></code></pre></div>
+<p>所以该对象需要的是span class 7指向的span。</p>
+<h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><p>在 GO 目前的版本中，内存管理使用了 位图（bitmap）、基数树（radix tree）。</p>
+<h2 id="bitmap"><a href="#bitmap" class="headerlink" title="bitmap"></a>bitmap</h2><p>图（Bitmap），即位（Bit）的集合，是一种数据结构，可用于记录大量的0-1状态，在很多地方都会用到，比如Linux内核（如inode，磁盘块）、Bloom Filter算法等，其优势是可以在一个非常高的空间利用率下保存大量0-1状态。<br>BitMap算法的核心思想是用bit数组来记录0-1两种状态，然后再将具体数据映射到这个比特数组的具体位置，这个比特位设置成0表示数据不存在，设置成1表示数据存在。<br>BitMap算在在大量数据查询、去重等应用场景中使用的比较多，这个算法具有比较高的空间利用率。<br>在《编程珠玑》第一章中，就有利用bitmap进行大量文件的排序。<br>JDK<br>google</p>
+<h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><p><img src="/images/golang/memory-manage-trie-01.png" srcset="/img/loading.gif" lazyload alt="前缀树"><br>在计算机科学中，trie，又称前缀树或字典树，是一种有序树，用于保存关联数组，其中的键通常是字符串。与二叉查找树不同，键不是直接保存在节点中，而是由节点在树中的位置决定。一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，而根节点对应空字符串。一般情况下，不是所有的节点都有对应的值，只有叶子节点和部分内部节点所对应的键才有相关的值。<br>应用场景<br>trie树常用于搜索提示。如当输入一个网址，可以自动搜索出可能的选择。当没有完全匹配的搜索结果，可以返回前缀最相似的可能。</p>
+<h2 id="基数树"><a href="#基数树" class="headerlink" title="基数树"></a>基数树</h2><p><img src="/images/golang/memory-manage-radix-01.png" srcset="/img/loading.gif" lazyload alt="基数树"><br>在计算机科学中，基数树，或称Patricia trie/tree，或crit bit tree，压缩前缀树，是一种更节省空间的Trie（前缀树）。对于基数树的每个节点，如果该节点是唯一的子树的话，就和父节点合并。<br>应用场景<br>用于IP 路由。 信息检索中用于文本文档的倒排索引。</p>
+<h2 id="go-内存管理中的位图、基数树"><a href="#go-内存管理中的位图、基数树" class="headerlink" title="go 内存管理中的位图、基数树"></a>go 内存管理中的位图、基数树</h2><p>在Go1.12的时候,Go语言采用了 Treap 进行内存的管理，Treap 是一种引入了随机数的二叉树搜索树，其实现简单，并且引入的随机数以及必要时的旋转保证了比较好的平衡特性。</p>
+<h3 id="mspan-的实现-基数树（radix-tree）"><a href="#mspan-的实现-基数树（radix-tree）" class="headerlink" title="mspan 的实现 基数树（radix tree）"></a>mspan 的实现 基数树（radix tree）</h3><p>管理线性的地址空间的位图结构叫做基数树<br>mpagealloc.go</p>
+<h1 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h1><ul>
+<li>mpagealloc.go：Page allocator、radix tree</li>
+<li>malloc.go：mallocgc() 申请内存的入口</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>bitmap 管理内存页<br>radix tree 内存管理的结构</p>
+<h1 id="参考借鉴"><a href="#参考借鉴" class="headerlink" title="参考借鉴"></a>参考借鉴</h1><p><a target="_blank" rel="noopener" href="https://lessisbetter.site/2019/07/06/go-memory-allocation/">Go内存分配那些事，就这么简单！</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av288263284/">GopherCon 2020: Michael Knyszek - Evolving the Go Memory Manager’s RAM</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903769201704973">漫画：什么是Bitmap算法？</a><br><a target="_blank" rel="noopener" href="http://c.biancheng.net/view/1270.html">什么是虚拟内存，虚拟内存及其作用详解</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/golang/">golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/">内存分配</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/golang/scheduling/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">GoMPG与调度</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/gunicorn/timeout/">
+                        <span class="hidden-mobile">Redash Gunicorn 超时</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
+        var gitalk = new Gitalk({
+          clientID: '1545f02c9a677f0bd433',
+          clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
+          repo: 'zuoshuwen.github.io',
+          owner: 'zuoshuwen',
+          admin: ["zuoshuwen"],
+          id: '7675d29956acf5c30e912c0e6609ee38',
+          language: 'zh-CN',
+          labels: ["Gitalk"],
+          perPage: 10,
+          pagerDirection: 'last',
+          createIssueManually: true,
+          distractionFreeMode: false,
+          proxy: '&lt;your own proxy&gt;/https://github.com/login/oauth/access_token'
+        });
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        京ICP备18026333号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?97f60cea7055dca81a77d34bd50655bf";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

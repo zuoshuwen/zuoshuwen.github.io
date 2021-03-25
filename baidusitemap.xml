@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://ilifes.com/golang/a/</loc>
+    <lastmod>2021-03-25</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/scheduling/</loc>
+    <lastmod>2021-03-25</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/memory-leak-escape/</loc>
+    <lastmod>2021-03-25</lastmod>
+  </url>
+  <url>
     <loc>https://ilifes.com/golang/oop/</loc>
     <lastmod>2021-03-25</lastmod>
   </url>
@@ -9,15 +21,11 @@
     <lastmod>2021-03-25</lastmod>
   </url>
   <url>
-    <loc>https://ilifes.com/golang/scheduling/</loc>
-    <lastmod>2021-03-25</lastmod>
+    <loc>https://ilifes.com/golang/memory-alloc/</loc>
+    <lastmod>2021-01-26</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/gunicorn/timeout/</loc>
-    <lastmod>2021-01-04</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/forward-memory-leak/</loc>
     <lastmod>2021-01-04</lastmod>
   </url>
   <url>
