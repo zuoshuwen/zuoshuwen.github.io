@@ -8,16 +8,17 @@
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
-  <link rel="icon" type="image/png" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="后端技术、笔记、教程">
+  <meta name="description" content="MPG前言在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <title>Go并发编程之并发模型—(1)概念 - Sown</title>
+  
+  <title>Go的MPG与调度 - Sown</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -55,11 +56,11 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.3.0"></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -162,7 +163,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Go并发编程之并发模型—(1)概念">
+            <span class="h2" id="subtitle" title="Go的MPG与调度">
               
             </span>
 
@@ -172,8 +173,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-29 10:32" pubdate>
-        2020年12月29日 上午
+      <time datetime="2021-01-26 19:09" pubdate>
+        2021年1月26日 晚上
       </time>
     </span>
   
@@ -184,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      956 字
+      2.6k 字
     </span>
   
 
@@ -194,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      10
+      28
        分钟
     </span>
   
@@ -232,11 +233,11 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Go并发编程之并发模型—(1)概念</h1>
+            <h1 style="display: none">Go的MPG与调度</h1>
             
             <div class="markdown-body">
-              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
-<a id="more"></a>
+              <h1 id="MPG"><a href="#MPG" class="headerlink" title="MPG"></a>MPG</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+<span id="more"></span>
 
 <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
 <h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
@@ -281,6 +282,7 @@
 <span class="hljs-comment">//  ...</span>
 &#125;()</code></pre></div>
 
+
 <h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
 <h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
@@ -289,7 +291,206 @@
 <li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
 <li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
 </ol>
-
+<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"></p>
+<h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>源码</th>
+<th>说明</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全局M列表</td>
+<td>runtime.allm</td>
+<td>所有M的单链表</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局P列表</td>
+<td>runtime.allp</td>
+<td>所有P的数组</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局G列表</td>
+<td>runtime.allgs</td>
+<td>所有P的切片</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>调度器的空闲M列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲M的单链表</td>
+<td>暂时不用；用时再取</td>
+</tr>
+<tr>
+<td>调度器的空闲P列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲P的单链表</td>
+<td>P不在关联M，P中可运行G为空，加入该列表；M需要P关联，从此列表取；</td>
+</tr>
+<tr>
+<td>调度器的可运行G队列</td>
+<td>runtime.sched.runq.head；runtime.sched.runq.tail</td>
+<td>可运行的G队列</td>
+<td>如果P的可运行G队列满，加入此队列</td>
+</tr>
+<tr>
+<td>调度器的自由G列表</td>
+<td>runtime.sched.gFree.stack(有栈)；runtime.sched.gFree.noStack (无栈)</td>
+<td>自由的G的两个单链表</td>
+<td>本地P自由G列表缺G，此列表给补；本地P自由G列表满G，此列表收取；</td>
+</tr>
+<tr>
+<td>P的可运行G队列</td>
+<td>runtime.p.runq；runtime.p.runqhead；runtime.p.runqtail</td>
+<td>P中的可运行G的队列</td>
+<td>调度器初始化过的G，加入该队列</td>
+</tr>
+<tr>
+<td>P的自由G列表</td>
+<td>runtime.p.gfree</td>
+<td>P中的自由G的单链表</td>
+<td>包含一些已经运行完成的G；go启用G，先从此处寻找现成的G；</td>
+</tr>
+</tbody></table>
+<h2 id="M-1"><a href="#M-1" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g0</td>
+<td>*g</td>
+<td>特殊的 goroutine，在 runtime 启动之初创建的，用于执行一些运行时任务</td>
+</tr>
+<tr>
+<td>mstartfn</td>
+<td>func()</td>
+<td>在新的 M 上启动特殊任务（系统监控、GC辅助、M自旋）</td>
+</tr>
+<tr>
+<td>curg</td>
+<td>*g</td>
+<td>当前 M 正在运行的 G 的指针</td>
+</tr>
+<tr>
+<td>p</td>
+<td>puintptr</td>
+<td>当前 M 正在关联的那个 P</td>
+</tr>
+<tr>
+<td>nextp</td>
+<td>puintptr</td>
+<td>暂存与当前 M 有潜在关联的 P（预连）</td>
+</tr>
+<tr>
+<td>spinning</td>
+<td>bool</td>
+<td>是否在寻找可运行的 G，寻找过程中 M 自旋</td>
+</tr>
+<tr>
+<td>lockedg</td>
+<td>*g</td>
+<td>当前 M 锁定的 G</td>
+</tr>
+</tbody></table>
+<h2 id="P-1"><a href="#P-1" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pidle</td>
+<td>当前 P 未与任何 M 关联</td>
+</tr>
+<tr>
+<td>Prunning</td>
+<td>当前 P 正在于 M 关联</td>
+</tr>
+<tr>
+<td>Psyscall</td>
+<td>当前 P 中的运行的那个 G 正在进行系统调用</td>
+</tr>
+<tr>
+<td>Pgcstop</td>
+<td>运行时系统需要停止调度。例如，运行时系统正在垃圾回收的某些步骤前，就会试图把runtime.allp（全局 P 列表）都置于此状态</td>
+</tr>
+<tr>
+<td>Pdead</td>
+<td>当前 P 已经不会再被使用。例如，运行过程中，通过 runtime.GOMAXPROCS 函数减少了 p 的最大数量</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-p-status-01.png" srcset="/img/loading.gif" lazyload alt="P状态流转"></p>
+<h2 id="G-1"><a href="#G-1" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gidle</td>
+<td>刚被新分配，但还未初始化</td>
+</tr>
+<tr>
+<td>Grunnable</td>
+<td>可运行队列中等待运行</td>
+</tr>
+<tr>
+<td>Grunning</td>
+<td>运行</td>
+</tr>
+<tr>
+<td>Gsyscall</td>
+<td>执行某个系统调用</td>
+</tr>
+<tr>
+<td>Gwaiting</td>
+<td>阻塞</td>
+</tr>
+<tr>
+<td>Gdead</td>
+<td>闲置</td>
+</tr>
+<tr>
+<td>Gcopystack</td>
+<td>栈被移动，移动的原因可能是栈的扩展或收缩</td>
+</tr>
+<tr>
+<td>Gscan</td>
+<td>组合状态，发生在 GC 扫描</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-g-status-01.png" srcset="/img/loading.gif" lazyload alt="G状态流转"></p>
+<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" srcset="/img/loading.gif" lazyload alt="MPG调度"></p>
+<ol>
+<li>我们通过 go func () 来创建一个 goroutine</li>
+<li>有两个存储 G 的队列，一个是局部调度器 P 的本地队列、一个是全局 G 队列。新创建的 G 会先保存在 P 的本地队列中，如果 P 的本地队列已经满了就会保存在全局的队列中</li>
+<li>G 只能运行在 M 中，一个 M 必须持有一个 P，M 与 P 是 1：1 的关系。M 会从 P 的本地队列弹出一个可执行状态的 G 来执行，如果 P 的本地队列为空，就会想其他的 MP 组合偷取一个可执行的 G 来执行</li>
+<li>一个 M 调度 G 执行的过程是一个循环机制</li>
+<li>当 M 执行某一个 G 时候如果发生了 syscall 或则其余阻塞操作，M 会阻塞，如果当前有一些 G 在执行，runtime 会把这个线程 M 从 P 中摘除 (detach)，然后再创建一个新的操作系统的线程 (如果有空闲的线程可用就复用空闲线程) 来服务于这个 P</li>
+<li>当 M 系统调用结束时候，这个 G 会尝试获取一个空闲的 P 执行，并放入到这个 P 的本地队列。如果获取不到 P，那么这个线程 M 变成休眠状态， 加入到空闲线程中，然后这个 G 会被放入全局队列中</li>
+</ol>
+<h2 id="一些细节"><a href="#一些细节" class="headerlink" title="一些细节"></a>一些细节</h2><h3 id="work-stealing"><a href="#work-stealing" class="headerlink" title="work stealing"></a>work stealing</h3><p>当本线程无可运行的 G 时，尝试从其他线程绑定的 P 偷取 G，而不是销毁线程。</p>
+<h3 id="hand-off"><a href="#hand-off" class="headerlink" title="hand off"></a>hand off</h3><ol>
+<li>利用并行<br>GOMAXPROCS 设置 P 的数量，最多有 GOMAXPROCS 个线程分布在多个 CPU 上同时运行。GOMAXPROCS 也限制了并发的程度，比如 GOMAXPROCS = 核数/2，则最多利用了一半的 CPU 核进行并行</li>
+<li>抢占<br>在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这就是 goroutine 不同于 coroutine 的一个地方</li>
+<li>全局 G 队列<br>在新的调度器中依然有全局 G 队列，但功能已经被弱化了，当 M 执行 work stealing 从其他 P 偷不到 G 时，它可以从全局 G 队列获取 G</li>
+</ol>
+<h3 id="gopark"><a href="#gopark" class="headerlink" title="gopark"></a>gopark</h3><p>系统调用；<br>channel读写条件不满足；<br>抢占式调度时间片结束；</p>
+<p>解除当前goroutine的m的绑定关系，将当前goroutine状态机切换为等待状态；<br>调用一次schedule()函数，在局部调度器P发起一轮新的调度。</p>
+<h3 id="sysmon"><a href="#sysmon" class="headerlink" title="sysmon"></a>sysmon</h3><p>P的数量影响了同时运行go代码的协程数. 如果P被占用很久, 就会影响调度. sysmon协程的一个功能就是进行抢占.<br>sysmon协程是在go runtime初始化之后, 执行用户编写的代码之前, 由runtime启动的不与任何P绑定, 直接由一个M执行的协程. 类似于 linux中的执行一些系统任务的内核线程.<br>可认为是10ms执行一次. (初始运行间隔为20us(微秒), sysmon运行1ms后逐渐翻倍, 最终每10ms运行一次. 如果有发生过抢占成功, 则又恢复成 初始20us的运行间隔, 如此循环)</p>
+<h3 id="mcall"><a href="#mcall" class="headerlink" title="mcall"></a>mcall</h3><p>mcall在golang需要进行协程切换时被调用，用来保存被切换出去协程的信息，并在当前线程的g0协程堆栈上执行新的函数。一般情况下，会在新函数中执行一次schedule()来挑选新的协程来运行。接下来我们就看看mcall的实现。</p>
+<h3 id="M-的状态"><a href="#M-的状态" class="headerlink" title="M 的状态"></a>M 的状态</h3><p>自旋、非自旋</p>
+<h3 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h3><h3 id="如何停止长时间占用资源的g，信号协作"><a href="#如何停止长时间占用资源的g，信号协作" class="headerlink" title="如何停止长时间占用资源的g，信号协作"></a>如何停止长时间占用资源的g，信号协作</h3><h3 id="OOM"><a href="#OOM" class="headerlink" title="OOM"></a>OOM</h3>
             </div>
             <hr>
             <div>
@@ -308,20 +509,34 @@
                     
                       <a class="hover-with-bg" href="/tags/CSP/">CSP</a>
                     
+                      <a class="hover-with-bg" href="/tags/MPG/">MPG</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%B0%83%E5%BA%A6/">调度</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%BA%BF%E7%A8%8B/">线程</a>
+                    
+                      <a class="hover-with-bg" href="/tags/goroutine/">goroutine</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+                    
                   </div>
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/gunicorn/timeout/">
+                      <a href="/golang/memory-gc/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redash Gunicorn 超时</span>
+                        <span class="hidden-mobile">Go内存GC</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -329,8 +544,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/golang/datastruct-arrayslice/">
-                        <span class="hidden-mobile">Go数据结构之数组与切片</span>
+                      <a href="/golang/forward-memory-leak/">
+                        <span class="hidden-mobile">实战Go内存泄露(转载)</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -342,12 +557,14 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments">
+              <article class="comments" id="comments" lazyload>
+                
+                  
                 
                 
   <div id="gitalk-container"></div>
   <script type="text/javascript">
-    Fluid.utils.waitElementVisible('gitalk-container', function() {
+    Fluid.utils.lazyComments('gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
       Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
         var gitalk = new Gitalk({
@@ -356,13 +573,14 @@
           repo: 'zuoshuwen.github.io',
           owner: 'zuoshuwen',
           admin: ["zuoshuwen"],
-          id: 'db1c1e29dc50d05aabb7e846fc6147c5',
+          id: '9588e50e56cc67709f3d28b99415ef9f',
           language: 'zh-CN',
           labels: ["Gitalk"],
           perPage: 10,
           pagerDirection: 'last',
           createIssueManually: true,
-          distractionFreeMode: false
+          distractionFreeMode: false,
+          proxy: '&lt;your own proxy&gt;/https://github.com/login/oauth/access_token'
         });
         gitalk.render('gitalk-container');
       });
@@ -473,8 +691,9 @@
   
 </footer>
 
-<!-- SCRIPTS -->
 
+  <!-- SCRIPTS -->
+  
   <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
 
@@ -497,7 +716,7 @@
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
@@ -544,11 +763,12 @@
   <script>
     (function () {
       var path = "/local-search.xml";
-      var inputArea = document.querySelector("#local-search-input");
-      inputArea.onclick = function () {
+      $('#local-search-input').on('click', function() {
         searchFunc(path, 'local-search-input', 'local-search-result');
-        this.onclick = null
-      }
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
     })()
   </script>
 
@@ -592,7 +812,6 @@
 
 <!-- 主题的启动项 保持在最底部 -->
 <script  src="/js/boot.js" ></script>
-
 
 
 </body>

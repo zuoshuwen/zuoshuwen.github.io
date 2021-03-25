@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
-  <link rel="icon" type="image/png" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -17,6 +17,7 @@
   <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
+  
   <title>分类 - Sown</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
@@ -39,11 +40,11 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.3.0"></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -186,7 +187,7 @@
     <div class="category row">
       <a
         class="category-item collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckk6p7q1q00046grycfk79pgx" role="tab" data-toggle="collapse" href="#collapse-ckk6p7q1q00046grycfk79pgx"
+        id="heading-21cc28409729565fc1a4d2dd92db269f" role="tab" data-toggle="collapse" href="#collapse-21cc28409729565fc1a4d2dd92db269f"
         aria-expanded="false"
       >
         golang
@@ -194,27 +195,34 @@
       </a>
       <a href="/categories/golang/" class="category-count col-2 col-md-1">
         <i class="iconfont icon-articles"></i>
-        <span>6</span>
+        <span>7</span>
       </a>
       <div class="category-collapse">
         
+        
           
-  <div id="collapse-ckk6p7q1q00046grycfk79pgx" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckk6p7q1q00046grycfk79pgx">
-    
+  <div id="collapse-21cc28409729565fc1a4d2dd92db269f" class="collapse in" role="tabpanel"
+       aria-labelledby="heading-21cc28409729565fc1a4d2dd92db269f">
     
     
       
       
-        <a href="/golang/memory-leak/" class="list-group-item list-group-item-action">
-          <span class="category-post">实战Go内存泄露(转载)</span>
+        <a href="/golang/memory-gc/" class="list-group-item list-group-item-action">
+          <span class="category-post">Go内存GC</span>
         </a>
       
     
       
       
-        <a href="/golang/parallel-concept/" class="list-group-item list-group-item-action">
-          <span class="category-post">Go并发编程之并发模型—(1)概念</span>
+        <a href="/golang/scheduling/" class="list-group-item list-group-item-action">
+          <span class="category-post">Go的MPG与调度</span>
+        </a>
+      
+    
+      
+      
+        <a href="/golang/forward-memory-leak/" class="list-group-item list-group-item-action">
+          <span class="category-post">实战Go内存泄露(转载)</span>
         </a>
       
     
@@ -257,7 +265,7 @@
     <div class="category row">
       <a
         class="category-item collapsed list-group-item category-item-action col-10 col-md-11"
-        id="heading-ckk6p7q1y000f6gryezvu1g79" role="tab" data-toggle="collapse" href="#collapse-ckk6p7q1y000f6gryezvu1g79"
+        id="heading-5c2a58ca0239e92b3ddf44c6f73bae09" role="tab" data-toggle="collapse" href="#collapse-5c2a58ca0239e92b3ddf44c6f73bae09"
         aria-expanded="false"
       >
         gunicorn
@@ -269,10 +277,10 @@
       </a>
       <div class="category-collapse">
         
+        
           
-  <div id="collapse-ckk6p7q1y000f6gryezvu1g79" class="collapse in" role="tabpanel"
-       aria-labelledby="heading-ckk6p7q1y000f6gryezvu1g79">
-    
+  <div id="collapse-5c2a58ca0239e92b3ddf44c6f73bae09" class="collapse in" role="tabpanel"
+       aria-labelledby="heading-5c2a58ca0239e92b3ddf44c6f73bae09">
     
     
       
@@ -376,8 +384,9 @@
   
 </footer>
 
-<!-- SCRIPTS -->
 
+  <!-- SCRIPTS -->
+  
   <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
 
@@ -400,7 +409,7 @@
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
@@ -441,11 +450,12 @@
   <script>
     (function () {
       var path = "/local-search.xml";
-      var inputArea = document.querySelector("#local-search-input");
-      inputArea.onclick = function () {
+      $('#local-search-input').on('click', function() {
         searchFunc(path, 'local-search-input', 'local-search-result');
-        this.onclick = null
-      }
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
     })()
   </script>
 
@@ -489,7 +499,6 @@
 
 <!-- 主题的启动项 保持在最底部 -->
 <script  src="/js/boot.js" ></script>
-
 
 
 </body>

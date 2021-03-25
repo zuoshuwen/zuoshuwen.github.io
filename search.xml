@@ -1,73 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello Sown</title>
-    <url>/Hello-Sown/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><div class="code-wrapper"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span></code></pre></div>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><div class="code-wrapper"><pre><code class="hljs bash">$ hexo server</code></pre></div>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><div class="code-wrapper"><pre><code class="hljs bash">$ hexo generate</code></pre></div>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><div class="code-wrapper"><pre><code class="hljs bash">$ hexo deploy</code></pre></div>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/gunicorn/timeout/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<a id="more"></a>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
-<p>输出：</p>
-<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
-<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
-<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
-<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>gunicorn</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go数据结构之数组与切片</title>
     <url>/golang/datastruct-arrayslice/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
@@ -1083,73 +1016,56 @@ PASS</code></pre></div>
       </tags>
   </entry>
   <entry>
-    <title>Go并发编程之并发模型—(1)概念</title>
-    <url>/golang/parallel-concept/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+    <title>Redash Gunicorn 超时</title>
+    <url>/gunicorn/timeout/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
 <a id="more"></a>
 
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
-<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
-<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
-<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
-<p>调度过程示例：</p>
-<ol>
-<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
-<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
-<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
-</ol>
-<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
-<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
-<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
-<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
-<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
-<p>常见的有：</p>
-<ul>
-<li>线程&amp;锁</li>
-<li>Actor</li>
-<li>CSP</li>
-<li>Lambda 架构</li>
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
 </ul>
-<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
-<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
-<blockquote>
-<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
-</blockquote>
-<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
-<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
-<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
-<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
-<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
-<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
-<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
-<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
-<p>Go 代码片段的封装。</p>
-<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
-<span class="hljs-comment">//  ...</span>
-&#125;()</code></pre></div>
-
-<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
-<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
-<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
-<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
-</ol>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
+<p>输出：</p>
+<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
+<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
+<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
+<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
 ]]></content>
       <categories>
-        <category>golang</category>
+        <category>gunicorn</category>
       </categories>
       <tags>
-        <tag>CSP</tag>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
       </tags>
   </entry>
   <entry>
     <title>实战Go内存泄露(转载)</title>
-    <url>/golang/memory-leak/</url>
+    <url>/golang/forward-memory-leak/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近解决了我们项目中的一个内存泄露问题，事实再次证明pprof是一个好工具，但掌握好工具的正确用法，才能发挥好工具的威力，不然就算你手里有屠龙刀，也成不了天下第一，本文就是带你用pprof定位内存泄露问题。</p>
 <a id="more"></a>
 
@@ -1752,6 +1668,315 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
         <tag>内存</tag>
         <tag>泄漏</tag>
         <tag>pprof</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go的MPG与调度</title>
+    <url>/golang/scheduling/</url>
+    <content><![CDATA[<h1 id="MPG"><a href="#MPG" class="headerlink" title="MPG"></a>MPG</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+<span id="more"></span>
+
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
+<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
+<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
+<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
+<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
+<p>调度过程示例：</p>
+<ol>
+<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
+<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
+<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
+</ol>
+<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
+<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
+<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
+<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
+<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
+<p>常见的有：</p>
+<ul>
+<li>线程&amp;锁</li>
+<li>Actor</li>
+<li>CSP</li>
+<li>Lambda 架构</li>
+</ul>
+<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
+<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
+<blockquote>
+<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
+</blockquote>
+<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
+<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
+<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
+<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
+<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
+<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
+<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
+<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
+<p>Go 代码片段的封装。</p>
+<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
+<span class="hljs-comment">//  ...</span>
+&#125;()</code></pre></div>
+
+
+<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
+<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
+<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
+<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
+</ol>
+<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
+<h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>源码</th>
+<th>说明</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全局M列表</td>
+<td>runtime.allm</td>
+<td>所有M的单链表</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局P列表</td>
+<td>runtime.allp</td>
+<td>所有P的数组</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局G列表</td>
+<td>runtime.allgs</td>
+<td>所有P的切片</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>调度器的空闲M列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲M的单链表</td>
+<td>暂时不用；用时再取</td>
+</tr>
+<tr>
+<td>调度器的空闲P列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲P的单链表</td>
+<td>P不在关联M，P中可运行G为空，加入该列表；M需要P关联，从此列表取；</td>
+</tr>
+<tr>
+<td>调度器的可运行G队列</td>
+<td>runtime.sched.runq.head；runtime.sched.runq.tail</td>
+<td>可运行的G队列</td>
+<td>如果P的可运行G队列满，加入此队列</td>
+</tr>
+<tr>
+<td>调度器的自由G列表</td>
+<td>runtime.sched.gFree.stack(有栈)；runtime.sched.gFree.noStack (无栈)</td>
+<td>自由的G的两个单链表</td>
+<td>本地P自由G列表缺G，此列表给补；本地P自由G列表满G，此列表收取；</td>
+</tr>
+<tr>
+<td>P的可运行G队列</td>
+<td>runtime.p.runq；runtime.p.runqhead；runtime.p.runqtail</td>
+<td>P中的可运行G的队列</td>
+<td>调度器初始化过的G，加入该队列</td>
+</tr>
+<tr>
+<td>P的自由G列表</td>
+<td>runtime.p.gfree</td>
+<td>P中的自由G的单链表</td>
+<td>包含一些已经运行完成的G；go启用G，先从此处寻找现成的G；</td>
+</tr>
+</tbody></table>
+<h2 id="M-1"><a href="#M-1" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g0</td>
+<td>*g</td>
+<td>特殊的 goroutine，在 runtime 启动之初创建的，用于执行一些运行时任务</td>
+</tr>
+<tr>
+<td>mstartfn</td>
+<td>func()</td>
+<td>在新的 M 上启动特殊任务（系统监控、GC辅助、M自旋）</td>
+</tr>
+<tr>
+<td>curg</td>
+<td>*g</td>
+<td>当前 M 正在运行的 G 的指针</td>
+</tr>
+<tr>
+<td>p</td>
+<td>puintptr</td>
+<td>当前 M 正在关联的那个 P</td>
+</tr>
+<tr>
+<td>nextp</td>
+<td>puintptr</td>
+<td>暂存与当前 M 有潜在关联的 P（预连）</td>
+</tr>
+<tr>
+<td>spinning</td>
+<td>bool</td>
+<td>是否在寻找可运行的 G，寻找过程中 M 自旋</td>
+</tr>
+<tr>
+<td>lockedg</td>
+<td>*g</td>
+<td>当前 M 锁定的 G</td>
+</tr>
+</tbody></table>
+<h2 id="P-1"><a href="#P-1" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pidle</td>
+<td>当前 P 未与任何 M 关联</td>
+</tr>
+<tr>
+<td>Prunning</td>
+<td>当前 P 正在于 M 关联</td>
+</tr>
+<tr>
+<td>Psyscall</td>
+<td>当前 P 中的运行的那个 G 正在进行系统调用</td>
+</tr>
+<tr>
+<td>Pgcstop</td>
+<td>运行时系统需要停止调度。例如，运行时系统正在垃圾回收的某些步骤前，就会试图把runtime.allp（全局 P 列表）都置于此状态</td>
+</tr>
+<tr>
+<td>Pdead</td>
+<td>当前 P 已经不会再被使用。例如，运行过程中，通过 runtime.GOMAXPROCS 函数减少了 p 的最大数量</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-p-status-01.png" alt="P状态流转"></p>
+<h2 id="G-1"><a href="#G-1" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gidle</td>
+<td>刚被新分配，但还未初始化</td>
+</tr>
+<tr>
+<td>Grunnable</td>
+<td>可运行队列中等待运行</td>
+</tr>
+<tr>
+<td>Grunning</td>
+<td>运行</td>
+</tr>
+<tr>
+<td>Gsyscall</td>
+<td>执行某个系统调用</td>
+</tr>
+<tr>
+<td>Gwaiting</td>
+<td>阻塞</td>
+</tr>
+<tr>
+<td>Gdead</td>
+<td>闲置</td>
+</tr>
+<tr>
+<td>Gcopystack</td>
+<td>栈被移动，移动的原因可能是栈的扩展或收缩</td>
+</tr>
+<tr>
+<td>Gscan</td>
+<td>组合状态，发生在 GC 扫描</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-g-status-01.png" alt="G状态流转"></p>
+<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" alt="MPG调度"></p>
+<ol>
+<li>我们通过 go func () 来创建一个 goroutine</li>
+<li>有两个存储 G 的队列，一个是局部调度器 P 的本地队列、一个是全局 G 队列。新创建的 G 会先保存在 P 的本地队列中，如果 P 的本地队列已经满了就会保存在全局的队列中</li>
+<li>G 只能运行在 M 中，一个 M 必须持有一个 P，M 与 P 是 1：1 的关系。M 会从 P 的本地队列弹出一个可执行状态的 G 来执行，如果 P 的本地队列为空，就会想其他的 MP 组合偷取一个可执行的 G 来执行</li>
+<li>一个 M 调度 G 执行的过程是一个循环机制</li>
+<li>当 M 执行某一个 G 时候如果发生了 syscall 或则其余阻塞操作，M 会阻塞，如果当前有一些 G 在执行，runtime 会把这个线程 M 从 P 中摘除 (detach)，然后再创建一个新的操作系统的线程 (如果有空闲的线程可用就复用空闲线程) 来服务于这个 P</li>
+<li>当 M 系统调用结束时候，这个 G 会尝试获取一个空闲的 P 执行，并放入到这个 P 的本地队列。如果获取不到 P，那么这个线程 M 变成休眠状态， 加入到空闲线程中，然后这个 G 会被放入全局队列中</li>
+</ol>
+<h2 id="一些细节"><a href="#一些细节" class="headerlink" title="一些细节"></a>一些细节</h2><h3 id="work-stealing"><a href="#work-stealing" class="headerlink" title="work stealing"></a>work stealing</h3><p>当本线程无可运行的 G 时，尝试从其他线程绑定的 P 偷取 G，而不是销毁线程。</p>
+<h3 id="hand-off"><a href="#hand-off" class="headerlink" title="hand off"></a>hand off</h3><ol>
+<li>利用并行<br>GOMAXPROCS 设置 P 的数量，最多有 GOMAXPROCS 个线程分布在多个 CPU 上同时运行。GOMAXPROCS 也限制了并发的程度，比如 GOMAXPROCS = 核数/2，则最多利用了一半的 CPU 核进行并行</li>
+<li>抢占<br>在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这就是 goroutine 不同于 coroutine 的一个地方</li>
+<li>全局 G 队列<br>在新的调度器中依然有全局 G 队列，但功能已经被弱化了，当 M 执行 work stealing 从其他 P 偷不到 G 时，它可以从全局 G 队列获取 G</li>
+</ol>
+<h3 id="gopark"><a href="#gopark" class="headerlink" title="gopark"></a>gopark</h3><p>系统调用；<br>channel读写条件不满足；<br>抢占式调度时间片结束；</p>
+<p>解除当前goroutine的m的绑定关系，将当前goroutine状态机切换为等待状态；<br>调用一次schedule()函数，在局部调度器P发起一轮新的调度。</p>
+<h3 id="sysmon"><a href="#sysmon" class="headerlink" title="sysmon"></a>sysmon</h3><p>P的数量影响了同时运行go代码的协程数. 如果P被占用很久, 就会影响调度. sysmon协程的一个功能就是进行抢占.<br>sysmon协程是在go runtime初始化之后, 执行用户编写的代码之前, 由runtime启动的不与任何P绑定, 直接由一个M执行的协程. 类似于 linux中的执行一些系统任务的内核线程.<br>可认为是10ms执行一次. (初始运行间隔为20us(微秒), sysmon运行1ms后逐渐翻倍, 最终每10ms运行一次. 如果有发生过抢占成功, 则又恢复成 初始20us的运行间隔, 如此循环)</p>
+<h3 id="mcall"><a href="#mcall" class="headerlink" title="mcall"></a>mcall</h3><p>mcall在golang需要进行协程切换时被调用，用来保存被切换出去协程的信息，并在当前线程的g0协程堆栈上执行新的函数。一般情况下，会在新函数中执行一次schedule()来挑选新的协程来运行。接下来我们就看看mcall的实现。</p>
+<h3 id="M-的状态"><a href="#M-的状态" class="headerlink" title="M 的状态"></a>M 的状态</h3><p>自旋、非自旋</p>
+<h3 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h3><h3 id="如何停止长时间占用资源的g，信号协作"><a href="#如何停止长时间占用资源的g，信号协作" class="headerlink" title="如何停止长时间占用资源的g，信号协作"></a>如何停止长时间占用资源的g，信号协作</h3><h3 id="OOM"><a href="#OOM" class="headerlink" title="OOM"></a>OOM</h3>]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>CSP</tag>
+        <tag>MPG</tag>
+        <tag>调度</tag>
+        <tag>线程</tag>
+        <tag>goroutine</tag>
+        <tag>并发</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go内存GC</title>
+    <url>/golang/memory-gc/</url>
+    <content><![CDATA[<h1 id="GC"><a href="#GC" class="headerlink" title="GC"></a>GC</h1><p>Golang 一直都在高速发展，每次版本迭代，内存管理相关方面都会有所变化。</p>
+<h2 id="STW"><a href="#STW" class="headerlink" title="STW"></a>STW</h2><p>STW 阶段指的是程序暂停所有运行中的协程，否则不会开始垃圾回收阶段。<br>最开始的时候，在垃圾回收阶段只有一个协程执行垃圾回收。<br>目前 并发GC，垃圾回收阶段用户协程与垃圾回收协程并发执行。STW时间，小于100微妙。</p>
+<p>尽管 STW 如今已经优化到了半毫秒级别以下，但这个程序被卡死原因是由于需要进入 STW 导致的。原因在于，GC 在需要进入 STW 时，需要通知并让所有的用户态代码停止，但是 for {} 所在的 goroutine 永远都不会被中断，从而始终无法进入 STW 阶段。实际实践中也是如此，当程序的某个 goroutine 长时间得不到停止，强行拖慢进入 STW 的时机，这种情况下造成的影响（卡死）是非常可怕的。好在自 Go 1.14 之后，这类 goroutine 能够被异步地抢占，从而使得进入 STW 的时间不会超过抢占信号触发的周期，程序也不会因为仅仅等待一个 goroutine 的停止而停顿在进入 STW 之前的操作上。</p>
+<h2 id="三色标记"><a href="#三色标记" class="headerlink" title="三色标记"></a>三色标记</h2><ol>
+<li>灰色：对象还在标记队列中等待</li>
+<li>黑色：对象已被标记，gcmarkBits 对应位为 1 – 该对象不会在本次 GC 中被回收</li>
+<li>白色：对象未被标记，gcmarkBits 对应位为 0 – 该对象将会在本次 GC 中被清理</li>
+</ol>
+<p><img src="/images/golang/memory-manage-gc-01.png" alt="三色标记法"></p>
+<p>通过上图，应该对三色标记法有了一个比较直观的了解，那么我们现在来讲讲原理。简单的讲，就是标记内存中那些还在使用中（即被引用了）的部分，而内存中不再使用（即未被引用）的部分，就是要回收的垃圾，需要将其回收，以供后续内存分配使用。上图中的 A、B、D 就是被引用正在使用的内存，而C、F、E 曾经被使用过，但现在没有任何对象引用，就需要被回收掉。</p>
+<p>而 Root 区域主要是程序运行到当前时刻的栈和全局数据区域，是实时正在使用到的内存，当然应该优先标记。而考虑到内存块中存放的可能是指针，所以还需要递归的进行标记，待全部标记完后，就会对未被标记的内存进行回收。</p>
+<h2 id="内存标记"><a href="#内存标记" class="headerlink" title="内存标记"></a>内存标记</h2><p>golang 中采用 span 数据结构管理内存，span 中维护了一个个内存块，并由一个位图 allocBits 表示内存块的分配情况，而上文中提到的 gcmarkBits 是记录每块内存块被引用情况的。</p>
+<p><img src="/images/golang/memory-manage-gc-02.png" alt="内存标记"></p>
+<p>如上图，allocBits 记录了每块内存的分配情况，而 gcmarkBits 记录了每块内存的标记情况。在标记阶段会对每块内存进行标记，有对象引用的内存标记为 1，没有对象引用的为 0。而 allocBits 和 gcmarkBits 的数据结构是完全一样的，在结束标记后，将 allocBits 指向 gcmarkBits，则有标记的才是存活的，这样就完成了内存回收。而 gcmarkBits 则会在下次标记时重新分配内存。</p>
+<h2 id="垃圾回收优化"><a href="#垃圾回收优化" class="headerlink" title="垃圾回收优化"></a>垃圾回收优化</h2><p>在前文中提到，golang 的垃圾回收算法属于 标记-清除，是需要 STW 的。STW 就是 Stop The World 的意思，在 golang 中就是要停掉所有的 goroutine，专心进行垃圾回收，待垃圾回收结束后再恢复 goroutine。而 STW 时间的长短直接影响了应用的执行，如果时间过长，那将是灾难性的。为了缩短 STW 时间，golang 不对优化垃圾回收算法，其中写屏障（Write Barrier）和辅助GC（Mutator Assist）就是两种优化垃圾回收的方法。</p>
+<ul>
+<li>写屏障（Write Barrier）：上面说到的 STW 的目的是防止 GC 扫描时内存变化引起的混乱，而写屏障就是让 goroutine 与 GC 同时运行的手段，虽然不能完全消除 STW，但是可以大大减少 STW 的时间。写屏障在 GC 的特定时间开启，开启后指针传递时会把指针标记，即本轮不回收，下次 GC 时再确定。</li>
+<li>辅助 GC（Mutator Assist）：为了防止内存分配过快，在 GC 执行过程中，GC 过程中 mutator 线程会并发运行，而 mutator assist 机制会协助 GC 做一部分的工作。</li>
+</ul>
+<h2 id="垃圾回收触发机制"><a href="#垃圾回收触发机制" class="headerlink" title="垃圾回收触发机制"></a>垃圾回收触发机制</h2><ol>
+<li>内存分配量达到阈值：每次内存分配都会检查当前内存分配量是否达到阈值，如果达到阈值则触发 GC。阈值 = 上次 GC 内存分配量 * 内存增长率，内存增长率由环境变量 GOGC 控制，默认为 100，即每当内存扩大一倍时启动 GC。</li>
+<li>定时触发 GC：默认情况下，2分钟触发一次 GC，该间隔由 src/runtime/proc.go 中的 forcegcperiod 声明。</li>
+<li>手动触发 GC：在代码中，可通过使用 runtime.GC() 手动触发 GC。</li>
+</ol>
+<h2 id="GC-优化建议"><a href="#GC-优化建议" class="headerlink" title="GC 优化建议"></a>GC 优化建议</h2><p>由上文可知，GC 性能是与对象数量有关的，对象越多 GC 性能越差，对程序的影响也越大。所以在开发中要尽量减少对象分配个数，采用对象复用、将小对象组合成大对象或采用小数据类型（如使用 int8 代替 int）等。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><p>一门编程语言的垃圾回收机制会直接影响使用其开发应用的性能。在日常开发工作中也因注意到其作用，有助于开发出高性能的应用，这也是 GC 常常在面试中被问到的原因。同时，了解 GC 对了解内存管理也很有帮助。</p>
+<h1 id="参考借鉴"><a href="#参考借鉴" class="headerlink" title="参考借鉴"></a>参考借鉴</h1><p><a href="https://developer.aliyun.com/article/775798">浅析 Golang 垃圾回收机制</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>垃圾回收</tag>
+        <tag>GC</tag>
       </tags>
   </entry>
 </search>

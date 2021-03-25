@@ -8,15 +8,16 @@
 <head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
-  <link rel="icon" type="image/png" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="后端技术、笔记、教程">
+  <meta name="description" content="前言最近解决了我们项目中的一个内存泄露问题，事实再次证明pprof是一个好工具，但掌握好工具的正确用法，才能发挥好工具的威力，不然就算你手里有屠龙刀，也成不了天下第一，本文就是带你用pprof定位内存泄露问题。">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
+  
   <title>实战Go内存泄露(转载) - Sown</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
@@ -55,11 +56,11 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.3.0"></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 
 <body>
@@ -268,7 +269,7 @@
 	&#125;
 &#125;</code></pre></div>
 <p><em>提醒：本文所有代码部分可左右滑动</em></p>
-<h3 id="浏览器方式"><a href="#浏览器方式" class="headerlink" title="浏览器方式"></a>浏览器方式</h3><p><img src="https://lessisbetter.site/images/2019-05-image-20190516173924325-7999564.png" srcset="/img/loading.gif" alt="image-20190516173924325"></p>
+<h3 id="浏览器方式"><a href="#浏览器方式" class="headerlink" title="浏览器方式"></a>浏览器方式</h3><p><img src="https://lessisbetter.site/images/2019-05-image-20190516173924325-7999564.png" srcset="/img/loading.gif" lazyload alt="image-20190516173924325"></p>
 <p>输入网址<code>ip:port/debug/pprof/</code>打开pprof主页，从上到下依次是<strong>5类profile信息</strong>：</p>
 <ol>
 <li><strong>block</strong>：goroutine的阻塞信息，本例就截取自一个goroutine阻塞的demo，但block为0，没掌握block的用法</li>
@@ -446,7 +447,7 @@ Time: May <span class="hljs-number">16</span>, <span class="hljs-number">2019</s
 </ol>
 <p>这2种方式分别介绍一下。</p>
 <h2 id="监控工具查看进程内在占用情况"><a href="#监控工具查看进程内在占用情况" class="headerlink" title="监控工具查看进程内在占用情况"></a>监控工具查看进程内在占用情况</h2><p><strong>如果使用云平台部署Go程序</strong>，云平台都提供了内存查看的工具，可以查看OS的内存占用情况和某个进程的内存占用情况，比如阿里云，我们在1个云主机上只部署了1个Go服务，所以OS的内存占用情况，基本是也反映了进程内存占用情况，OS内存占用情况如下，可以看到<strong>随着时间的推进，内存的占用率在不断的提高，这是内存泄露的最明显现象</strong>：</p>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190512111200988-7630721.png" srcset="/img/loading.gif" alt="image-20190512111200988"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190512111200988-7630721.png" srcset="/img/loading.gif" lazyload alt="image-20190512111200988"></p>
 <p><strong>如果没有云平台这种内存监控工具，可以制作一个简单的内存记录工具。</strong></p>
 <p>1、建立一个脚本<code>prog_mem.sh</code>，获取进程占用的物理内存情况，脚本内容如下：</p>
 <div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
@@ -457,13 +458,13 @@ time=$(date <span class="hljs-string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span>)
 <p>2、然后使用<code>crontab</code>建立定时任务，每分钟记录1次。使用<code>crontab -e</code>编辑crontab配置，在最后增加1行：</p>
 <div class="code-wrapper"><pre><code class="hljs bash">*/1 * * * * ~/record/prog_mem.sh</code></pre></div>
 <p>脚本输出的内容保存在<code>prog_mem.log</code>，只要大体浏览一下就可以发现内存的增长情况，判断是否存在内存泄露。如果需要可视化，可以直接黏贴<code>prog_mem.log</code>内容到Excel等表格工具，绘制内存占用图。</p>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190512172935195-7653375.png" srcset="/img/loading.gif" alt="image-20190512172935195"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190512172935195-7653375.png" srcset="/img/loading.gif" lazyload alt="image-20190512172935195"></p>
 <h2 id="go-pprof发现存在内存问题"><a href="#go-pprof发现存在内存问题" class="headerlink" title="go pprof发现存在内存问题"></a>go pprof发现存在内存问题</h2><blockquote>
 <p>有情提醒：如果对pprof不了解，可以先看[go pprof基本知识](#go pprof基本知识)，这是下一节，看完再倒回来看。</p>
 </blockquote>
 <p>如果你Google或者百度，Go程序内存泄露的文章，它总会告诉你使用<strong>pprof heap</strong>，能够生成漂亮的调用路径图，火焰图等等，然后你根据调用路径就能定位内存泄露问题，我最初也是对此深信不疑，尝试了若干天后，只是发现内存泄露跟某种场景有关，根本找不到内存泄露的根源，<strong>如果哪位朋友用heap就能定位内存泄露的线上问题，麻烦介绍下</strong>。</p>
 <p>后来读了Dave的<a target="_blank" rel="noopener" href="https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html#using_more_than_one_cpu">《High Performance Go Workshop》</a>，刷新了对heap的认识，内存pprof的简要内容如下：</p>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190512114048868-7632448.png" srcset="/img/loading.gif" alt="image-20190512114048868"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190512114048868-7632448.png" srcset="/img/loading.gif" lazyload alt="image-20190512114048868"></p>
 <p>Dave讲了以下几点：</p>
 <ol>
 <li><strong>内存profiling记录的是堆内存分配的情况，以及调用栈信息</strong>，并不是进程完整的内存情况，猜测这也是在go pprof中称为heap而不是memory的原因。</li>
@@ -556,7 +557,7 @@ ROUTINE ======================== main.main in /home/ubuntu/heap/demo2.<span clas
 <li>该goroutine的调用次数非常多，虽然每个协程调用过程中消耗的内存不多，但该调用路径上，协程数量巨大，造成消耗大量的内存，并且这些goroutine由于某种原因无法退出，占用的内存不会释放，<strong>内存泄露的原因在到g111调用路径上某段代码实现有问题，造成创建了大量的g111</strong>。</li>
 </ol>
 <p><strong>第2种情况，就是goroutine泄露，这是通过heap无法发现的，所以heap在定位内存泄露这件事上，发挥的作用不大</strong>。</p>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190512144150064-7643310.png" srcset="/img/loading.gif" alt="image-20190512144150064"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190512144150064-7643310.png" srcset="/img/loading.gif" lazyload alt="image-20190512144150064"></p>
 <hr>
 <h1 id="goroutine泄露怎么导致内存泄露"><a href="#goroutine泄露怎么导致内存泄露" class="headerlink" title="goroutine泄露怎么导致内存泄露"></a>goroutine泄露怎么导致内存泄露</h1><h2 id="什么是goroutine泄露"><a href="#什么是goroutine泄露" class="headerlink" title="什么是goroutine泄露"></a>什么是goroutine泄露</h2><p>如果你启动了1个goroutine，但并没有符合预期的退出，直到程序结束，此goroutine才退出，这种情况就是goroutine泄露。</p>
 <blockquote>
@@ -688,7 +689,7 @@ Dropped <span class="hljs-number">32</span> nodes (cum &lt;= <span class="hljs-n
 <h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><p>url请求中设置debug=1：</p>
 <div class="code-wrapper"><pre><code class="hljs url">http:&#x2F;&#x2F;ip:port&#x2F;debug&#x2F;pprof&#x2F;goroutine?debug&#x3D;1</code></pre></div>
 <p>效果如下：</p>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190516143740567-7988660.png" srcset="/img/loading.gif"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190516143740567-7988660.png" srcset="/img/loading.gif" lazyload></p>
 <p>看起来密密麻麻的，其实简单又十分有用，看上图标出来的部分，手机上图看起来可能不方便，那就放大图片，或直接看下面各字段的含义：</p>
 <ol>
 <li><code>goroutine profile: total 32023</code>：32023是<strong>goroutine的总数量</strong>，</li>
@@ -716,7 +717,7 @@ Dropped <span class="hljs-number">32</span> nodes (cum &lt;= <span class="hljs-n
 &#125;</code></pre></div>
 <h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><p>url请求中设置debug=2：</p>
 <div class="code-wrapper"><pre><code class="hljs url">http:&#x2F;&#x2F;ip:port&#x2F;debug&#x2F;pprof&#x2F;goroutine?debug&#x3D;2</code></pre></div>
-<p><img src="https://lessisbetter.site/images/2019-05-image-20190516143537339-7988537.png" srcset="/img/loading.gif"></p>
+<p><img src="https://lessisbetter.site/images/2019-05-image-20190516143537339-7988537.png" srcset="/img/loading.gif" lazyload></p>
 <p>第2种方式和第1种方式是互补的，它可以看到每个goroutine的信息：</p>
 <ol>
 <li><code>goroutine 20 [chan send, 2 minutes]</code>：20是goroutine id，<code>[]</code>中是当前goroutine的状态，阻塞在写channel，并且阻塞了2分钟，长时间运行的系统，你能看到阻塞时间更长的情况。</li>
@@ -829,7 +830,7 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
 </ol>
 </blockquote>
 <div style="color:#0096FF; text-align:center">关注公众号，获取最新Golang文章</div>
-<img src="https://lessisbetter.site/images/2019-01-article_qrcode.jpg" srcset="/img/loading.gif" style="border:0"  align=center />
+<img src="https://lessisbetter.site/images/2019-01-article_qrcode.jpg" srcset="/img/loading.gif" lazyload style="border:0"  align=center />
             </div>
             <hr>
             <div>
@@ -856,12 +857,22 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
                 
               </div>
               
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
               
               
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/golang/scheduling/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go的MPG与调度</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
@@ -880,12 +891,14 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
 
             
               <!-- Comments -->
-              <article class="comments" id="comments">
+              <article class="comments" id="comments" lazyload>
+                
+                  
                 
                 
   <div id="gitalk-container"></div>
   <script type="text/javascript">
-    Fluid.utils.waitElementVisible('gitalk-container', function() {
+    Fluid.utils.lazyComments('gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
       Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
         var gitalk = new Gitalk({
@@ -894,13 +907,14 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
           repo: 'zuoshuwen.github.io',
           owner: 'zuoshuwen',
           admin: ["zuoshuwen"],
-          id: '09489648708a9ad95fb430e26a98aeb5',
+          id: '4a346decdac6472de6042e2490035edb',
           language: 'zh-CN',
           labels: ["Gitalk"],
           perPage: 10,
           pagerDirection: 'last',
           createIssueManually: true,
-          distractionFreeMode: false
+          distractionFreeMode: false,
+          proxy: '&lt;your own proxy&gt;/https://github.com/login/oauth/access_token'
         });
         gitalk.render('gitalk-container');
       });
@@ -1011,8 +1025,9 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
   
 </footer>
 
-<!-- SCRIPTS -->
 
+  <!-- SCRIPTS -->
+  
   <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
 
@@ -1035,7 +1050,7 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
 
 
   
-    <script  src="/js/lazyload.js" ></script>
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
@@ -1082,11 +1097,12 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
   <script>
     (function () {
       var path = "/local-search.xml";
-      var inputArea = document.querySelector("#local-search-input");
-      inputArea.onclick = function () {
+      $('#local-search-input').on('click', function() {
         searchFunc(path, 'local-search-input', 'local-search-result');
-        this.onclick = null
-      }
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
     })()
   </script>
 
@@ -1130,7 +1146,6 @@ ROUTINE ======================== main.alloc2.func1 in /home/ubuntu/heap/leak_dem
 
 <!-- 主题的启动项 保持在最底部 -->
 <script  src="/js/boot.js" ></script>
-
 
 
 </body>
