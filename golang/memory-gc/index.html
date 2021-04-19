@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -256,11 +256,11 @@
 <li>黑色：对象已被标记，gcmarkBits 对应位为 1 – 该对象不会在本次 GC 中被回收</li>
 <li>白色：对象未被标记，gcmarkBits 对应位为 0 – 该对象将会在本次 GC 中被清理</li>
 </ol>
-<p><img src="/images/golang/memory-manage-gc-01.png" srcset="/img/loading.gif" lazyload alt="三色标记法"></p>
+<p><img src="/images/golang/memory-manage-gc-01.png" alt="三色标记法"></p>
 <p>通过上图，应该对三色标记法有了一个比较直观的了解，那么我们现在来讲讲原理。简单的讲，就是标记内存中那些还在使用中（即被引用了）的部分，而内存中不再使用（即未被引用）的部分，就是要回收的垃圾，需要将其回收，以供后续内存分配使用。上图中的 A、B、D 就是被引用正在使用的内存，而C、F、E 曾经被使用过，但现在没有任何对象引用，就需要被回收掉。</p>
 <p>而 Root 区域主要是程序运行到当前时刻的栈和全局数据区域，是实时正在使用到的内存，当然应该优先标记。而考虑到内存块中存放的可能是指针，所以还需要递归的进行标记，待全部标记完后，就会对未被标记的内存进行回收。</p>
 <h2 id="内存标记"><a href="#内存标记" class="headerlink" title="内存标记"></a>内存标记</h2><p>golang 中采用 span 数据结构管理内存，span 中维护了一个个内存块，并由一个位图 allocBits 表示内存块的分配情况，而上文中提到的 gcmarkBits 是记录每块内存块被引用情况的。</p>
-<p><img src="/images/golang/memory-manage-gc-02.png" srcset="/img/loading.gif" lazyload alt="内存标记"></p>
+<p><img src="/images/golang/memory-manage-gc-02.png" alt="内存标记"></p>
 <p>如上图，allocBits 记录了每块内存的分配情况，而 gcmarkBits 记录了每块内存的标记情况。在标记阶段会对每块内存进行标记，有对象引用的内存标记为 1，没有对象引用的为 0。而 allocBits 和 gcmarkBits 的数据结构是完全一样的，在结束标记后，将 allocBits 指向 gcmarkBits，则有标记的才是存活的，这样就完成了内存回收。而 gcmarkBits 则会在下次标记时重新分配内存。</p>
 <h2 id="垃圾回收优化"><a href="#垃圾回收优化" class="headerlink" title="垃圾回收优化"></a>垃圾回收优化</h2><p>在前文中提到，golang 的垃圾回收算法属于 标记-清除，是需要 STW 的。STW 就是 Stop The World 的意思，在 golang 中就是要停掉所有的 goroutine，专心进行垃圾回收，待垃圾回收结束后再恢复 goroutine。而 STW 时间的长短直接影响了应用的执行，如果时间过长，那将是灾难性的。为了缩短 STW 时间，golang 不对优化垃圾回收算法，其中写屏障（Write Barrier）和辅助GC（Mutator Assist）就是两种优化垃圾回收的方法。</p>
 <ul>
@@ -334,7 +334,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -491,10 +491,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

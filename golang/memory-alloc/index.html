@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -249,13 +249,13 @@
             
             <div class="markdown-body">
               <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。</p>
-<h1 id="系统内存"><a href="#系统内存" class="headerlink" title="系统内存"></a>系统内存</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><img src="/images/golang/memory-manage-vm-01.png" srcset="/img/loading.gif" lazyload alt="虚拟内存"><br>虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实际上，它通常是被分隔成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。<br>目前，大多数操作系统都使用了虚拟内存，如Windows家族的“虚拟内存”；Linux的“交换空间”等。</p>
+<h1 id="系统内存"><a href="#系统内存" class="headerlink" title="系统内存"></a>系统内存</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><img src="/images/golang/memory-manage-vm-01.png" alt="虚拟内存"><br>虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实际上，它通常是被分隔成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。<br>目前，大多数操作系统都使用了虚拟内存，如Windows家族的“虚拟内存”；Linux的“交换空间”等。</p>
 <ul>
 <li>访问内存，实际访问的是虚拟内存</li>
 <li>虚拟内存通过页表查看，当前要访问的虚拟内存地址，是否已经加载到了物理内存，如果已经在物理内存，则取物理内存数据，如果没有对应的物理内存，则从磁盘加载数据到物理内存，并把物理内存地址和虚拟内存地址更新到页表。</li>
 <li>每个进程都要各自的虚拟内存，内存的并发访问问题的粒度从多进程级别，可以降低到多线程级别。</li>
 </ul>
-<h2 id="堆、栈"><a href="#堆、栈" class="headerlink" title="堆、栈"></a>堆、栈</h2><p><img src="/images/golang/memory-manage-vm-02.png" srcset="/img/loading.gif" lazyload alt="堆、栈"></p>
+<h2 id="堆、栈"><a href="#堆、栈" class="headerlink" title="堆、栈"></a>堆、栈</h2><p><img src="/images/golang/memory-manage-vm-02.png" alt="堆、栈"></p>
 <h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
 <li>栈在高地址，从高地址向低地址增长；堆在低地址，从低地址向高地址增长。</li>
 <li>栈的内存不需要回收；堆需要回收，无论是主动free、垃圾回收。</li>
@@ -284,7 +284,7 @@
 <li>优点：回收性能好</li>
 <li>缺点：算法复杂</li>
 </ul>
-<h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" srcset="/img/loading.gif" lazyload alt="TCMalloc"></p>
+<h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" alt="TCMalloc"></p>
 <p>内存分配策略的实现，我们也可以叫它内存分配器，相当于在用户编写的程序与虚拟内存中间建立了”内存池”，而避免手写内存池。</p>
 <p>下面是比较成熟的内存池实现库</p>
 <ul>
@@ -303,7 +303,7 @@
 <li>中对象大小：257~1024kb</li>
 <li>大对象大小：&gt; 1024kb</li>
 </ul>
-<h1 id="GOMalloc"><a href="#GOMalloc" class="headerlink" title="GOMalloc"></a>GOMalloc</h1><p><img src="/images/golang/memory-manage-gomalloc-01.png" srcset="/img/loading.gif" lazyload alt="Golang内存管理"></p>
+<h1 id="GOMalloc"><a href="#GOMalloc" class="headerlink" title="GOMalloc"></a>GOMalloc</h1><p><img src="/images/golang/memory-manage-gomalloc-01.png" alt="Golang内存管理"></p>
 <h2 id="大小维度"><a href="#大小维度" class="headerlink" title="大小维度"></a>大小维度</h2><h2 id="object-size"><a href="#object-size" class="headerlink" title="object size"></a>object size</h2><p>是申请对象的大小，比如，申请一个 8byte object size。</p>
 <h2 id="size-class"><a href="#size-class" class="headerlink" title="size class"></a>size class</h2><p><code>object size</code> 的分类、级别，比如 8byte ~ 16byte，16byte ~ 32byte，32byte ~ 48byte …，共 67 个<br>在代码中是这样的：</p>
 <div class="code-wrapper"><pre><code class="hljs go">_NumSizeClasses = <span class="hljs-number">67</span></code></pre></div>
@@ -380,8 +380,8 @@
 <p>所以该对象需要的是span class 7指向的span。</p>
 <h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><p>在 GO 目前的版本中，内存管理使用了 位图（bitmap）、基数树（radix tree）。</p>
 <h2 id="bitmap"><a href="#bitmap" class="headerlink" title="bitmap"></a>bitmap</h2><p>图（Bitmap），即位（Bit）的集合，是一种数据结构，可用于记录大量的0-1状态，在很多地方都会用到，比如Linux内核（如inode，磁盘块）、Bloom Filter算法等，其优势是可以在一个非常高的空间利用率下保存大量0-1状态。<br>BitMap算法的核心思想是用bit数组来记录0-1两种状态，然后再将具体数据映射到这个比特数组的具体位置，这个比特位设置成0表示数据不存在，设置成1表示数据存在。<br>BitMap算在在大量数据查询、去重等应用场景中使用的比较多，这个算法具有比较高的空间利用率。<br>在《编程珠玑》第一章中，就有利用bitmap进行大量文件的排序。<br>JDK<br>google</p>
-<h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><p><img src="/images/golang/memory-manage-trie-01.png" srcset="/img/loading.gif" lazyload alt="前缀树"><br>在计算机科学中，trie，又称前缀树或字典树，是一种有序树，用于保存关联数组，其中的键通常是字符串。与二叉查找树不同，键不是直接保存在节点中，而是由节点在树中的位置决定。一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，而根节点对应空字符串。一般情况下，不是所有的节点都有对应的值，只有叶子节点和部分内部节点所对应的键才有相关的值。<br>应用场景<br>trie树常用于搜索提示。如当输入一个网址，可以自动搜索出可能的选择。当没有完全匹配的搜索结果，可以返回前缀最相似的可能。</p>
-<h2 id="基数树"><a href="#基数树" class="headerlink" title="基数树"></a>基数树</h2><p><img src="/images/golang/memory-manage-radix-01.png" srcset="/img/loading.gif" lazyload alt="基数树"><br>在计算机科学中，基数树，或称Patricia trie/tree，或crit bit tree，压缩前缀树，是一种更节省空间的Trie（前缀树）。对于基数树的每个节点，如果该节点是唯一的子树的话，就和父节点合并。<br>应用场景<br>用于IP 路由。 信息检索中用于文本文档的倒排索引。</p>
+<h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><p><img src="/images/golang/memory-manage-trie-01.png" alt="前缀树"><br>在计算机科学中，trie，又称前缀树或字典树，是一种有序树，用于保存关联数组，其中的键通常是字符串。与二叉查找树不同，键不是直接保存在节点中，而是由节点在树中的位置决定。一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，而根节点对应空字符串。一般情况下，不是所有的节点都有对应的值，只有叶子节点和部分内部节点所对应的键才有相关的值。<br>应用场景<br>trie树常用于搜索提示。如当输入一个网址，可以自动搜索出可能的选择。当没有完全匹配的搜索结果，可以返回前缀最相似的可能。</p>
+<h2 id="基数树"><a href="#基数树" class="headerlink" title="基数树"></a>基数树</h2><p><img src="/images/golang/memory-manage-radix-01.png" alt="基数树"><br>在计算机科学中，基数树，或称Patricia trie/tree，或crit bit tree，压缩前缀树，是一种更节省空间的Trie（前缀树）。对于基数树的每个节点，如果该节点是唯一的子树的话，就和父节点合并。<br>应用场景<br>用于IP 路由。 信息检索中用于文本文档的倒排索引。</p>
 <h2 id="go-内存管理中的位图、基数树"><a href="#go-内存管理中的位图、基数树" class="headerlink" title="go 内存管理中的位图、基数树"></a>go 内存管理中的位图、基数树</h2><p>在Go1.12的时候,Go语言采用了 Treap 进行内存的管理，Treap 是一种引入了随机数的二叉树搜索树，其实现简单，并且引入的随机数以及必要时的旋转保证了比较好的平衡特性。</p>
 <h3 id="mspan-的实现-基数树（radix-tree）"><a href="#mspan-的实现-基数树（radix-tree）" class="headerlink" title="mspan 的实现 基数树（radix tree）"></a>mspan 的实现 基数树（radix tree）</h3><p>管理线性的地址空间的位图结构叫做基数树<br>mpagealloc.go</p>
 <h1 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h1><ul>
@@ -449,7 +449,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -606,10 +606,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

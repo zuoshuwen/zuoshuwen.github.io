@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -303,7 +303,7 @@
 <li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
 <li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
 </ol>
-<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" srcset="/img/loading.gif" lazyload alt="MPG关系图"></p>
+<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
 <h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
 <thead>
 <tr>
@@ -440,7 +440,7 @@
 <td>当前 P 已经不会再被使用。例如，运行过程中，通过 runtime.GOMAXPROCS 函数减少了 p 的最大数量</td>
 </tr>
 </tbody></table>
-<p><img src="/images/golang/scheduling-p-status-01.png" srcset="/img/loading.gif" lazyload alt="P状态流转"></p>
+<p><img src="/images/golang/scheduling-p-status-01.png" alt="P状态流转"></p>
 <h2 id="G-1"><a href="#G-1" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
 <thead>
 <tr>
@@ -481,8 +481,8 @@
 <td>组合状态，发生在 GC 扫描</td>
 </tr>
 </tbody></table>
-<p><img src="/images/golang/scheduling-g-status-01.png" srcset="/img/loading.gif" lazyload alt="G状态流转"></p>
-<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" srcset="/img/loading.gif" lazyload alt="MPG调度"></p>
+<p><img src="/images/golang/scheduling-g-status-01.png" alt="G状态流转"></p>
+<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" alt="MPG调度"></p>
 <ol>
 <li>我们通过 go func () 来创建一个 goroutine</li>
 <li>有两个存储 G 的队列，一个是局部调度器 P 的本地队列、一个是全局 G 队列。新创建的 G 会先保存在 P 的本地队列中，如果 P 的本地队列已经满了就会保存在全局的队列中</li>
@@ -569,7 +569,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -726,10 +726,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

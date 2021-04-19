@@ -70,7 +70,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -296,7 +296,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
 <span class="hljs-code">    a1_test.go:18: counter = 4663</span>
 <span class="hljs-bullet">--- </span>PASS: TestDemo1 (1.00s)
 PASS</code></pre></div>
-<p>多试几次，结果一直是小于 5000 的不定值。<br>竞争状态下程序行为的图像表示<br><img src="/images/golang/ipc-mutex-01.jpg" srcset="/img/loading.gif" lazyload alt="ipc-mutex-01"></p>
+<p>多试几次，结果一直是小于 5000 的不定值。<br>竞争状态下程序行为的图像表示<br><img src="/images/golang/ipc-mutex-01.jpg" alt="ipc-mutex-01"></p>
 <h4 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h4><p>将刚刚的代码稍作改动</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> mut sync.Mutex <span class="hljs-comment">// 声明锁</span>
@@ -349,7 +349,7 @@ PASS</code></pre></div>
 <span class="hljs-number">2020</span><span class="hljs-regexp">/09/</span><span class="hljs-number">30</span> <span class="hljs-number">22</span>:<span class="hljs-number">14</span>:<span class="hljs-number">05</span> goroutine A Unlock
 --- PASS: TestDemo3 (<span class="hljs-number">5.00</span>s)
 PASS</code></pre></div>
-<p>通过每个操作记录下来的时间可以看出，goroutine A 的 Lock 一直阻塞到了 goroutine B 的 Unlock。<br><img src="/images/golang/ipc-mutex-02.jpg" srcset="/img/loading.gif" lazyload alt="ipc-mutex-01"></p>
+<p>通过每个操作记录下来的时间可以看出，goroutine A 的 Lock 一直阻塞到了 goroutine B 的 Unlock。<br><img src="/images/golang/ipc-mutex-02.jpg" alt="ipc-mutex-01"></p>
 <h4 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h4><p>这时候有个疑问，那 goroutine B 上的锁，goroutine A 能解锁吗？修改一下刚才的代码，试一下</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> mut sync.Mutex
@@ -487,7 +487,7 @@ PASS</code></pre></div>
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -644,10 +644,6 @@ PASS</code></pre></div>
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 
