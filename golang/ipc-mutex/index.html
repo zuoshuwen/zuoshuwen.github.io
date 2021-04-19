@@ -277,7 +277,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
 </ul>
 </blockquote>
 <p>Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>接下来通过一个“做累加”的示例程序，展示<strong>竞争状态</strong>（race condition）。</p>
 <h4 id="不加锁"><a href="#不加锁" class="headerlink" title="不加锁"></a>不加锁</h4><p>开启 5000 个 goroutine，让每个 goroutine 给 counter 加 1，最终在所有 goroutine 都完成任务时 counter 的值应该为 5000，先试下不加锁的示例程序表现如何</p>
@@ -408,7 +408,7 @@ PASS</code></pre></div>
 <span class="hljs-bullet">--- </span>PASS: TestDemo6 (11.00s)
 PASS</code></pre></div>
 <p>测试通过，未报错，证明B上的锁，A可以不用解锁直接改。</p>
-<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="锁的两种通常处理方式"><a href="#锁的两种通常处理方式" class="headerlink" title="锁的两种通常处理方式"></a>锁的两种通常处理方式</h3><ul>
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h3><h3 id="锁的两种通常处理方式"><a href="#锁的两种通常处理方式" class="headerlink" title="锁的两种通常处理方式"></a>锁的两种通常处理方式</h3><ul>
 <li>一种是没有获取到锁的线程就一直循环等待判断该资源是否已经释放锁，这种锁叫做<strong>自旋锁</strong>，它不用将线程阻塞起来(NON-BLOCKING)；</li>
 <li>还有一种处理方式就是把自己阻塞起来，等待重新调度请求，这种叫做互斥锁。</li>
 </ul>
