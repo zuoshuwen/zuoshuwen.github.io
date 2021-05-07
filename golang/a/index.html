@@ -30,7 +30,7 @@
     
     
       
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.6.0/styles/github-gist.min.css" />
     
   
 
@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.10","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -109,9 +109,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
+              <a class="nav-link" href="/microservices/a/">
+                <i class="iconfont icon-books"></i>
+                微服务
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/netprogram/a/">
+                <i class="iconfont icon-books"></i>
+                网络编程
               </a>
             </li>
           
@@ -133,18 +145,6 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
               <a class="nav-link" href="/about/">
                 <i class="iconfont icon-user-fill"></i>
                 关于
@@ -154,13 +154,13 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
                 class="iconfont icon-search"></i>&nbsp;</a>
           </li>
         
         
           <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
+            <a class="nav-link" target="_self">&nbsp;<i
                 class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
@@ -197,7 +197,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      128 字
+      378 字
     </span>
   
 
@@ -207,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      4
        分钟
     </span>
   
@@ -248,24 +248,29 @@
             <h1 style="display: none">Go系列文章索引</h1>
             
             <div class="markdown-body">
-              <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><ol>
-<li><a href="/golang/datastruct-arrayslice/" title="Go数据结构之数组与切片">Go数据结构之数组与切片</a><input type="checkbox" disabled checked="checked"></li>
-<li><a href="/golang/oop/" title="Go数据结构之Map">Go数据结构之Map</a><input type="checkbox" disabled >
-
-</li>
+              <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>自己系统学习的过程分享出来，</p>
+<p>几点原则，</p>
+<ol>
+<li>不逐行深入学习源码，因为源码一直再变化， </li>
+<li>学习理论支撑，讲方法、方法论、设计思想、策略</li>
+<li>先普及计算机（cpu、内存、网络写）再写go调度、内存，再往上写应用方面的。<br>还有先写一些理论支撑，比如COW</li>
+</ol>
+<h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><ol>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/base-system/" title="操作系统">操作系统</a></li>
+<li>网络</li>
+</ol>
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><ol>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/datastruct-arrayslice/" title="Go数据结构之数组与切片">Go数据结构之数组与切片</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/oop/" title="Go数据结构之Map">Go数据结构之Map</a></li>
 </ol>
 <h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><ol>
-<li><a href="/golang/oop/" title="Go面向对象">Go面向对象</a><input type="checkbox" disabled >
-
-</li>
+<li><a href="/golang/oop/" title="Go面向对象">Go面向对象</a><input type="checkbox" disabled ></li>
 </ol>
 <h1 id="Runtime"><a href="#Runtime" class="headerlink" title="Runtime"></a>Runtime</h1><ol>
 <li><a href="/golang/scheduling/" title="GoMPG与调度">GoMPG与调度</a><input type="checkbox" disabled ></li>
 <li><a href="/golang/memory-alloc/" title="Go内存管理、分配">Go内存管理、分配</a><input type="checkbox" disabled ></li>
 <li><a href="/golang/memory-gc/" title="Go内存GC">Go内存GC</a><input type="checkbox" disabled ></li>
-<li><a href="/golang/memory-leak-escape/" title="Go内存泄漏、逃逸">Go内存泄漏、逃逸</a><input type="checkbox" disabled >
-
-</li>
+<li><a href="/golang/memory-leak-escape/" title="Go内存泄漏、逃逸">Go内存泄漏、逃逸</a><input type="checkbox" disabled ></li>
 </ol>
 <h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><ol>
 <li><a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a><input type="checkbox" disabled checked="checked"></li>
@@ -278,16 +283,32 @@
 <li>data race <input type="checkbox" disabled ></li>
 <li>channel <input type="checkbox" disabled ></li>
 </ol>
-<h1 id="项目工程"><a href="#项目工程" class="headerlink" title="项目工程"></a>项目工程</h1><ol>
-<li><a target="_blank" rel="noopener" href="https://lailin.xyz/post/go-training-03.html">Go错误处理</a><input type="checkbox" disabled checked="checked"></li>
+<h1 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h1><h1 id="项目工程"><a href="#项目工程" class="headerlink" title="项目工程"></a>项目工程</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://lailin.xyz/post/go-training-03.html">Go错误处理</a><input type="checkbox" disabled checked="checked"><br>选项模式</li>
 </ol>
-<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>1.无锁编程</p>
+<p>启动 goroutine 应该在方法外，不应该在方法里面，并发行为，交给调用者。<br>搞清楚channel什么时候退出，控制这个channel的退出，并发扔给调用者，这三个关键点<br>log.Fatal()不能随便用，因为会导致defer不能执行</p>
+<p>go的内存模型就是为了解决 single（64位系统处理8字节，确实是原子的，但是不是可见的，因为有cacheline,cpu的应对方法就是mesi，go的方法就是内存屏障）</p>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>1.无锁编程<br>影子变量<br>鸭子类型</p>
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/golang/">golang</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">文章索引</a>
+                    
+                  </div>
                 
               </div>
               
@@ -326,9 +347,9 @@
                 
   <div id="gitalk-container"></div>
   <script type="text/javascript">
-    Fluid.utils.lazyComments('gitalk-container', function() {
+    Fluid.utils.loadComments('#gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js', function () {
         var gitalk = new Gitalk({
           clientID: '1545f02c9a677f0bd433',
           clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
@@ -468,9 +489,8 @@
   </script>
 
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
 <script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
@@ -483,7 +503,7 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.2/dist/tocbot.min.js" ></script>
 
 
 
@@ -495,7 +515,7 @@
 
 
 
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
 
 
 

@@ -30,7 +30,7 @@
     
     
       
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.6.0/styles/github-gist.min.css" />
     
   
 
@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.10","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -109,9 +109,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
+              <a class="nav-link" href="/microservices/a/">
+                <i class="iconfont icon-books"></i>
+                微服务
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/netprogram/a/">
+                <i class="iconfont icon-books"></i>
+                网络编程
               </a>
             </li>
           
@@ -133,18 +145,6 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
               <a class="nav-link" href="/about/">
                 <i class="iconfont icon-user-fill"></i>
                 关于
@@ -154,13 +154,13 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
                 class="iconfont icon-search"></i>&nbsp;</a>
           </li>
         
         
           <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
+            <a class="nav-link" target="_self">&nbsp;<i
                 class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
@@ -197,7 +197,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.5k 字
+      2.5k 字
     </span>
   
 
@@ -207,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      15
+      26
        分钟
     </span>
   
@@ -249,8 +249,28 @@
             
             <div class="markdown-body">
               <h1 id="GC"><a href="#GC" class="headerlink" title="GC"></a>GC</h1><p>Golang 一直都在高速发展，每次版本迭代，内存管理相关方面都会有所变化。</p>
+<h2 id="释放内存"><a href="#释放内存" class="headerlink" title="释放内存"></a>释放内存</h2><h3 id="1-手动管理"><a href="#1-手动管理" class="headerlink" title="1. 手动管理"></a>1. 手动管理</h3><p>代表语言有 C、C++，需要调用 alloc, realloc, calloc, free 等函数</p>
+<h3 id="2-垃圾回收（GC）"><a href="#2-垃圾回收（GC）" class="headerlink" title="2. 垃圾回收（GC）"></a>2. 垃圾回收（GC）</h3><p>在计算机科学中，垃圾回收（英语：Garbage Collection，缩写为GC）是指一种自动的存储器管理机制。当某个程序占用的一部分内存空间不再被这个程序访问时，这个程序会借助垃圾回收算法向操作系统归还这部分内存空间。垃圾回收器可以减轻程序员的负担，也减少程序中的错误。垃圾回收最早起源于LISP语言。</p>
+<h4 id="2-1-标记和扫描GC-Mark-sweep"><a href="#2-1-标记和扫描GC-Mark-sweep" class="headerlink" title="2.1 标记和扫描GC(Mark-sweep)"></a>2.1 标记和扫描GC(Mark-sweep)</h4><p>代表语言有 Golang<br>标记和扫描GC，也称为跟踪GC。<br>它通常是一个两阶段的算法，首先将仍然被引用的对象标记为“活的”，然后在下一阶段释放不活的对象的内存。从根变量开始遍历所有引用的对象，标记引用的对象，没有被标记的进行回收</p>
+<ul>
+<li>优点：解决了引用计数的缺点。</li>
+<li>缺点：需要 STW，暂时停掉程序运行。</li>
+</ul>
+<h4 id="2-2-引用计数GC"><a href="#2-2-引用计数GC" class="headerlink" title="2.2 引用计数GC"></a>2.2 引用计数GC</h4><p>代表语言有 PHP, Perl, and Python<br>在这种方法中，每个对象获得一个引用计数，该引用计数随着对它的引用的改变而增加或减少，当计数变为零时，垃圾收集就完成了，缺点是不能处理循环引用。</p>
+<ul>
+<li>优点：对象回收快，不会出现内存耗尽或达到某个阈值时才回收。</li>
+<li>缺点：不能很好的处理循环引用，而实时维护引用计数也是有损耗的。</li>
+</ul>
+<h4 id="2-3-标记-压缩-Mark-compact"><a href="#2-3-标记-压缩-Mark-compact" class="headerlink" title="2.3 标记-压缩(Mark-compact)"></a>2.3 标记-压缩(Mark-compact)</h4><h4 id="2-4-半空间复制（Semispace-copy）"><a href="#2-4-半空间复制（Semispace-copy）" class="headerlink" title="2.4 半空间复制（Semispace copy）"></a>2.4 半空间复制（Semispace copy）</h4><h4 id="2-5-分代GC"><a href="#2-5-分代GC" class="headerlink" title="2.5 分代GC"></a>2.5 分代GC</h4><p>代表语言 Java，按照对象生命周期长短划分不同的代空间，生命周期长的放入老年代，短的放入新生代，不同代有不同的回收算法和回收频率。</p>
+<ul>
+<li>优点：回收性能好</li>
+<li>缺点：算法复杂</li>
+</ul>
 <h2 id="STW"><a href="#STW" class="headerlink" title="STW"></a>STW</h2><p>STW 阶段指的是程序暂停所有运行中的协程，否则不会开始垃圾回收阶段。<br>最开始的时候，在垃圾回收阶段只有一个协程执行垃圾回收。<br>目前 并发GC，垃圾回收阶段用户协程与垃圾回收协程并发执行。STW时间，小于100微妙。</p>
 <p>尽管 STW 如今已经优化到了半毫秒级别以下，但这个程序被卡死原因是由于需要进入 STW 导致的。原因在于，GC 在需要进入 STW 时，需要通知并让所有的用户态代码停止，但是 for {} 所在的 goroutine 永远都不会被中断，从而始终无法进入 STW 阶段。实际实践中也是如此，当程序的某个 goroutine 长时间得不到停止，强行拖慢进入 STW 的时机，这种情况下造成的影响（卡死）是非常可怕的。好在自 Go 1.14 之后，这类 goroutine 能够被异步地抢占，从而使得进入 STW 的时间不会超过抢占信号触发的周期，程序也不会因为仅仅等待一个 goroutine 的停止而停顿在进入 STW 之前的操作上。</p>
+<p>stop the world, GC 的一些阶段需要停止所有的 mutator 以确定当前的引用关系。这便是很多人对 GC 担心的来源，这也是 GC 算法优化的重点。</p>
+<p>在垃圾回收机制 (GC) 中，”Stop the World” (STW) 是一个重要阶段。顾名思义， 在 “Stop the World” 阶段， 当前运行的所有程序将被暂停， 扫描内存的 root 节点和添加写屏障 (write barrier) 。</p>
+<p>处理器 P (无论是正在运行代码的处理器还是已在 idle 列表中的处理器)， 都会被被标记成停止状态 (stopped)， 不再运行任何代码。 调度器把每个处理器的 M  从各自对应的处理器 P 分离出来， 放到 idle 列表中去。<br>对于 Goroutine 本身， 他们会被放到一个全局队列中等待</p>
 <h2 id="三色标记"><a href="#三色标记" class="headerlink" title="三色标记"></a>三色标记</h2><ol>
 <li>灰色：对象还在标记队列中等待</li>
 <li>黑色：对象已被标记，gcmarkBits 对应位为 1 – 该对象不会在本次 GC 中被回收</li>
@@ -262,6 +282,14 @@
 <h2 id="内存标记"><a href="#内存标记" class="headerlink" title="内存标记"></a>内存标记</h2><p>golang 中采用 span 数据结构管理内存，span 中维护了一个个内存块，并由一个位图 allocBits 表示内存块的分配情况，而上文中提到的 gcmarkBits 是记录每块内存块被引用情况的。</p>
 <p><img src="/images/golang/memory-manage-gc-02.png" alt="内存标记"></p>
 <p>如上图，allocBits 记录了每块内存的分配情况，而 gcmarkBits 记录了每块内存的标记情况。在标记阶段会对每块内存进行标记，有对象引用的内存标记为 1，没有对象引用的为 0。而 allocBits 和 gcmarkBits 的数据结构是完全一样的，在结束标记后，将 allocBits 指向 gcmarkBits，则有标记的才是存活的，这样就完成了内存回收。而 gcmarkBits 则会在下次标记时重新分配内存。</p>
+<h1 id="Mark-amp-Sweep"><a href="#Mark-amp-Sweep" class="headerlink" title="Mark &amp; Sweep"></a>Mark &amp; Sweep</h1><ol>
+<li>Stop the World</li>
+<li>Mark：通过 Root 和 Root 直接间接访问到的对象， 来寻找所有可达的对象，并进行标记。</li>
+<li>Sweep：对堆对象迭代，已标记的对象置位标记。所有未标记的对象加入freelist， 可用于再分配。</li>
+<li>Start the World</li>
+</ol>
+<p>这个算法最大的问题是 GC 执行期间需要把整个程序完全暂停，朴素的 Mark Sweep 是整体 STW，并且分配速度慢，内存碎片率高。</p>
+<h2 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h2><p>并发回收的屏障技术归根结底就是在利用内存写屏障来保证强三色不变性和弱三色不变性。早期的 Go 团队实践中选择了从提出较早的 Dijkstra 插入屏障出发， 不可避免的在为了保证强三色不变性的情况下，需要对栈进行重扫。 而在后期的实践中，Go 团队提出了将 Dijkstra 和 Yuasa 屏障结合的混合屏障， 将强三色不变性进行了弱化，从而消除了对栈的重新扫描这一硬性要求，使得在未来实现全面并发 GC 成为可能。</p>
 <h2 id="垃圾回收优化"><a href="#垃圾回收优化" class="headerlink" title="垃圾回收优化"></a>垃圾回收优化</h2><p>在前文中提到，golang 的垃圾回收算法属于 标记-清除，是需要 STW 的。STW 就是 Stop The World 的意思，在 golang 中就是要停掉所有的 goroutine，专心进行垃圾回收，待垃圾回收结束后再恢复 goroutine。而 STW 时间的长短直接影响了应用的执行，如果时间过长，那将是灾难性的。为了缩短 STW 时间，golang 不对优化垃圾回收算法，其中写屏障（Write Barrier）和辅助GC（Mutator Assist）就是两种优化垃圾回收的方法。</p>
 <ul>
 <li>写屏障（Write Barrier）：上面说到的 STW 的目的是防止 GC 扫描时内存变化引起的混乱，而写屏障就是让 goroutine 与 GC 同时运行的手段，虽然不能完全消除 STW，但是可以大大减少 STW 的时间。写屏障在 GC 的特定时间开启，开启后指针传递时会把指针标记，即本轮不回收，下次 GC 时再确定。</li>
@@ -341,9 +369,9 @@
                 
   <div id="gitalk-container"></div>
   <script type="text/javascript">
-    Fluid.utils.lazyComments('gitalk-container', function() {
+    Fluid.utils.loadComments('#gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js', function () {
         var gitalk = new Gitalk({
           clientID: '1545f02c9a677f0bd433',
           clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
@@ -483,9 +511,8 @@
   </script>
 
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
 <script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
@@ -498,7 +525,7 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.2/dist/tocbot.min.js" ></script>
 
 
 
@@ -510,7 +537,7 @@
 
 
 
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
 
 
 

@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://ilifes.com/netprogram/a/</loc>
+    <lastmod>2021-05-06</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/memory-gc/</loc>
+    <lastmod>2021-05-06</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/memory-alloc/</loc>
+    <lastmod>2021-05-06</lastmod>
+  </url>
+  <url>
     <loc>https://ilifes.com/golang/scheduling/</loc>
-    <lastmod>2021-04-19</lastmod>
+    <lastmod>2021-05-06</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/golang/a/</loc>
-    <lastmod>2021-03-26</lastmod>
+    <lastmod>2021-05-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/base-system/</loc>
+    <lastmod>2021-05-04</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/microservices/ha-limit/</loc>
+    <lastmod>2021-04-25</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/microservices/a/</loc>
+    <lastmod>2021-04-25</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/microservices/ha-quarantine/</loc>
+    <lastmod>2021-04-23</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/python/gunicorn-timeout/</loc>
+    <lastmod>2021-04-23</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/golang/ipc-mutex/</loc>
@@ -19,18 +51,6 @@
   <url>
     <loc>https://ilifes.com/golang/oop/</loc>
     <lastmod>2021-03-25</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/memory-gc/</loc>
-    <lastmod>2021-03-25</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/memory-alloc/</loc>
-    <lastmod>2021-01-26</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/gunicorn/timeout/</loc>
-    <lastmod>2021-01-04</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/golang/ipc-atomic/</loc>

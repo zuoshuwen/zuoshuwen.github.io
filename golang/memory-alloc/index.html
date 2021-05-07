@@ -30,7 +30,7 @@
     
     
       
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.6.0/styles/github-gist.min.css" />
     
   
 
@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.10","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -109,9 +109,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
+              <a class="nav-link" href="/microservices/a/">
+                <i class="iconfont icon-books"></i>
+                微服务
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/netprogram/a/">
+                <i class="iconfont icon-books"></i>
+                网络编程
               </a>
             </li>
           
@@ -133,18 +145,6 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
               <a class="nav-link" href="/about/">
                 <i class="iconfont icon-user-fill"></i>
                 关于
@@ -154,13 +154,13 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
                 class="iconfont icon-search"></i>&nbsp;</a>
           </li>
         
         
           <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
+            <a class="nav-link" target="_self">&nbsp;<i
                 class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
@@ -197,7 +197,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.1k 字
+      2.6k 字
     </span>
   
 
@@ -207,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      36
+      30
        分钟
     </span>
   
@@ -266,23 +266,6 @@
 <h3 id="栈还有以下特点"><a href="#栈还有以下特点" class="headerlink" title="栈还有以下特点"></a>栈还有以下特点</h3><ul>
 <li>LIFO，每当一个函数声明一个新变量时，它就被“推”到堆栈的最顶层块上。然后，每当一个函数退出时，最上面的块就会被清除</li>
 <li>每个线程一个 stack</li>
-</ul>
-<h2 id="释放内存"><a href="#释放内存" class="headerlink" title="释放内存"></a>释放内存</h2><h3 id="1-手动管理"><a href="#1-手动管理" class="headerlink" title="1. 手动管理"></a>1. 手动管理</h3><p>代表语言有 C、C++，需要调用 alloc, realloc, calloc, free 等函数</p>
-<h3 id="2-垃圾回收（GC）"><a href="#2-垃圾回收（GC）" class="headerlink" title="2. 垃圾回收（GC）"></a>2. 垃圾回收（GC）</h3><p>在计算机科学中，垃圾回收（英语：Garbage Collection，缩写为GC）是指一种自动的存储器管理机制。当某个程序占用的一部分内存空间不再被这个程序访问时，这个程序会借助垃圾回收算法向操作系统归还这部分内存空间。垃圾回收器可以减轻程序员的负担，也减少程序中的错误。垃圾回收最早起源于LISP语言。</p>
-<h4 id="2-1-标记和扫描GC-Mark-sweep"><a href="#2-1-标记和扫描GC-Mark-sweep" class="headerlink" title="2.1 标记和扫描GC(Mark-sweep)"></a>2.1 标记和扫描GC(Mark-sweep)</h4><p>代表语言有 Golang<br>标记和扫描GC，也称为跟踪GC。<br>它通常是一个两阶段的算法，首先将仍然被引用的对象标记为“活的”，然后在下一阶段释放不活的对象的内存。从根变量开始遍历所有引用的对象，标记引用的对象，没有被标记的进行回收</p>
-<ul>
-<li>优点：解决了引用计数的缺点。</li>
-<li>缺点：需要 STW，暂时停掉程序运行。</li>
-</ul>
-<h4 id="2-2-引用计数GC"><a href="#2-2-引用计数GC" class="headerlink" title="2.2 引用计数GC"></a>2.2 引用计数GC</h4><p>代表语言有 PHP, Perl, and Python<br>在这种方法中，每个对象获得一个引用计数，该引用计数随着对它的引用的改变而增加或减少，当计数变为零时，垃圾收集就完成了，缺点是不能处理循环引用。</p>
-<ul>
-<li>优点：对象回收快，不会出现内存耗尽或达到某个阈值时才回收。</li>
-<li>缺点：不能很好的处理循环引用，而实时维护引用计数也是有损耗的。</li>
-</ul>
-<h4 id="2-3-标记-压缩-Mark-compact"><a href="#2-3-标记-压缩-Mark-compact" class="headerlink" title="2.3 标记-压缩(Mark-compact)"></a>2.3 标记-压缩(Mark-compact)</h4><h4 id="2-4-半空间复制（Semispace-copy）"><a href="#2-4-半空间复制（Semispace-copy）" class="headerlink" title="2.4 半空间复制（Semispace copy）"></a>2.4 半空间复制（Semispace copy）</h4><h4 id="2-5-分代GC"><a href="#2-5-分代GC" class="headerlink" title="2.5 分代GC"></a>2.5 分代GC</h4><p>代表语言 Java，按照对象生命周期长短划分不同的代空间，生命周期长的放入老年代，短的放入新生代，不同代有不同的回收算法和回收频率。</p>
-<ul>
-<li>优点：回收性能好</li>
-<li>缺点：算法复杂</li>
 </ul>
 <h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" alt="TCMalloc"></p>
 <p>内存分配策略的实现，我们也可以叫它内存分配器，相当于在用户编写的程序与虚拟内存中间建立了”内存池”，而避免手写内存池。</p>
@@ -436,7 +419,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/gunicorn/timeout/">
+                      <a href="/python/gunicorn-timeout/">
                         <span class="hidden-mobile">Redash Gunicorn 超时</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
@@ -456,9 +439,9 @@
                 
   <div id="gitalk-container"></div>
   <script type="text/javascript">
-    Fluid.utils.lazyComments('gitalk-container', function() {
+    Fluid.utils.loadComments('#gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', function () {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js', function () {
         var gitalk = new Gitalk({
           clientID: '1545f02c9a677f0bd433',
           clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
@@ -598,9 +581,8 @@
   </script>
 
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
 <script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
@@ -613,7 +595,7 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.2/dist/tocbot.min.js" ></script>
 
 
 
@@ -625,7 +607,7 @@
 
 
 
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
 
 
 
