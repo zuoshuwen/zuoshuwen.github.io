@@ -1,40 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://ilifes.com/redis/a/</loc>
+    <lastmod>2021-08-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/datastruct-algorithm/a/</loc>
+    <lastmod>2021-08-07</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/program/a/</loc>
+    <lastmod>2021-07-17</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/etcd/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/microservices/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/mysql/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/distributed/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/index/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
     <loc>https://ilifes.com/netprogram/a/</loc>
-    <lastmod>2021-05-06</lastmod>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/concurrent-programme/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/design-pattern/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/ios/a/</loc>
+    <lastmod>2021-07-02</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-channel/</loc>
+    <lastmod>2021-06-06</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/oop/</loc>
+    <lastmod>2021-06-05</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-errgroup/</loc>
+    <lastmod>2021-05-26</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-context/</loc>
+    <lastmod>2021-05-26</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/scheduling/</loc>
+    <lastmod>2021-05-17</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-waitgrouponce/</loc>
+    <lastmod>2021-05-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-pool/</loc>
+    <lastmod>2021-05-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/ipc-map/</loc>
+    <lastmod>2021-05-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ilifes.com/golang/memory-alloc/</loc>
+    <lastmod>2021-05-15</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/golang/memory-gc/</loc>
     <lastmod>2021-05-06</lastmod>
   </url>
   <url>
-    <loc>https://ilifes.com/golang/memory-alloc/</loc>
-    <lastmod>2021-05-06</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/scheduling/</loc>
-    <lastmod>2021-05-06</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/a/</loc>
-    <lastmod>2021-05-04</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/base-system/</loc>
-    <lastmod>2021-05-04</lastmod>
-  </url>
-  <url>
     <loc>https://ilifes.com/microservices/ha-limit/</loc>
     <lastmod>2021-04-25</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/microservices/a/</loc>
-    <lastmod>2021-04-25</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/microservices/ha-quarantine/</loc>
-    <lastmod>2021-04-23</lastmod>
   </url>
   <url>
     <loc>https://ilifes.com/python/gunicorn-timeout/</loc>
@@ -46,10 +106,6 @@
   </url>
   <url>
     <loc>https://ilifes.com/golang/memory-leak-escape/</loc>
-    <lastmod>2021-03-25</lastmod>
-  </url>
-  <url>
-    <loc>https://ilifes.com/golang/oop/</loc>
     <lastmod>2021-03-25</lastmod>
   </url>
   <url>

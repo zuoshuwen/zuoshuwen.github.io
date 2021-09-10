@@ -14,7 +14,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="MPG前言在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。">
+  <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
   
@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.10","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}}};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com"}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -96,11 +96,39 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/golang/a/">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="iconfont icon-books"></i>
-                Go
+                程序设计
               </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/datastruct-algorithm/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    数据结构与算法
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/design-pattern/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    设计模式
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/program/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    方案
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -108,11 +136,55 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/microservices/a/">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="iconfont icon-books"></i>
-                微服务
+                编程
               </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/netprogram/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    网络编程
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/golang/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    Go
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/ios/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    iOS
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/html5/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    H5
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/applet/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    小程序
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -120,11 +192,127 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/netprogram/a/">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="iconfont icon-books"></i>
-                网络编程
+                架构
               </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/distributed/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    分布式
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/microservices/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    微服务
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/example/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    方案设计
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/microservices/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    架构模式
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/ddd/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    领域驱动设计
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-books"></i>
+                开源学习
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/redis/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    Redis
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/mysql/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    MySQL
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/etcd/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    Etcd
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-books"></i>
+                数据
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/datadev/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    数据开发
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/datanal/a/">
+                    <i class="iconfont icon-notebook"></i>
+                    数据分析
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -197,7 +385,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.2k 字
+      3.2k 字
     </span>
   
 
@@ -207,7 +395,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      46
+      36
        分钟
     </span>
   
@@ -248,62 +436,7 @@
             <h1 style="display: none">GoMPG与调度</h1>
             
             <div class="markdown-body">
-              <h1 id="MPG"><a href="#MPG" class="headerlink" title="MPG"></a>MPG</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
-<span id="more"></span>
-
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
-<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
-<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
-<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
-<p>调度过程示例：</p>
-<ol>
-<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
-<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
-<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
-</ol>
-<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
-<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
-<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
-<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
-<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
-<p>常见的有：</p>
-<ul>
-<li>线程&amp;锁</li>
-<li>Actor</li>
-<li>CSP</li>
-<li>Lambda 架构</li>
-</ul>
-<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
-<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
-<blockquote>
-<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
-</blockquote>
-<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
-<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
-<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
-<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
-<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
-<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
-<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
-<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
-<p>Go 代码片段的封装。</p>
-<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
-<span class="hljs-comment">//  ...</span>
-&#125;()</code></pre></div>
-
-
-<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
-<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
-<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
-<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
-</ol>
-<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
+              <h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
 <h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
 <thead>
 <tr>
@@ -368,7 +501,7 @@
 <td>包含一些已经运行完成的G；go启用G，先从此处寻找现成的G；</td>
 </tr>
 </tbody></table>
-<h2 id="M-1"><a href="#M-1" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
+<h2 id="M"><a href="#M" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
 <thead>
 <tr>
 <th>名称</th>
@@ -412,7 +545,7 @@
 <td>当前 M 锁定的 G</td>
 </tr>
 </tbody></table>
-<h2 id="P-1"><a href="#P-1" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
+<h2 id="P"><a href="#P" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
 <thead>
 <tr>
 <th>状态</th>
@@ -441,7 +574,7 @@
 </tr>
 </tbody></table>
 <p><img src="/images/golang/scheduling-p-status-01.png" alt="P状态流转"></p>
-<h2 id="G-1"><a href="#G-1" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
+<h2 id="G"><a href="#G" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
 <thead>
 <tr>
 <th>状态</th>
@@ -523,6 +656,7 @@
 <li>GC 收集，比如 STW、扫描 G 的堆栈和标记、清楚操作</li>
 <li>栈扩容，当需要的时候，由 g0 进行扩栈操作</li>
 </ul>
+<p><a target="_blank" rel="noopener" href="https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011">https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011</a></p>
 
             </div>
             <hr>
@@ -599,22 +733,14 @@
   <script type="text/javascript">
     Fluid.utils.loadComments('#gitalk-container', function() {
       Fluid.utils.createCssLink('/css/gitalk.css')
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js', function () {
-        var gitalk = new Gitalk({
-          clientID: '1545f02c9a677f0bd433',
-          clientSecret: '57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18',
-          repo: 'zuoshuwen.github.io',
-          owner: 'zuoshuwen',
-          admin: ["zuoshuwen"],
-          id: '9588e50e56cc67709f3d28b99415ef9f',
-          language: 'zh-CN',
-          labels: ["Gitalk"],
-          perPage: 10,
-          pagerDirection: 'last',
-          createIssueManually: true,
-          distractionFreeMode: false,
-          proxy: '&lt;your own proxy&gt;/https://github.com/login/oauth/access_token'
-        });
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1545f02c9a677f0bd433","clientSecret":"57b1b2091f1c8788e4a2722c7b05ba53bc1e6b18","repo":"zuoshuwen.github.io","owner":"zuoshuwen","admin":["zuoshuwen"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"<your own proxy>/https://github.com/login/oauth/access_token"},
+          {
+            id: '9588e50e56cc67709f3d28b99415ef9f'
+          }
+        )
+        var gitalk = new Gitalk(options);
         gitalk.render('gitalk-container');
       });
     });
@@ -769,6 +895,10 @@
 
 
 
+  <script  src="/js/local-search.js" ></script>
+
+
+
 
   <script defer src="/js/leancloud.js" ></script>
 
@@ -783,21 +913,6 @@
       typing(title)
       
     })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
   </script>
 
 
