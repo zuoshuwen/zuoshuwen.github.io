@@ -2926,4 +2926,390 @@ once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span 
         <tag>方案</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Redis源码剖析与实战</title>
+    <url>/redis/source-code/</url>
+    <content><![CDATA[<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="动态字符串、SDS"><a href="#动态字符串、SDS" class="headerlink" title="动态字符串、SDS"></a>动态字符串、SDS</h2><p>char* 的不足：</p>
+<ul>
+<li>操作效率低：获取长度需遍历，O(N)复杂度</li>
+<li>二进制不安全：无法存储包含 \0 的数据</li>
+</ul>
+<p>SDS 的优势：</p>
+<ul>
+<li>操作效率高：获取长度无需遍历，O(1)复杂度</li>
+<li>二进制安全：因单独记录长度字段，所以可存储包含 \0 的数据</li>
+<li>兼容 C 字符串函数，可直接使用字符串 API</li>
+</ul>
+<p>另外 Redis 在操作 SDS 时，为了避免频繁操作字符串时，每次「申请、释放」内存的开销，还做了这些优化：</p>
+<ul>
+<li>内存预分配：SDS 扩容，会多申请一些内存（小于 1MB 翻倍扩容，大于 1MB 按 1MB 扩容）</li>
+<li>多余内存不释放：SDS 缩容，不释放多余的内存，下次使用可直接复用这些内存</li>
+</ul>
+<p>这种策略，是以多占一些内存的方式，换取「追加」操作的速度。</p>
+<p>这个内存预分配策略，详细逻辑可以看 sds.c 的 sdsMakeRoomFor 函数。</p>
+<p>课后题：SDS 字符串在 Redis 内部模块实现中也被广泛使用，你能在 Redis server 和客户端的实现中，找到使用 SDS 字符串的地方么？</p>
+<ol>
+<li>Redis 中所有 key 的类型就是 SDS（详见 db.c 的 dbAdd 函数）</li>
+<li>Redis Server 在读取 Client 发来的请求时，会先读到一个缓冲区中，这个缓冲区也是 SDS（详见 server.h 中 struct client 的 querybuf 字段）</li>
+<li>写操作追加到 AOF 时，也会先写到 AOF 缓冲区，这个缓冲区也是 SDS （详见 server.h 中 struct client 的 aof_buf 字段）</li>
+</ol>
+<h2 id="Hash"><a href="#Hash" class="headerlink" title="Hash"></a>Hash</h2><ol>
+<li><p>Redis 中的 dict 数据结构，采用「链式哈希」的方式存储，当哈希冲突严重时，会开辟一个新的哈希表，翻倍扩容，并采用「渐进式 rehash」的方式迁移数据</p>
+</li>
+<li><p>所谓「渐进式 rehash」是指，把很大块迁移数据的开销，平摊到多次小的操作中，目的是降低主线程的性能影响</p>
+</li>
+<li><p>Redis 中凡是需要 O(1) 时间获取 k-v 数据的场景，都使用了 dict 这个数据结构，也就是说 dict 是 Redis 中重中之重的「底层数据结构」</p>
+</li>
+<li><p>dict 封装好了友好的「增删改查」API，并在适当时机「自动扩容、缩容」，这给上层数据类型（Hash/Set/Sorted Set）、全局哈希表的实现提供了非常大的便利</p>
+</li>
+<li><p>例如，Redis 中每个 DB 存放数据的「全局哈希表、过期key」都用到了 dict：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// server.h</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisDb</span> &#123;</span>
+   dict *dict; <span class="hljs-comment">// 全局哈希表，数据键值对存在这</span>
+   dict *expires; <span class="hljs-comment">// 过期 key + 过期时间 存在这</span>
+   ...
+&#125;</code></pre></div></li>
+<li><p>「全局哈希表」在触发渐进式 rehash 的情况有 2 个：</p>
+</li>
+</ol>
+<ul>
+<li>增删改查哈希表时：每次迁移 1 个哈希桶（文章提到的 dict.c 中的 _dictRehashStep 函数）</li>
+<li>定时 rehash：如果 dict 一直没有操作，无法渐进式迁移数据，那主线程会默认每间隔 100ms 执行一次迁移操作。这里一次会以 100 个桶为基本单位迁移数据，并限制如果一次操作耗时超时 1ms 就结束本次任务，待下次再次触发迁移（文章没提到这个，详见 dict.c 的 dictRehashMilliseconds 函数）</li>
+</ul>
+<p>（注意：定时 rehash 只会迁移全局哈希表中的数据，不会定时迁移 Hash/Set/Sorted Set 下的哈希表的数据，这些哈希表只会在操作数据时做实时的渐进式 rehash）</p>
+<ol start="7">
+<li>dict 在负载因子超过 1 时（used: bucket size &gt;= 1），会触发 rehash。但如果 Redis 正在 RDB 或 AOF rewrite，为避免父进程大量写时复制，会暂时关闭触发 rehash。但这里有个例外，如果负载因子超过了 5（哈希冲突已非常严重），依旧会强制做 rehash（重点）</li>
+<li>dict 在 rehash 期间，查询旧哈希表找不到结果，还需要在新哈希表查询一次</li>
+</ol>
+<p>课后题：Hash 函数会影响 Hash 表的查询效率及哈希冲突情况，那么，你能从 Redis 的源码中，找到 Hash 表使用的是哪一种 Hash 函数吗？</p>
+<p>找到 dict.c 的 dictFind 函数，可以看到查询一个 key 在哈希表的位置时，调用了 dictHashKey 计算 key 的哈希值：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-function">dictEntry *<span class="hljs-title">dictFind</span><span class="hljs-params">(dict *d, <span class="hljs-keyword">const</span> <span class="hljs-keyword">void</span> *key)</span> </span>&#123;
+   <span class="hljs-comment">// 计算 key 的哈希值</span>
+   h = dictHashKey(d, key);
+   ...
+&#125;</code></pre></div>
+
+<p>继续跟代码可以看到 dictHashKey 调用了 struct dict 下 dictType 的 hashFunction 函数：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// dict.h</span>
+dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</code></pre></div>
+
+<p>而这个 hashFunction 是在初始化一个 dict 时，才会指定使用哪个哈希函数的。</p>
+<p>当 Redis Server 在启动时会创建「全局哈希表」：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// 初始化 db 下的全局哈希表</span>
+<span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; server.dbnum; j++) &#123;
+   <span class="hljs-comment">// dbDictType 中指定了哈希函数</span>
+   server.db[j].dict = dictCreate(&amp;dbDictType,<span class="hljs-literal">NULL</span>);
+...
+&#125;</code></pre></div>
+
+<p>这个 dbDictType struct 指定了具体的哈希函数，跟代码进去能看到，使用了 SipHash 算法，具体实现逻辑在 siphash.c。</p>
+<p>（SipHash 哈希算法是在 Redis 4.0 才开始使用的，3.0-4.0 使用的是 MurmurHash2 哈希算法，3.0 之前是 DJBX33A 哈希算法）</p>
+<h2 id="RedisObject"><a href="#RedisObject" class="headerlink" title="RedisObject"></a>RedisObject</h2><ol>
+<li>要想理解 Redis 数据类型的设计，必须要先了解 redisObject。</li>
+</ol>
+<p>Redis 的 key 是 String 类型，但 value 可以是很多类型（String/List/Hash/Set/ZSet等），所以 Redis 要想存储多种数据类型，就要设计一个通用的对象进行封装，这个对象就是 redisObject。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// server.h</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisObject</span> &#123;</span>
+   <span class="hljs-keyword">unsigned</span> type:<span class="hljs-number">4</span>;
+   <span class="hljs-keyword">unsigned</span> encoding:<span class="hljs-number">4</span>;
+   <span class="hljs-keyword">unsigned</span> lru:LRU_BITS;
+   <span class="hljs-keyword">int</span> refcount;
+   <span class="hljs-keyword">void</span> *ptr;
+&#125; robj;</code></pre></div>
+
+<p>其中，最重要的 2 个字段：</p>
+<ul>
+<li>type：面向用户的数据类型（String/List/Hash/Set/ZSet等）</li>
+<li>encoding：每一种数据类型，可以对应不同的底层数据结构来实现（SDS/ziplist/intset/hashtable/skiplist等）</li>
+</ul>
+<p>例如 String，可以用 embstr（嵌入式字符串，redisObject 和 SDS 一起分配内存），也可以用 rawstr（redisObject 和 SDS 分开存储）实现。</p>
+<p>又或者，当用户写入的是一个「数字」时，底层会转成 long 来存储，节省内存。</p>
+<p>同理，Hash/Set/ZSet 在数据量少时，采用 ziplist 存储，否则就转为 hashtable 来存。</p>
+<p>所以，redisObject 的作用在于：</p>
+<ul>
+<li>为多种数据类型提供统一的表示方式</li>
+<li>同一种数据类型，底层可以对应不同实现，节省内存</li>
+<li>支持对象共享和引用计数，共享对象存储一份，可多次使用，节省内存</li>
+</ul>
+<p>redisObject 更像是连接「上层数据类型」和「底层数据结构」之间的桥梁。</p>
+<ol start="2">
+<li>关于 String 类型的实现，底层对应 3 种数据结构：</li>
+</ol>
+<ul>
+<li>embstr：小于 44 字节，嵌入式存储，redisObject 和 SDS 一起分配内存，只分配 1 次内存</li>
+<li>rawstr：大于 44 字节，redisObject 和 SDS 分开存储，需分配 2 次内存</li>
+<li>long：整数存储（小于 10000，使用共享对象池存储，但有个前提：Redis 没有设置淘汰策略，详见 object.c 的 tryObjectEncoding 函数）</li>
+</ul>
+<ol start="3">
+<li>ziplist 的特点：</li>
+</ol>
+<ul>
+<li>连续内存存储：每个元素紧凑排列，内存利用率高</li>
+<li>变长编码：存储数据时，采用变长编码（满足数据长度的前提下，尽可能少分配内存）</li>
+<li>寻找元素需遍历：存放太多元素，性能会下降（适合少量数据存储）</li>
+<li>级联更新：更新、删除元素，会引发级联更新（因为内存连续，前面数据膨胀/删除了，后面要跟着一起动）</li>
+</ul>
+<p>List、Hash、Set、ZSet 底层都用到了 ziplist。</p>
+<ol start="4">
+<li>intset 的特点：</li>
+</ol>
+<ul>
+<li>Set 存储如果都是数字，采用 intset 存储</li>
+<li>变长编码：数字范围不同，intset 会选择 int16/int32/int64 编码（intset.c 的 _intsetValueEncoding 函数）</li>
+<li>有序：intset 在存储时是有序的，这意味着查找一个元素，可使用「二分查找」（intset.c 的 intsetSearch 函数）</li>
+<li>编码升级/降级：添加、更新、删除元素，数据范围发生变化，会引发编码长度升级或降级</li>
+</ul>
+<p>课后题：SDS 判断是否使用嵌入式字符串的条件是 44 字节，你知道为什么是 44 字节吗？</p>
+<p>嵌入式字符串会把 redisObject 和 SDS 一起分配内存，那在存储时结构是这样的：</p>
+<ul>
+<li>redisObject：16 个字节</li>
+<li>SDS：sdshdr8（3 个字节）+ SDS 字符数组（N 字节 + \0 结束符 1 个字节）</li>
+</ul>
+<p>Redis 规定嵌入式字符串最大以 64 字节存储，所以 N = 64 - 16(redisObject) - 3(sdshr8) - 1(\0)， N = 44 字节。</p>
+<h2 id="ZSet"><a href="#ZSet" class="headerlink" title="ZSet"></a>ZSet</h2><ol>
+<li>ZSet 当数据比较少时，采用 ziplist 存储，每个 member/score 元素紧凑排列，节省内存</li>
+<li>当数据超过阈值（zset-max-ziplist-entries、zset-max-ziplist-value）后，转为 hashtable + skiplist 存储，降低查询的时间复杂度</li>
+<li>hashtable 存储 member-&gt;score 的关系，所以 ZSCORE 的时间复杂度为 O(1)</li>
+<li>skiplist 是一个「有序链表 + 多层索引」的结构，把查询元素的复杂度降到了 O(logN)，服务于 ZRANGE/ZREVRANGE 这类命令</li>
+<li>skiplist 的多层索引，采用「随机」的方式来构建，也就是说每次添加一个元素进来，要不要对这个元素建立「多层索引」？建立「几层索引」？都要通过「随机数」的方式来决定</li>
+<li>每次随机一个 0-1 之间的数，如果这个数小于 0.25（25% 概率），那就给这个元素加一层指针，持续随机直到大于 0.25 结束，最终确定这个元素的层数（层数越高，概率越低，且限制最多 64 层，详见 t_zset.c 的 zslRandomLevel 函数）</li>
+<li>这个预设「概率」决定了一个跳表的内存占用和查询复杂度：概率设置越低，层数越少，元素指针越少，内存占用也就越少，但查询复杂会变高，反之亦然。这也是 skiplist 的一大特点，可通过控制概率，进而控制内存和查询效率</li>
+<li>skiplist 新插入一个节点，只需修改这一层前后节点的指针，不影响其它节点的层数，降低了操作复杂度（相比平衡二叉树的再平衡，skiplist 插入性能更优）</li>
+</ol>
+<p>关于 Redis 的 ZSet 为什么用 skiplist 而不用平衡二叉树实现的问题，原因是：</p>
+<ul>
+<li>skiplist 更省内存：25% 概率的随机层数，可通过公式计算出 skiplist 平均每个节点的指针数是 1.33 个，平衡二叉树每个节点指针是 2 个（左右子树）</li>
+<li>skiplist 遍历更友好：skiplist 找到大于目标元素后，向后遍历链表即可，平衡树需要通过中序遍历方式来完成，实现也略复杂</li>
+<li>skiplist 更易实现和维护：扩展 skiplist 只需要改少量代码即可完成，平衡树维护起来较复杂</li>
+</ul>
+<p>课后题：在使用跳表和哈希表相结合的双索引机制时，在获得高效范围查询和单点查询的同时，你能想到有哪些不足之处么？</p>
+<p>这种发挥「多个数据结构」的优势，来完成某个功能的场景，最大的特点就是「空间换时间」，所以内存占用多是它的不足。</p>
+<p>不过也没办法，想要高效率查询，就得牺牲内存，鱼和熊掌不可兼得。</p>
+<p>不过 skiplist 在实现时，Redis 作者应该也考虑到这个问题了，就是上面提到的这个「随机概率」，Redis 后期维护可以通过调整这个概率，进而达到「控制」查询效率和内存平衡的结果。当然，这个预设值是固定写死的，不可配置，应该是 Redis 作者经过测试和权衡后的设定，我们这里只需要知晓原理就好。</p>
+<h2 id="ZipList、QuickList、ListPack"><a href="#ZipList、QuickList、ListPack" class="headerlink" title="ZipList、QuickList、ListPack"></a>ZipList、QuickList、ListPack</h2><ol>
+<li>ziplist 设计的初衷就是「节省内存」，在存储数据时，把内存利用率发挥到了极致：</li>
+</ol>
+<ul>
+<li>数字按「整型」编码存储，比直接当字符串存内存占用少</li>
+<li>数据「长度」字段，会根据内容的大小选择最小的长度编码</li>
+<li>甚至对于极小的数据，干脆把内容直接放到了「长度」字段中（前几个位表示长度，后几个位存数据）</li>
+</ul>
+<ol start="2">
+<li>但 ziplist 的劣势也很明显：</li>
+</ol>
+<ul>
+<li>寻找元素只能挨个遍历，存储过长数据，查询性能很低</li>
+<li>每个元素中保存了「上一个」元素的长度（为了方便反向遍历），这会导致上一个元素内容发生修改，长度超过了原来的编码长度，下一个元素的内容也要跟着变，重新分配内存，进而就有可能再次引起下一级的变化，一级级更新下去，频繁申请内存</li>
+</ul>
+<ol start="3">
+<li>想要缓解 ziplist 的问题，比较简单直接的方案就是，多个数据项，不再用一个 ziplist 来存，而是分拆到多个 ziplist 中，每个 ziplist 用指针串起来，这样修改其中一个数据项，即便发生级联更新，也只会影响这一个 ziplist，其它 ziplist 不受影响，这种方案就是 quicklist：</li>
+</ol>
+<p>qucklist: ziplist1(也叫quicklistNode) &lt;-&gt; ziplist2 &lt;-&gt; ziplist3 &lt;-&gt; …</p>
+<ol start="4">
+<li>List 数据类型底层实现，就是用的 quicklist，因为它是一个链表，所以 LPUSH/LPOP/RPUSH/RPOP 的复杂度是 O(1)</li>
+<li>List 中每个 ziplist 节点可以存的元素个数/总大小，可以通过 list-max-ziplist-size 配置：</li>
+</ol>
+<ul>
+<li>正数：ziplist 最多包含几个数据项</li>
+<li>负数：取值 -1 ~ -5，表示每个 ziplist 存储最大的字节数，默认 -2，每个ziplist 8KB</li>
+</ul>
+<p>ziplist 超过上述任一配置，添加新元素就会新建 ziplist 插入到链表中。</p>
+<ol start="6">
+<li>List 因为更多是两头操作，为了节省内存，还可以把中间的 ziplist「压缩」，具体可看 list-compress-depth 配置项，默认配置不压缩</li>
+<li>要想彻底解决 ziplist 级联更新问题，本质上要修改 ziplist 的存储结构，也就是不要让每个元素保存「上一个」元素的长度即可，所以才有了 listpack</li>
+<li>listpack 每个元素项不再保存上一个元素的长度，而是优化元素内字段的顺序，来保证既可以从前也可以向后遍历</li>
+<li>listpack 是为了替代 ziplist 为设计的，但因为 List/Hash/Set/ZSet 都严重依赖 ziplist，所以这个替换之路很漫长，目前只有 Stream 数据类型用到了 listpack</li>
+</ol>
+<h2 id="Radix-Tree"><a href="#Radix-Tree" class="headerlink" title="Radix Tree"></a>Radix Tree</h2><p>作为有序索引，Radix Tree 也能提供范围查询，和我们日常使用的 B+ 树，以及第5讲中介绍的跳表相比，你觉得 Radix Tree 有什么优势和不足么？</p>
+<ol>
+<li>Radix Tree 优势</li>
+</ol>
+<ul>
+<li>本质上是前缀树，所以存储有「公共前缀」的数据时，比 B+ 树、跳表节省内存</li>
+<li>没有公共前缀的数据项，压缩存储，value 用 listpack 存储，也可以节省内存</li>
+<li>查询复杂度是 O(K)，只与「目标长度」有关，与总数据量无关</li>
+<li>这种数据结构也经常用在搜索引擎提示、文字自动补全等场景</li>
+</ul>
+<p>Stream 在存消息时，推荐使用默认自动生成的「时间戳+序号」作为消息 ID，不建议自己指定消息 ID，这样才能发挥 Radix Tree 公共前缀的优势。</p>
+<ol start="2">
+<li>Radix Tree 不足</li>
+</ol>
+<ul>
+<li>如果数据集公共前缀较少，会导致内存占用多</li>
+<li>增删节点需要处理其它节点的「分裂、合并」，跳表只需调整前后指针即可</li>
+<li>B+ 树、跳表范围查询友好，直接遍历链表即可，Radix Tree 需遍历树结构</li>
+<li>实现难度高比 B+ 树、跳表复杂</li>
+</ul>
+<p>每种数据结构都是在面对不同问题场景下，才被设计出来的，结合各自场景中的数据特点，使用优势最大的数据结构才是正解。</p>
+<h1 id="事件驱动"><a href="#事件驱动" class="headerlink" title="事件驱动"></a>事件驱动</h1><h2 id="Redis-Server"><a href="#Redis-Server" class="headerlink" title="Redis Server"></a>Redis Server</h2><p>Redis 启动流程，主要的工作有：</p>
+<ol>
+<li>初始化前置操作（设置时区、随机种子）</li>
+<li>初始化 Server 的各种默认配置（server.c 的 initServerConfig 函数），默认配置见 server.h 中的 CONFIG_DEFAULT_XXX，比较典型的配置有：</li>
+</ol>
+<ul>
+<li>默认端口</li>
+<li>定时任务频率</li>
+<li>数据库数量</li>
+<li>AOF 刷盘策略</li>
+<li>淘汰策略</li>
+<li>数据结构转换阈值</li>
+<li>主从复制参数</li>
+</ul>
+<ol start="3">
+<li>加载配置启动参数，覆盖默认配置（config.c 的 loadServerConfig 函数）：</li>
+</ol>
+<ul>
+<li>解析命令行参数</li>
+<li>解析配置文件</li>
+</ul>
+<ol start="3">
+<li>初始化 Server（server.c 的 initServer 函数），例如会初始化：</li>
+</ol>
+<ul>
+<li>共享对象池</li>
+<li>客户端链表</li>
+<li>从库链表</li>
+<li>监听端口</li>
+<li>全局哈希表</li>
+<li>LRU 池</li>
+<li>注册定时任务函数</li>
+<li>注册监听请求函数</li>
+</ul>
+<ol start="4">
+<li>启动事件循环（ae.c 的 aeMain 函数）</li>
+</ol>
+<ul>
+<li>处理请求</li>
+<li>处理定时任务</li>
+</ul>
+<p>这里补充一下，初始化 Server 完成后，Redis 还会启动 3 类后台线程（server.c 的 InitServerLast 函数），协助主线程工作（异步释放 fd、AOF 每秒刷盘、lazyfree）。</p>
+<p>课后题：Redis 源码的 main 函数在调用 initServer 函数之前，会执行如下的代码片段，你知道这个代码片段的作用是什么吗？</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> **argv)</span> </span>&#123;
+   ...
+   server.supervised = redisIsSupervised(server.supervised_mode);
+   <span class="hljs-keyword">int</span> background = server.daemonize &amp;&amp; !server.supervised;
+   <span class="hljs-keyword">if</span> (background) daemonize();
+   ...
+&#125;</code></pre></div>
+
+<p>Redis 可以配置以守护进程的方式启动（配置文件 daemonize = yes），也可以把 Redis 托管给 upstart 或 systemd 来启动 / 停止（supervised = upstart|systemd|auto）。</p>
+<h2 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h2><ol>
+<li>单线程服务器模型，面临的最大的问题就是，一个线程如何处理多个客户端请求？解决这种问题的办法就是「IO 多路复用」。它本质上是应用层不用维护多个客户端的连接状态，而是把它们「托管」给了操作系统，操作系统维护这些连接的状态变化，之后应用层只管问操作系统，哪些 socket 有数据可读/可写就好了，大大简化了应用层的复杂度</li>
+<li>IO 多路复用机制要想高效使用，一般还需要把 socket 设置成「非阻塞」模式，即 socket 没有数据可读/可写时，应用层去 read/write socket 也不会阻塞住（内核会返回指定错误，应用层可继续重试），这样应用层就可以去处理其它业务逻辑，不会阻塞影响性能</li>
+<li>为什么 Redis 要使用「单线程」处理客户端请求？本质上是因为，Redis 操作的是内存，操作内存数据是极快的，所以 Redis 的瓶颈不在 CPU，优化的重点就在网络 IO 上，高效的 IO 多路复用机制，正好可以满足这种需求，模型简单，性能也极高</li>
+<li>但成也萧何败也萧何，因为 Redis 处理请求是「单线程」，所以如果有任意请求在 Server 端发生耗时（例如操作 bigkey，或一次请求数据过多），就会导致后面的请求发生「排队」，业务端就会感知到延迟增大，性能下降</li>
+<li>基于此，Redis 又做了很多优化：一些耗时的操作，不再放在主线程处理，而是丢到后台线程慢慢执行。例如，异步关闭 fd，异步释放内存、后台 AOF 刷盘这些操作。所以 Redis Server 其实是「多线程」的，只不过最核心的处理请求逻辑是单线程的，这点一定要区分开</li>
+</ol>
+<p>课后题：在 Redis 事件驱动框架代码中，分别使用了 Linux 系统上的 select 和 epoll 两种机制，你知道为什么 Redis 没有使用 poll 这一机制吗？</p>
+<p>首先要明确一点，select 并不是只有 Linux 才支持的，Windows 平台也支持。</p>
+<p>而 Redis 针对不同操作系统，会选择不同的 IO 多路复用机制来封装事件驱动框架，具体代码见 ae.c。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// ae.c</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_EVPORT</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_evport.c&quot;</span> <span class="hljs-comment">// Solaris</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_EPOLL</span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_epoll.c&quot;</span> <span class="hljs-comment">// Linux</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_KQUEUE</span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_kqueue.c&quot;</span> <span class="hljs-comment">// MacOS</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_select.c&quot;</span> <span class="hljs-comment">// Windows</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span></code></pre></div>
+
+<p>仔细看上面的代码逻辑，先判断了 Solaris/Linux/MacOS 系统，选择对应的多路复用模型，最后剩下的系统都用 select 模型。</p>
+<p>所以我理解，select 并不是为 Linux 服务的，而是在 Windows 下使用的。</p>
+<p>因为 epoll 性能优于 select 和 poll，所以 Linux 平台下，Redis 直接会选择 epoll。而 Windows 不支持 epoll 和 poll，所以会用 select 模型。</p>
+<h2 id="进程模型"><a href="#进程模型" class="headerlink" title="进程模型"></a>进程模型</h2><ol>
+<li><p>为了高效处理网络 IO 的「连接事件」、「读事件」、「写事件」，演化出了 Reactor 模型</p>
+</li>
+<li><p>Reactor 模型主要有 reactor、acceptor、handler 三类角色：</p>
+</li>
+</ol>
+<ul>
+<li>reactor：分配事件</li>
+<li>acceptor：接收连接请求</li>
+<li>handler：处理业务逻辑</li>
+</ul>
+<ol start="3">
+<li>Reactor 模型又分为 3 类：</li>
+</ol>
+<ul>
+<li>单 Reactor 单线程：accept -&gt; read -&gt; 处理业务逻辑 -&gt; write 都在一个线程</li>
+<li>单 Reactor 多线程：accept/read/write 在一个线程，处理业务逻辑在另一个线程</li>
+<li>多 Reactor 多线程 / 进程：accept 在一个线程/进程，read/处理业务逻辑/write 在另一个线程/进程</li>
+</ul>
+<ol start="4">
+<li>Redis 6.0 以下版本，属于单 Reactor 单线程模型，监听请求、读取数据、处理请求、写回数据都在一个线程中执行，这样会有 3 个问题：</li>
+</ol>
+<ul>
+<li>单线程无法利用多核</li>
+<li>处理请求发生耗时，会阻塞整个线程，影响整体性能</li>
+<li>并发请求过高，读取/写回数据存在瓶颈</li>
+</ul>
+<ol start="5">
+<li>针对问题 3，Redis 6.0 进行了优化，引入了 IO 多线程，把读写请求数据的逻辑，用多线程处理，提升并发性能，但处理请求的逻辑依旧是单线程处理</li>
+</ol>
+<p>课后题：除了 Redis，你还了解什么软件系统使用了 Reactor 模型吗？</p>
+<p>Netty、Memcached 采用多 Reactor 多线程模型。</p>
+<p>Nginx 采用多 Reactor 多进程模型，不过与标准的多 Reactor 多进程模型有些许差异。Nginx 的主进程只用来初始化 socket，不会 accept 连接，而是由子进程 accept 连接，之后这个连接的所有处理都在子进程中完成。</p>
+<h2 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h2><ol>
+<li>Redis 事件循环主要处理两类事件：文件事件、时间事件</li>
+</ol>
+<ul>
+<li>文件事件包括：client 发起新连接、client 向 server 写数据、server 向 client 响应数据</li>
+<li>时间事件：Redis 的各种定时任务（主线程中执行）</li>
+</ul>
+<ol start="2">
+<li>Redis 在启动时，会创建 aeEventLoop，初始化 epoll 对象，监听端口，之后会注册文件事件、时间事件：</li>
+</ol>
+<ul>
+<li>文件事件：把 listen socket fd 注册到 epoll 中，回调函数是 acceptTcpHandler（新连接事件）</li>
+<li>时间事件：把 serverCron 函数注册到 aeEventLoop 中，并指定执行频率</li>
+</ul>
+<ol start="3">
+<li>Redis Server 启动后，会启动一个死循环，持续处理事件（ae.c 的 aeProcessEvents 函数）</li>
+<li>有文件事件（网络 IO)，则优先处理。例如，client 到 server 的新连接，会调用 acceptTcpHandler 函数，之后会注册读事件 readQueryFromClient 函数，client 发给 server 的数据，都会在这个函数处理，这个函数会解析 client 的数据，找到对应的 cmd 函数执行</li>
+<li>cmd 逻辑执行完成后，server 需要写回数据给 client，会先把响应数据写到对应 client 的 内存 buffer 中，在下一次处理 IO 事件之前，Redis 会把每个 client 的 buffer 数据写到 client 的 socket 中，给 client 响应</li>
+<li>如果响应给 client 的数据过多，则会分多次发送，待发送的数据会暂存到 buffer，然后会向 epoll 注册回调函数 sendReplyToClient，待 socket 可写时，继续调用回调函数向 client 写回剩余数据</li>
+<li>在这个死循环中处理每次事件时，都会先检查一下，时间事件是否需要执行，因为之前已经注册好了时间事件的回调函数 + 执行频率，所以在执行 aeApiPoll 时，timeout 就是定时任务的周期，这样即使没有 IO 事件，epoll_wait 也可以正常返回，此时就可以执行一次定时任务 serverCron 函数，这样就可以在一个线程中就完成 IO 事件 + 定时任务的处理</li>
+</ol>
+<p>课后题：Redis 在调用 aeApiCreate、aeApiAddEvent 这些函数时，是根据什么条件来决定，具体调用哪个文件中的 IO 多路复用函数的？</p>
+<p>在 ae.c 中，根据不同平台，首先定义好了要导入的封装好的 IO 多路复用函数，每个平台对应的文件中都定义了 aeApiCreate、aeApiAddEvent 这类函数，在执行时就会执行对应平台的函数逻辑。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">// ae.c</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_EVPORT</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_evport.c&quot;</span> <span class="hljs-comment">// Solaris</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_EPOLL</span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_epoll.c&quot;</span> <span class="hljs-comment">// Linux</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">ifdef</span> HAVE_KQUEUE</span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_kqueue.c&quot;</span> <span class="hljs-comment">// MacOS</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;ae_select.c&quot;</span> <span class="hljs-comment">// Windows</span></span>
+        <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+    <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>redis</category>
+      </categories>
+      <tags>
+        <tag>源码</tag>
+      </tags>
+  </entry>
 </search>

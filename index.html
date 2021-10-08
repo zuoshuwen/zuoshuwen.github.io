@@ -494,6 +494,73 @@ String底层使用 简单动态字符串（Simple Dynamic
   <div class="row mx-auto index-card">
     
     
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/redis/source-code/" target="_self">
+          <img src="/images/design-pattern/a-cover.png" alt="Redis源码剖析与实战">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/redis/source-code/" target="_self">
+          Redis源码剖析与实战
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/redis/source-code/" target="_self">
+          
+          
+            
+          
+          数据结构动态字符串、SDSchar* 的不足：
+
+操作效率低：获取长度需遍历，O(N)复杂度
+二进制不安全：无法存储包含 \0 的数据
+
+SDS 的优势：
+
+操作效率高：获取长度无需遍历，O(1)复杂度
+二进制安全：因单独记录长度字段，所以可存储包含 \0 的数据
+兼容 C 字符串函数，可直接使用字符串 API
+
+另外 Redis 在操作 SDS 时，为了避免频繁操作字符串时，每次「申请、释放」内
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-06-16 08:00" pubdate>
+              2021-06-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/redis/">redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
@@ -888,69 +955,11 @@ SOLID 原则 -OC
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/mysql/a/" target="_self">
-          <img src="/images/design-pattern/a-cover.png" alt="Mysql文章索引">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/mysql/a/" target="_self">
-          Mysql文章索引
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/mysql/a/" target="_self">
-          
-          
-            
-          
-          学习资料极客时间《MySQL实战45讲》书籍《高性能MySQL（第三版）》
-架构连接器长连接 ➕ mysql_reset_connection如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。
-查询缓存建议不要使用缓存
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-05-07 11:46" pubdate>
-              2021-05-07
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/redis/">redis</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/">文章索引</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
