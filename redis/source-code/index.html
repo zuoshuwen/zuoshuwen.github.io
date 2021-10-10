@@ -24,7 +24,7 @@
 <meta property="og:description" content="数据结构动态字符串、SDSchar* 的不足：  操作效率低：获取长度需遍历，O(N)复杂度 二进制不安全：无法存储包含 \0 的数据  SDS 的优势：  操作效率高：获取长度无需遍历，O(1)复杂度 二进制安全：因单独记录长度字段，所以可存储包含 \0 的数据 兼容 C 字符串函数，可直接使用字符串 API  另外 Redis 在操作 SDS 时，为了避免频繁操作字符串时，每次「申请、释放」内">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-16T00:00:00.000Z">
-<meta property="article:modified_time" content="2021-10-08T14:27:23.993Z">
+<meta property="article:modified_time" content="2021-10-10T07:13:28.993Z">
 <meta property="article:author" content="sown">
 <meta property="article:tag" content="源码">
 <meta name="twitter:card" content="summary_large_image">
@@ -396,7 +396,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10k 字
+      25k 字
     </span>
   
 
@@ -405,7 +405,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      33 分钟
+      79 分钟
     </span>
   
 
@@ -809,17 +809,378 @@ dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</code></pre></div>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span></code></pre></div>
 
 
+<h2 id="多进程"><a href="#多进程" class="headerlink" title="多进程"></a>多进程</h2><ol>
+<li>很多人认为 Redis 是单线程，这个描述是不准确的。准确来说 Redis 只有在处理「客户端请求」时，是单线程的。但整个 Redis Server 并不是单线程的，还有后台线程在辅助处理一些工作</li>
+<li>Redis 选择单线程处理请求，是因为 Redis 操作的是「内存」，加上设计了「高效」的数据结构，所以操作速度极快，利用 IO 多路复用机制，单线程依旧可以有非常高的性能</li>
+<li>但如果一个请求发生耗时，单线程的缺点就暴露出来了，后面的请求都要「排队」等待，所以 Redis 在启动时会启动一些「后台线程」来辅助工作，目的是把耗时的操作，放到后台处理，避免主线程操作耗时影响整体性能</li>
+<li>例如关闭 fd、AOF 刷盘、释放 key 的内存，这些耗时操作，都可以放到后台线程中处理，对主逻辑没有任何影响</li>
+<li>后台线程处理这些任务，就相当于一个消费者，生产者（主线程）把耗时任务丢到队列中（链表），消费者不停轮询这个队列，拿出任务就去执行对应的方法即可：</li>
+</ol>
+<ul>
+<li>BIO_CLOSE_FILE：close(fd)</li>
+<li>BIO_AOF_FSYNC：fsync(fd)</li>
+<li>BIO_LAZY_FREE：free(obj) / free(dict) / free(skiplist)</li>
+</ul>
+<p>课后题：Redis 后台任务使用 bio_job 结构体来描述，该结构体用了三个指针变量来表示任务参数，如果我们创建的任务，所需要的参数大于 3 个，你有什么应对方法来传参么？</p>
+<p>最直接的方法就是，把参数换成数组类型，这样就可以传递任意数量参数了。因为这里 Redis 的后台任务都比较简单，最多 3 个参数就足够满足需求，所以 job 直接写死了 3 个参数变量，这样做的好处是维护起来简单直接。</p>
+<h2 id="多IO线程"><a href="#多IO线程" class="headerlink" title="多IO线程"></a>多IO线程</h2><ol>
+<li>Redis 6.0 之前，处理客户端请求是单线程，这种模型的缺点是，只能用到「单核」CPU。如果并发量很高，那么在读写客户端数据时，容易引发性能瓶颈，所以 Redis 6.0 引入了多 IO 线程解决这个问题</li>
+<li>配置文件开启 io-threads N 后，Redis Server 启动时，会启动 N - 1 个 IO 线程（主线程也算一个 IO 线程），这些 IO 线程执行的逻辑是 networking.c 的 IOThreadMain 函数。但默认只开启多线程「写」client socket，如果要开启多线程「读」，还需配置 io-threads-do-reads = yes</li>
+<li>Redis 在读取客户端请求时，判断如果开启了 IO 多线程，则把这个 client 放到 clients_pending_read 链表中（postponeClientRead 函数），之后主线程在处理每次事件循环之前，把链表数据轮询放到 IO 线程的链表（io_threads_list）中</li>
+<li>同样地，在写回响应时，是把 client 放到 clients_pending_write 中（prepareClientToWrite 函数），执行事件循环之前把数据轮询放到 IO 线程的链表（io_threads_list）中</li>
+<li>主线程把 client 分发到 IO 线程时，自己也会读写客户端 socket（主线程也要分担一部分读写操作），之后「等待」所有 IO 线程完成读写，再由主线程「串行」执行后续逻辑</li>
+<li>每个 IO 线程，不停地从 io_threads_list 链表中取出 client，并根据指定类型读、写 client socket</li>
+<li>IO 线程在处理读、写 client 时有些许差异，如果 write_client_pedding &lt; io_threads * 2，则直接由「主线程」负责写，不再交给 IO 线程处理，从而节省 CPU 消耗</li>
+<li>Redis 官方建议，服务器最少 4 核 CPU 才建议开启 IO 多线程，4 核 CPU 建议开 2-3 个 IO 线程，8 核 CPU 开 6 个 IO 线程，超过 8 个线程性能提升不大</li>
+<li>Redis 官方表示，开启多 IO 线程后，性能可提升 1 倍。当然，如果 Redis 性能足够用，没必要开 IO 线程</li>
+</ol>
+<p>课后题：为什么 startThreadedIO / stopThreadedIO 要执行加解锁？</p>
+<p>既然涉及到加锁操作，必然是为了「互斥」从而控制某些逻辑。可以在代码中检索这个锁变量，看存在哪些逻辑对 io_threads_mutex 操作了加解锁。</p>
+<p>跟踪代码可以看到，在 networking.c 的 IOThreadMain 函数，也对这个变量进行了加解锁操作，那就说明 startThreadedIO / stopThreadedIO 函数，可以控制 IOThreadMain 里逻辑的执行，IOThreadMain 代码如下。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">IOThreadMain</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *myid)</span> </span>&#123;
+    ...
+    <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>) &#123;
+    ...
+    <span class="hljs-comment">/* Give the main thread a chance to stop this thread. */</span>
+    <span class="hljs-keyword">if</span> (io_threads_pending[id] == <span class="hljs-number">0</span>) &#123;
+    pthread_mutex_lock(&amp;io_threads_mutex[id]);
+    pthread_mutex_unlock(&amp;io_threads_mutex[id]);
+    <span class="hljs-keyword">continue</span>;
+    &#125;
+    <span class="hljs-comment">// 读写 client socket</span>
+    <span class="hljs-comment">// ...</span>
+&#125;</code></pre></div>
+
+<p>这个函数正是 IO 多线程的主逻辑。</p>
+<p>从注释可以看到，这是为了给主线程停止 IO 线程的的机会。也就是说，这里的目的是为了让主线程可以控制 IO 线程的开启 / 暂停。</p>
+<p>因为每次 IO 线程在执行时必须先拿到锁，才能执行后面的逻辑，如果主线程执行了 stopThreadedIO，就会先拿到锁，那么 IOThreadMain 函数在执行时就会因为拿不到锁阻塞「等待」，这就达到了 stop IO 线程的目的。</p>
+<p>同样地，调用 startThreadedIO 函数后，会释放锁，IO 线程就可以拿到锁，继续「恢复」执行。</p>
+<h2 id="分布式的原子性"><a href="#分布式的原子性" class="headerlink" title="分布式的原子性"></a>分布式的原子性</h2><ol>
+<li>无论是 IO 多路复用，还是 Redis 6.0 的多 IO 线程，Redis 执行具体命令的主逻辑依旧是「单线程」的</li>
+<li>执行命令是单线程，本质上就保证了每个命令必定是「串行」执行的，前面请求处理完成，后面请求才能开始处理</li>
+<li>所以 Redis 在实现分布式锁时，内部不需要考虑加锁问题，直接在主线程中判断 key 是否存在即可，实现起来非常简单</li>
+</ol>
+<p>课后题：如果将命令处理过程中的命令执行也交给多 IO 线程执行，除了对原子性会有影响，还会有什么好处和坏处？</p>
+<p>好处：</p>
+<ul>
+<li>每个请求分配给不同的线程处理，一个请求处理慢，并不影响其它请求</li>
+<li>请求操作的 key 越分散，性能会变高（并行处理比串行处理性能高）</li>
+<li>可充分利用多核 CPU 资源</li>
+</ul>
+<p>坏处：</p>
+<ul>
+<li>操作同一个 key 需加锁，加锁会影响性能，如果是热点 key，性能下降明显</li>
+<li>多线程上下文切换存在性能损耗</li>
+<li>多线程开发和调试不友好</li>
+</ul>
+<h2 id="LRU"><a href="#LRU" class="headerlink" title="LRU"></a>LRU</h2><ol>
+<li>实现一个严格的 LRU 算法，需要额外的内存构建 LRU 链表，同时维护链表也存在性能开销，Redis 对于内存资源和性能要求极高，所以没有采用严格 LRU 算法，而是采用「近似」LRU 算法实现数据淘汰策略</li>
+<li>触发数据淘汰的时机，是每次处理「请求」时判断的。也就是说，执行一个命令之前，首先要判断实例内存是否达到 maxmemory，是的话则先执行数据淘汰，再执行具体的命令</li>
+<li>淘汰数据时，会「持续」判断 Redis 内存是否下降到了 maxmemory 以下，不满足的话会继续淘汰数据，直到内存下降到 maxmemory 之下才会停止</li>
+<li>可见，如果发生大量淘汰的情况，那么处理客户端请求就会发生「延迟」，影响性能</li>
+<li>Redis 计算实例内存时，不会把「主从复制」的缓冲区计算在内，也就是说不管一个实例后面挂了多少个从库，主库不会把主从复制所需的「缓冲区」内存，计算到实例内存中，即这部分内存增加，不会对数据淘汰产生影响</li>
+<li>但如果 Redis 内存已达到 maxmemory，要谨慎执行 MONITOR 命令，因为 Redis Server 会向执行 MONITOR 的 client 缓冲区填充数据，这会导致缓冲区内存增长，进而引发数据淘汰</li>
+</ol>
+<p>课后题：为什么键值对的 LRU 时钟值，不是直接通过调用 getLRUClock 函数来获取？</p>
+<p>本质上是为了性能。</p>
+<p>Redis 这种对性能要求极高的数据库，在系统调用上的优化也做到了极致。</p>
+<p>获取机器时钟本质上也是一个「系统调用」，对于 Redis 这种动不动每秒上万的 QPS，如果每次都触发一次系统调用，这么频繁的操作也是一笔不小的开销。</p>
+<p>所以，Redis 用一个定时任务（serverCron 函数），以固定频率触发系统调用获取机器时钟，然后把机器时钟挂到 server 的全局变量下，这相当于维护了一个「本地缓存」，当需要获取时钟时，直接从全局变量获取即可，节省了大量的系统调用开销。</p>
+<h2 id="LFU"><a href="#LFU" class="headerlink" title="LFU"></a>LFU</h2><ol>
+<li>LFU 是在 Redis 4.0 新增的淘汰策略，它涉及的巧妙之处在于，其复用了 redisObject 结构的 lru 字段，把这个字段「一分为二」，保存最后访问时间和访问次数</li>
+<li>key 的访问次数不能只增不减，它需要根据时间间隔来做衰减，才能达到 LFU 的目的</li>
+<li>每次在访问一个 key 时，会「懒惰」更新这个 key 的访问次数：先衰减访问次数，再更新访问次数</li>
+<li>衰减访问次数，会根据时间间隔计算，间隔时间越久，衰减越厉害</li>
+<li>因为 redisObject lru 字段宽度限制，这个访问次数是有上限的（8 bit 最大值 255），所以递增访问次数时，会根据「当前」访问次数和「概率」的方式做递增，访问次数越大，递增因子越大，递增概率越低</li>
+<li>Redis 实现的 LFU 算法也是「近似」LFU，是在性能和内存方面平衡的结果</li>
+</ol>
+<p>课后题：LFU 算法在初始化键值对的访问次数时，会将访问次数设置为 LFU_INIT_VAL，默认值是 5 次。如果 LFU_INIT_VAL 设置为 1，会发生什么情况？</p>
+<p>如果开启了 LFU，那在写入一个新 key 时，需要初始化访问时间、访问次数（createObject 函数），如果访问次数初始值太小，那这些新 key 的访问次数，很有可能在短时间内就被「衰减」为 0，那就会面临马上被淘汰的风险。</p>
+<p>新 key 初始访问次数 LFU_INIT_VAL = 5，就是为了避免一个 key 在创建后，不会面临被立即淘汰的情况发生。</p>
+<h2 id="Lazy-Free"><a href="#Lazy-Free" class="headerlink" title="Lazy Free"></a>Lazy Free</h2><ol>
+<li>lazy-free 是 4.0 新增的功能，默认是关闭的，需要手动开启</li>
+<li>开启 lazy-free 时，有多个「子选项」可以控制，分别对应不同场景下，是否开启异步释放内存：</li>
+</ol>
+<ul>
+<li>lazyfree-lazy-expire：key 在过期删除时尝试异步释放内存</li>
+<li>lazyfree-lazy-eviction：内存达到 maxmemory 并设置了淘汰策略时尝试异步释放内存</li>
+<li>lazyfree-lazy-server-del：执行 RENAME/MOVE 等命令或需要覆盖一个 key 时，Redis 内部删除旧 key 尝试异步释放内存</li>
+<li>replica-lazy-flush：主从全量同步，从库清空数据库时异步释放内存</li>
+</ul>
+<ol start="3">
+<li>即使开启了 lazy-free，但如果执行的是 DEL 命令，则还是会同步释放 key 内存，只有使用 UNLINK 命令才「可能」异步释放内存</li>
+<li>Redis 6.0 版本新增了一个新的选项 lazyfree-lazy-user-del，打开后执行 DEL 就与 UNLINK 效果一样了</li>
+<li>最关键的一点，开启 lazy-free 后，除 replica-lazy-flush 之外，其它选项都只是「可能」异步释放 key 的内存，并不是说每次释放 key 内存都是丢到后台线程的</li>
+<li>开启 lazy-free 后，Redis 在释放一个 key 内存时，首先会评估「代价」，如果代价很小，那么就直接在「主线程」操作了，「没必要」放到后台线程中执行（不同线程传递数据也会有性能消耗）</li>
+<li>什么情况才会真正异步释放内存？这和 key 的类型、编码方式、元素数量都有关系（详见 lazyfreeGetFreeEffort 函数）：</li>
+</ol>
+<ul>
+<li>当 Hash/Set 底层采用哈希表存储（非 ziplist/int 编码存储）时，并且元素数量超过 64 个</li>
+<li>当 ZSet 底层采用跳表存储（非 ziplist 编码存储）时，并且元素数量超过 64 个</li>
+<li>当 List 链表节点数量超过 64 个（注意，不是元素数量，而是链表节点的数量，List 底层实现是一个链表，链表每个节点是一个 ziplist，一个 ziplist 可能有多个元素数据）</li>
+</ul>
+<p>只有满足以上条件，在释放 key 内存时，才会真正放到「后台线程」中执行，其它情况一律还是在主线程操作。</p>
+<p>也就是说 String（不管内存占用多大）、List（少量元素）、Set（int 编码存储）、Hash/ZSet（ziplist 编码存储）这些情况下的 key，在释放内存时，依旧在「主线程」中操作。</p>
+<ol start="8">
+<li>可见，即使打开了 lazy-free，String 类型的 bigkey，在删除时依旧有「阻塞」主线程的风险。所以，即便 Redis 提供了 lazy-free，还是不建议在 Redis 存储 bigkey</li>
+</ol>
+<p>9、Redis 在释放内存「评估」代价时，不是看 key 的内存大小，而是关注释放内存时的「工作量」有多大。从上面分析可以看出，如果 key 内存是连续的，释放内存的代价就比较低，则依旧放在「主线程」处理。如果 key 内存不连续（包含大量指针），这个代价就比较高，这才会放在「后台线程」中执行</p>
+<p>课后题：freeMemoryIfNeeded 函数在使用后台线程，删除被淘汰数据的过程中，主线程是否仍然可以处理外部请求？</p>
+<p>肯定是可以继续处理请求的。</p>
+<p>主线程决定淘汰这个 key 之后，会先把这个 key 从「全局哈希表」中剔除，然后评估释放内存的代价，如果符合条件，则丢到「后台线程」中执行「释放内存」操作。</p>
+<p>之后就可以继续处理客户端请求，尽管后台线程还未完成释放内存，但因为 key 已被全局哈希表剔除，所以主线程已查询不到这个 key 了，对客户端来说无影响。</p>
+<h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><ol>
+<li>RDB 文件是 Redis 的数据快照，以「二进制」格式存储，相比 AOF 文件更小，写盘和加载时间更短</li>
+<li>RDB 在执行 SAVE / BGSAVE 命令、定时 BGSAVE、主从复制时产生</li>
+<li>RDB 文件包含文件头、数据部分、文件尾</li>
+<li>文件头主要包括 Redis 的魔数、RDB 版本、Redis 版本、RDB 创建时间、键值对占用的内存大小等信息</li>
+<li>文件数据部分包括整个 Redis 数据库中存储的所有键值对信息</li>
+</ol>
+<ul>
+<li>数据库信息：db 编号、db 中 key 的数量、过期 key 的数量、键值数据</li>
+<li>键值数据：过期标识、时间戳（绝对时间）、键值对类型、key 长度、key、value 长度、value</li>
+</ul>
+<ol start="6">
+<li>文件尾保存了 RDB 的结束标记、文件校验值</li>
+<li>RDB 存储的数据，为了压缩体积，还做了很多优化:</li>
+</ol>
+<ul>
+<li>变长编码存储键值对数据</li>
+<li>用操作码标识不同的内容</li>
+<li>可整数编码的内容使用整数类型紧凑编码</li>
+</ul>
+<p>课后题：在 serverCron 函数中，rdbSaveBackground 函数一共会被调用执行几次？这又分别对应了什么场景？</p>
+<p>在 serverCron 函数中 rdbSaveBackground 会被调用 2 次。</p>
+<p>一次是满足配置的定时 RDB 条件后（save <seconds> &lt;changes），触发子进程生成 RDB。</p>
+<p>另一次是客户端执行了 BGSAVE 命令，Redis 会先设置 server.rdb_bgsave_scheduled = 1，之后 serverCron 函数判断这个变量为 1，也会触发子进程生成 RDB。</p>
+<h2 id="AOF-上"><a href="#AOF-上" class="headerlink" title="AOF 上"></a>AOF 上</h2><ol>
+<li>AOF 记录的是每个命令的「操作历史」，随着时间增长，AOF 文件会越来越大，所以需要 AOF 重写来「瘦身」，减小文件体积</li>
+<li>AOF 重写时，会扫描整个实例中的数据，把数据以「命令 + 键值对」的格式，写到 AOF 文件中</li>
+<li>触发 AOF 重写的时机有 4 个：</li>
+</ol>
+<ul>
+<li>执行 bgrewriteaof 命令</li>
+<li>手动打开 AOF 开关（config set appendonly yes）</li>
+<li>从库加载完主库 RDB 后（AOF 被启动的前提下）</li>
+<li>定时触发：AOF 文件大小比例超出阈值、AOF 文件大小绝对值超出阈值（AOF 被启动的前提下）</li>
+</ul>
+<p>这 4 个时机，都不能有 RDB 子进程，否则 AOF 重写会延迟执行。</p>
+<ol start="4">
+<li>AOF 重写期间会禁用 rehash，不让父进程调整哈希表大小，目的是父进程「写时复制」拷贝大量内存页面</li>
+</ol>
+<p>课后题：为什么 Redis 源码中在有 RDB 子进程运行时，不会启动 AOF 重写子进程？</p>
+<p>无论是生成 RDB 还是 AOF 重写，都需要创建子进程，然后把实例中的所有数据写到磁盘上，这个过程中涉及到两块：</p>
+<ul>
+<li>CPU：写盘之前需要先迭代实例中的所有数据，在这期间会耗费比较多的 CPU 资源，两者同时进行，CPU 资源消耗大</li>
+<li>磁盘：同样地，RDB 和 AOF 重写，都是把内存数据落盘，在这期间 Redis 会持续写磁盘，如果同时进行，磁盘 IO 压力也会较大</li>
+</ul>
+<p>整体来说都是为了资源考虑，所以不会让它们同时进行。</p>
+<h2 id="AOF-下"><a href="#AOF-下" class="headerlink" title="AOF 下"></a>AOF 下</h2><ol>
+<li>AOF 重写是在子进程中执行，但在此期间父进程还会接收写操作，为了保证新的 AOF 文件数据更完整，所以父进程需要把在这期间的写操作缓存下来，然后发给子进程，让子进程追加到 AOF 文件中</li>
+<li>因为需要父子进程传输数据，所以需要用到操作系统提供的进程间通信机制，这里 Redis 用的是「管道」，管道只能是一个进程写，另一个进程读，特点是单向传输</li>
+<li>AOF 重写时，父子进程用了 3 个管道，分别传输不同类别的数据：</li>
+</ol>
+<ul>
+<li>父进程传输数据给子进程的管道：发送 AOF 重写期间新的写操作</li>
+<li>子进程完成重写后通知父进程的管道：让父进程停止发送新的写操作</li>
+<li>父进程确认收到子进程通知的管道：父进程通知子进程已收到通知</li>
+</ul>
+<ol start="4">
+<li>AOF 重写的完整流程是：父进程 fork 出子进程，子进程迭代实例所有数据，写到一个临时 AOF 文件，在写文件期间，父进程收到新的写操作，会先缓存到 buf 中，之后父进程把 buf 中的数据，通过管道发给子进程，子进程写完 AOF 文件后，会从管道中读取这些命令，再追加到 AOF 文件中，最后 rename 这个临时 AOF 文件为新文件，替换旧的 AOF 文件，重写结束</li>
+</ol>
+<p>课后题：Redis 中其它使用管道的地方还有哪些？</p>
+<p>在源码中搜索 pipe 函数，能看到 server.child_info_pipe 和 server.module_blocked_pipe 也使用了管道。</p>
+<p>其中 child_info_pipe 管道如下：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">/* Pipe and data structures for child -&gt; parent info sharing. */</span>
+<span class="hljs-keyword">int</span> child_info_pipe[<span class="hljs-number">2</span>]; <span class="hljs-comment">/* Pipe used to write the child_info_data. */</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>
+    <span class="hljs-keyword">int</span> process_type; <span class="hljs-comment">/* AOF or RDB child? */</span>
+    <span class="hljs-keyword">size_t</span> cow_size; <span class="hljs-comment">/* Copy on write size. */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> <span class="hljs-keyword">long</span> magic; <span class="hljs-comment">/* Magic value to make sure data is valid. */</span>
+&#125; child_info_data;</code></pre></div>
 
 
+<p>从注释能看出，子进程在生成 RDB 或 AOF 重写完成后，子进程通知父进程在这期间，父进程「写时复制」了多少内存，父进程把这个数据记录到 server 的 stat_rdb_cow_bytes / stat_aof_cow_bytes 下（childinfo.c 的 receiveChildInfo 函数），以便客户端可以查询到最后一次 RDB 和 AOF 重写期间写时复制时，新申请的内存大小。</p>
+<p>而 module_blocked_pipe 管道主要服务于 Redis module。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">/* Pipe used to awake the event loop if a client blocked on a module command needs to be processed. */</span>
+<span class="hljs-keyword">int</span> module_blocked_pipe[<span class="hljs-number">2</span>];</code></pre></div>
 
+<p>看注释是指，如果被 module 命令阻塞的客户端需要处理，则会唤醒事件循环开始处理。</p>
+<h2 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h2><ol>
+<li>Redis 主从复制分为 4 个阶段：</li>
+</ol>
+<ul>
+<li>初始化</li>
+<li>建立连接</li>
+<li>主从握手</li>
+<li>数据传输（全量/增量复制）</li>
+</ul>
+<ol start="2">
+<li>主从复制流程由于是是「从库」发起的，所以重点要看从库的执行流程</li>
+<li>从库发起复制的方式有 3 个：</li>
+</ol>
+<ul>
+<li>执行 slaveof / replicaof 命令</li>
+<li>配置文件配置了主库的 ip port</li>
+<li>启动实例时指定了主库的 ip port</li>
+</ul>
+<ol start="4">
+<li>建议从 slaveof / replicaof 命令跟源码进去，来看整个主从复制的流程（入口在 replication.c 的 replicaofCommand 函数）</li>
+<li>从库执行这个命令后，会先在 server 结构体上，记录主库的 ip port，然后把 server.repl_state 从 REPL_STATE_NONE 改为 REPL_STATE_CONNECT，「复制状态机」启动</li>
+<li>随后从库会在定时任务（server.c 的 serverCron 函数）中会检测 server.repl_state 的状态，然后向主库发起复制请求（replication.c 的 replicationCron 函数），进入复制流程（replication.c 的 connectWithMaster 函数）</li>
+<li>从库会与主库建立连接（REPL_STATE_CONNECTING），注册读事件（syncWithMaster 函数），之后主从进入握手认证阶段，从库会告知主库自己的 ip port 等信息，在这期间会流转多个状态（server.h 中定义的复制状态）：</li>
+</ol>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_RECEIVE_PONG 3 <span class="hljs-comment">/* Wait for PING reply */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_SEND_AUTH 4 <span class="hljs-comment">/* Send AUTH to master */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_RECEIVE_AUTH 5 <span class="hljs-comment">/* Wait for AUTH reply */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_SEND_PORT 6 <span class="hljs-comment">/* Send REPLCONF listening-port */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_RECEIVE_PORT 7 <span class="hljs-comment">/* Wait for REPLCONF reply */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_SEND_IP 8 <span class="hljs-comment">/* Send REPLCONF ip-address */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_RECEIVE_IP 9 <span class="hljs-comment">/* Wait for REPLCONF reply */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_SEND_CAPA 10 <span class="hljs-comment">/* Send REPLCONF capa */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> REPL_STATE_RECEIVE_CAPA 11 <span class="hljs-comment">/* Wait for REPLCONF reply */</span></span></code></pre></div>
 
+<ol start="8">
+<li>完成握手后，从库向主库发送 PSYNC 命令和自己的 offset，首先尝试「增量同步」，如果 offset = -1，主库返回 FULLRESYNC 表示「全量同步」数据，否则返回 CONTINUE 增量同步</li>
+<li>如果是全量同步，主库会先生成 RDB，从库等待，主库完成 RDB 后发给从库，从库接收 RDB，然后清空实例数据，加载 RDB，之后读取主库发来的「增量」数据</li>
+<li>如果是增量同步，从库只需接收主库传来的增量数据即可</li>
+</ol>
+<p>课后题：当一个实例是主库时，为什么不需要使用状态机来实现主库在主从复制时的流程流转？</p>
+<p>因为复制数据的发起方是从库，从库要求复制数据会经历多个阶段（发起连接、握手认证、请求数据），而主库只需要「被动」接收从库的请求，根据需要「响应数据」即可完成整个流程，所以主库不需要状态机流转。</p>
+<h2 id="哨兵"><a href="#哨兵" class="headerlink" title="哨兵"></a>哨兵</h2><ol>
+<li>哨兵和 Redis 实例是一套代码，只不过哨兵会根据启动参数（redis-sentinel 或 redis-server –sentinel），设置当前实例为哨兵模式（server.sentinel_mode = 1），然后初始化哨兵相关数据</li>
+<li>哨兵模式的实例，只能执行一部分命令（ping、sentinel、subscribe、unsubscribe、psubscribe、punsubscribe、publish、info、role、client、shutdown、auth），其中 sentinel、publish、info、role 都是针对哨兵专门实现的</li>
+<li>之后哨兵会初始化各种属性，例如哨兵实例 ID、用于故障切换的当前纪元、监听的主节点、正在执行的脚本数量、与其他哨兵实例发送的 IP 和端口号等信息</li>
+<li>启动哨兵后，会检查配置文件是否可写（不可写直接退出，哨兵需把监控的实例信息写入配置文件）、是否配置了哨兵 ID（没配置随机生成一个）</li>
+<li>最后哨兵会在监控的 master 实例的 PubSub（+monitor 频道）发布一条消息，表示哨兵开始监控 Redis 实例</li>
+<li>哨兵后续会通过 PubSub 的方式，与主从库、其它哨兵实例进行通信</li>
+</ol>
+<p>课后题：哨兵实例本身是有配置文件 sentinel.conf 的，那么在哨兵实例的初始化过程中，解析这个配置文件的函数在哪？</p>
+<p>Redis 启动时，会在 main 函数中调用 loadServerConfig 加载配置文件，loadServerConfig 函数会读取配置文件中的内容，然后调用 loadServerConfigFromString 函数解析具体的配置项。</p>
+<p>loadServerConfigFromString 函数中，其中有一个分支，对哨兵模式进行了判断，如果是哨兵模式，则调用 sentinelHandleConfiguration 函数解析哨兵配置项。</p>
+<p>所以，函数调用链为 main -&gt; loadServerConfig（读出配置文件内容） -&gt; loadServerConfigFromString（解析配置项） -&gt; sentinelHandleConfiguration（解析哨兵配置项）。</p>
+<h2 id="哨兵选举-上"><a href="#哨兵选举-上" class="headerlink" title="哨兵选举 上"></a>哨兵选举 上</h2><ol>
+<li>Redis 为了实现故障自动切换，引入了一个外部「观察者」检测实例的状态，这个观察者就是「哨兵」</li>
+<li>但一个哨兵检测实例，有可能因为网络原因导致「误判」，所以需要「多个」哨兵共同判定</li>
+<li>多个哨兵共同判定出实例故障后（主观下线、客观下线），会进入故障切换流程，切换时需要「选举」出一个哨兵「领导者」进行操作</li>
+<li>这个选举的过程，就是「分布式共识」，即多个哨兵通过「投票」选举出一个都认可的实例当领导者，由这个领导者发起切换，这个选举使用的算法是 Raft 算法</li>
+<li>严格来说，Raft 算法的核心流程是这样的：</li>
+</ol>
+<ul>
+<li>集群正常情况下，Leader 会持续给 Follower 发心跳消息，维护 Leader 地位</li>
+<li>如果 Follower 一段时间内收不到 Leader 心跳消息，则变为 Candidate 发起选举</li>
+<li>Candidate 先给自己投一票，然后向其它节点发送投票请求</li>
+<li>Candidate 收到超过半数确认票，则提升为新的 Leader，新 Leader 给其它 Follower 发心跳消息，维护新的 Leader 地位</li>
+<li>Candidate 投票期间，收到了 Leader 心跳消息，则自动变为 Follower</li>
+<li>投票结束后，没有超过半数确认票的实例，选举失败，会再次发起选举</li>
+</ul>
+<ol start="6">
+<li>但哨兵的选举没有按照严格按照 Raft 实现，因为多个哨兵之间是「对等」关系，没有 Leader 和 Follower 角色，只有当 Redis 实例发生故障时，哨兵才选举领导者进行切换，选举 Leader 的过程是按照 Raft 算法步骤 3-6 实现的</li>
+</ol>
+<p>课后题：哨兵实例执行的周期性函数 sentinelTimer 的最后，修改 server.hz 的目的是什么？</p>
+<p>server.hz 表示执行定时任务函数 serverCron 的频率，哨兵在最后修改 server.hz 增加一个随机值，是为了避免多个哨兵以「相同频率」执行，引发每个哨兵同时发起选举，进而导致没有一个哨兵能拿到多数投票，领导者选举失败的问题。适当打散执行频率，可以有效降低选举失败的概率。</p>
+<h2 id="哨兵选举-下"><a href="#哨兵选举-下" class="headerlink" title="哨兵选举 下"></a>哨兵选举 下</h2><ol>
+<li>一个哨兵检测判定主库故障，这个过程是「主观下线」，另外这个哨兵还会向其它哨兵询问（发送 sentinel is-master-down-by-addr 命令），多个哨兵都检测主库故障，数量达到配置的 quorum 值，则判定为「客观下线」</li>
+<li>首先判定为客观下线的哨兵，会发起选举，让其它哨兵给自己投票成为「领导者」，成为领导者的条件是，拿到超过「半数」的确认票 + 超过预设的 quorum 阈值的赞成票</li>
+<li>投票过程中会比较哨兵和主库的「纪元」（主库纪元 &lt; 发起投票哨兵的纪元 + 发起投票哨兵的纪元 &gt; 其它哨兵的纪元），保证一轮投票中一个哨兵只能投一次票</li>
+</ol>
+<p>课后题：哨兵在 sentinelTimer 函数中调用 sentinelHandleDictOfRedisInstances 函数，对每个主节点都执行 sentinelHandleRedisInstance 函数，并且还会对主节点的所有从节点也执行 sentinelHandleRedisInstance 函数，那么，哨兵会不会判断从节点的主观下线和客观下线？</p>
+<p>sentinelHandleRedisInstance 函数逻辑如下：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">sentinelHandleRedisInstance</span><span class="hljs-params">(sentinelRedisInstance *ri)</span> </span>&#123;
+    ...
 
+    <span class="hljs-comment">/* Every kind of instance */</span>
+    <span class="hljs-comment">// 判断主观下线</span>
+    sentinelCheckSubjectivelyDown(ri);
 
+    ...
 
+    <span class="hljs-comment">/* Only masters */</span>
+    <span class="hljs-keyword">if</span> (ri-&gt;flags &amp; SRI_MASTER) &#123;
+        <span class="hljs-comment">// 判断客观下线</span>
+        sentinelCheckObjectivelyDown(ri);
+        <span class="hljs-keyword">if</span> (sentinelStartFailoverIfNeeded(ri))
+            sentinelAskMasterStateToOtherSentinels(ri,SENTINEL_ASK_FORCED);
+        sentinelFailoverStateMachine(ri);
+        sentinelAskMasterStateToOtherSentinels(ri,SENTINEL_NO_FLAGS);
+    &#125;
+&#125;</code></pre></div>
 
+<p>可以看到，无论主库还是从库，哨兵都判断了「主观下线」，但只有主库才判断「客观下线」和「故障切换」。</p>
+<h2 id="pub-sub"><a href="#pub-sub" class="headerlink" title="pub/sub"></a>pub/sub</h2><ol>
+<li>哨兵是通过 master 的 PubSub 发现其它哨兵的：每个哨兵向 master 的 PubSub（<strong>sentinel</strong>:hello 频道）发布消息，同时也会订阅这个频道，这样每个哨兵就能拿到其它哨兵的 IP、端口等信息</li>
+<li>每个哨兵有了其它哨兵的信息后，在判定 Redis 实例状态时，就可以互相通信、交换信息，共同判定实例是否真的故障</li>
+<li>哨兵判定 Redis 实例故障、发起切换时，都会向 master 的 PubSub 的频道发布消息</li>
+<li>客户端可以订阅 master 的 PubSub，感知到哨兵工作到了哪个状态节点，从而作出自己的反应</li>
+<li>PubSub 的实现，其实就是 Redis 在内存中维护了一个「发布-订阅」映射表，订阅者执行 SUBSCRIBE 命令，Redis 会把订阅者加入到指定频道的「链表」下。发布者执行 PUBLISH，Redis 就找到这个映射表中这个频道的所有「订阅者」，把消息「实时转发」给这些订阅者</li>
+</ol>
+<p>课后题：在哨兵实例上执行 publish 命令，这条命令是不是就是由 pubsub.c 文件中的 publishCommand 函数来处理的?</p>
+<p>以哨兵模式启动的 Redis 实例，会使用新「命令表」。</p>
+<p>在 server.c 的 main 函数中可以看到，哨兵模式启动后，会调用 initSentinel 函数。</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">initSentinel</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>&#123;
+    ...
 
+    <span class="hljs-comment">// 只添加 sentinelcmds 下的命令</span>
+    <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>; j &lt; <span class="hljs-keyword">sizeof</span>(sentinelcmds)/<span class="hljs-keyword">sizeof</span>(sentinelcmds[<span class="hljs-number">0</span>]); j++) &#123;
+        <span class="hljs-keyword">int</span> retval;
+        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisCommand</span> *<span class="hljs-title">cmd</span> =</span> sentinelcmds+j;
 
+        retval = dictAdd(server.commands, sdsnew(cmd-&gt;name), cmd);
+        serverAssert(retval == DICT_OK);
+    &#125;
+    ...
+&#125;</code></pre></div>
 
+<p>可以看到只把 sentinelcmds 命令表添加到了 server.commands 中。sentinelcmds 如下：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisCommand</span> <span class="hljs-title">sentinelcmds</span>[] =</span> &#123;
+    ...
+    &#123;<span class="hljs-string">&quot;subscribe&quot;</span>,subscribeCommand,<span class="hljs-number">-2</span>,<span class="hljs-string">&quot;&quot;</span>,<span class="hljs-number">0</span>,<span class="hljs-literal">NULL</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>&#125;,
+    &#123;<span class="hljs-string">&quot;publish&quot;</span>,sentinelPublishCommand,<span class="hljs-number">3</span>,<span class="hljs-string">&quot;&quot;</span>,<span class="hljs-number">0</span>,<span class="hljs-literal">NULL</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>&#125;,
+    &#123;<span class="hljs-string">&quot;info&quot;</span>,sentinelInfoCommand,<span class="hljs-number">-1</span>,<span class="hljs-string">&quot;&quot;</span>,<span class="hljs-number">0</span>,<span class="hljs-literal">NULL</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>&#125;,
+    ...
+&#125;;</code></pre></div>
+
+<p>可以看到哨兵的 PUBLISH 命令是由 sentinelPublishCommand 单独实现的，并非普通实例的 publishCommand。</p>
+<h2 id="redis-性能测试"><a href="#redis-性能测试" class="headerlink" title="redis 性能测试"></a>redis 性能测试</h2><ol>
+<li>redis-benchmark 是 Redis 官方提供的性能测试工具，一般都用这个工具测试其性能</li>
+<li>测试性能结果，与客户端并发数、value 大小、是否用 pipeline 都有关系</li>
+<li>除此之外，性能结果还受系统环境的影响，例如 CPU 负载、网络带宽、客户端和服务端是否在同一机器、实例是否部署在虚拟机、Redis 绑核情况都会影响性能结果</li>
+<li>提升 Redis 性能的几点优化：</li>
+</ol>
+<ul>
+<li>控制客户端并发数</li>
+<li>value 小于 10KB</li>
+<li>推荐使用 pipeline</li>
+<li>隔离部署</li>
+<li>保证 CPU、网络带宽负载正常</li>
+<li>不部署在虚拟机</li>
+<li>进程绑核</li>
+<li>CPU 绑定网卡队列</li>
+<li>Redis 内存碎片</li>
+<li>不使用 Swap</li>
+</ul>
+<h2 id="RDB、AOF文件损坏"><a href="#RDB、AOF文件损坏" class="headerlink" title="RDB、AOF文件损坏"></a>RDB、AOF文件损坏</h2><ol>
+<li>RDB 和 AOF 文件在写盘故障时，可能发生损坏不完整的情况，那使用其恢复数据就会出现问题，所以 Redis 提供了 2 个命令来检测文件是否有错误</li>
+<li>要想检测出文件错误，那说明 RDB 和 AOF 必定是按照某种固定格式写入的，检测是否完整只需要按照其格式规则，发现不符即认为文件不完整</li>
+<li>redis-check-rdb 命令检测 RDB，因为 RDB 有明确的文件头、数据部分、文件尾，读取文件发现不完整即报错</li>
+<li>redis-check-aof 命令检测 AOF，AOF 按照 RESP 协议写入，按照这个协议可以读取每个命令参数个数、参数字符串长度，如果不符合协议格式，则说明不完整。但这个命令提供了 –fix 命令，可以修复 AOF 文件，实现原理是：把不完整的命令和后续部分，直接从 AOF 中删除</li>
+</ol>
+<p>课后题：redis_check_aof_main 函数是检测 AOF 文件的入口函数，但是它还会调用检测 RDB 文件的入口函数 redis_check_rdb_main，它的作用是什么？</p>
+<p>Redis 在 4.0 版本支持了「混合持久化」，即在 AOF rewrite 期间，先以 RDB 格式写入到 AOF 文件中，再把后续命令追加到 AOF 中，这样 AOF rewrite 后的文件既包括了 RDB 格式，又包含 AOF 格式（目的是为了让 AOF 体积更小），所以 redis_check_rdb_main 在检测 AOF 文件时，RDB 和 AOF 文件格式都需要检测。</p>
+<h2 id="Gossip"><a href="#Gossip" class="headerlink" title="Gossip"></a>Gossip</h2><ol>
+<li>多个节点组成一个分布式系统，它们之间需要交换数据，可以采用中心化的方式（依赖第三方系统，例如ZK），也可以采用非中心化（分布式协议，例如 Gossip）的方式</li>
+<li>Redis Cluster 采用非中心化的方式 Gossip 协议，实现多个节点之间信息交换</li>
+<li>集群中的每个实例，会按照固定频率，从集群中「随机」挑选部分实例，发送 PING 消息（自身实例状态、已知部分实例信息、slots 分布），用来交换彼此状态信息</li>
+<li>收到 PING 的实例，会响应 PONG 消息，PONG 消息和 PING 消息格式一样，包含了自身实例状态、已知部分实例信息、slots 分布</li>
+<li>这样经过几次交换后，集群中每个实例都能拿到其它实例的状态信息</li>
+<li>即使有节点状态发生变化（新实例加入、节点故障、数据迁移），也可以通过 Gossip 协议的 PING-PONG 消息完成整个集群状态在每个实例上的同步</li>
+</ol>
+<p>课后题：为什么 clusterSendPing 函数计算 wanted 值时，是用的集群节点个数的十分之一？</p>
+<p>这个和 Redis Cluster 判定实例「故障」逻辑有关了。</p>
+<p>Redis Cluster 实例在周期性向其它实例交换信息时，会先随机选出 5 个实例，然后从中找出最久没通信过的实例，发送 PING 消息。</p>
+<p>但这里有个问题，随机选出的这 5 个实例，有可能并不是整个「集群」中最久没通信过的，为了避免拿不到这些实例的状态，导致集群误以为这些实例已过期，所以制定了一个策略：如果和实例最近通信时间超过了 cluster-node-timeout / 2，那会立即向这个实例发送 PING 消息。</p>
+<p>每次 PING 都会收到 PONG 响应，一来一回 2 次心跳包，来回都带有部分实例的状态信息，那在 cluster-node-timeout 时间内会收到 4 次心跳包。</p>
+<p>又因为 Redis Cluster 计算故障转移超时时间是 cluster-node-timeout * 2，那这段时间内就能收到 8 个 PING + PONG 心跳包，每个心跳包中实例个数设置为集群的 1/10，那在故障转移期间就能收到集群 80%（8 * 1/10）节点发来的故障状态信息了，满足集群大部分节点发来的节点故障情况。</p>
 
             </div>
             <hr>
@@ -864,8 +1225,8 @@ dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</code></pre></div>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/golang/ipc-channel/">
-                        <span class="hidden-mobile">Go并发编程之终极武器—channel</span>
+                      <a href="/redis/use/">
+                        <span class="hidden-mobile">Redis核心技术与实战</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
