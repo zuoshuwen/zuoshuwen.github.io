@@ -2823,6 +2823,8 @@ once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span 
 <h1 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h1><ol>
 <li><a href="/redis/use/" title="Redis核心技术与实战">Redis核心技术与实战</a></li>
 <li><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzIyOTYxNDI5OA==&action=getalbum&album_id=1699766580538032128&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247484679&from_itemidx=1&count=3&nolastread=1#wechat_redirect" title="" target="_blank">水滴与银弹</a></li>
+<li><a href="/redis/source-code/" title="Redis源码剖析与实战">Redis源码剖析与实战</a></li>
+<li><a href="https://mp.weixin.qq.com/s/M3FBetynBYfb8rbxnjJRvg">魔改-Redis性能暴力优化的实践</a></li>
 </ol>
 <h1 id=""><a href="#" class="headerlink" title="====================================="></a>=====================================</h1><h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://strikefreedom.top/multiple-threaded-network-model-in-redis">Redis 多线程网络模型全面揭秘</a><br><a href="http://gk.link/a/10keR">极客时间《Redis核心技术与实战》</a><br><a href="https://u.jd.com/6J6Ebnu">《Redis设计与实现》</a><br><a href="https://u.jd.com/6r61kdn">《Redis使用手册》</a><br><a href="http://wonderxxf.gitee.io/coderfan/categories/Redis/">奔跑的小石头</a><br><a href="http://zhangtielei.com/">张铁蕾</a></p>
 <h1 id="全局哈希表"><a href="#全局哈希表" class="headerlink" title="全局哈希表"></a>全局哈希表</h1><p>保存了每个键和值<br><img src="/images/redis/global-hashtable-01.png" height=100 alt="全局哈希表"/></p>
