@@ -2870,6 +2870,7 @@ once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span 
 <p>clion 配置 sftp、gdb remote debug</p>
 <p>linux 执行 gdbserver :1234 ./src/redis-server</p>
 <h3 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h3><p>主要就是如何用clion远程调试c（gdb debug），然后是clion如何调试redis</p>
+<p><img src="/images/redis/shui-di-yu-yin-dan-01.png" alt="redis变慢原因分析"></p>
 ]]></content>
       <categories>
         <category>redis</category>
