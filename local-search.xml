@@ -117,6 +117,33 @@
   
   
   <entry>
+    <title>Redigo</title>
+    <link href="/redigo/a/"/>
+    <url>/redigo/a/</url>
+    
+    <content type="html"><![CDATA[<p>[<a href="https://github.com/zuoshuwen/redigo]">https://github.com/zuoshuwen/redigo]</a>(github: <a href="https://github.com/zuoshuwen/redigo">https://github.com/zuoshuwen/redigo</a>)</p><ol><li>翻译</li><li>增加定时维护连接池空闲连接功能</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Redigo</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Redis</tag>
+      
+      <tag>go</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Go并发编程之终极武器—channel</title>
     <link href="/golang/ipc-channel/"/>
     <url>/golang/ipc-channel/</url>
