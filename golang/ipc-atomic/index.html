@@ -13,11 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="前言之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。
-百度百科上关于原子操作的介绍。">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="前言之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。 百度百科上关于原子操作的介绍。">
+  
+    <meta name="description" content="前言之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。 百度百科上关于原子操作的介绍。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go并发编程之传统同步—(3)原子操作">
 <meta property="og:url" content="https://ilifes.com/golang/ipc-atomic/index.html">
@@ -30,6 +29,7 @@
 <meta property="article:tag" content="同步">
 <meta property="article:tag" content="原子操作">
 <meta name="twitter:card" content="summary_large_image">
+  
   
   <title>Go并发编程之传统同步—(3)原子操作 - Sown</title>
 
@@ -68,7 +68,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -406,7 +406,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      undefined 字
+      3.4k 字
     </span>
   
 
@@ -415,7 +415,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      NaN 分钟
+      29 分钟
     </span>
   
 
@@ -457,7 +457,7 @@
             <div class="markdown-body">
               <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
 <p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
 <h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
@@ -479,6 +479,7 @@
 <span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)
 PASS</code></pre></div>
 
+
 <h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span>
@@ -497,6 +498,7 @@ PASS</code></pre></div>
 2020/10/11 00:32:05 counter: 0
 <span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)
 PASS</code></pre></div>
+
 
 <h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
@@ -520,6 +522,7 @@ PASS</code></pre></div>
 <span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)
 PASS</code></pre></div>
 
+
 <h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
@@ -534,6 +537,7 @@ PASS</code></pre></div>
 	time.Sleep(<span class="hljs-number">2</span> * time.Second)
 &#125;</code></pre></div>
 
+
 <h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
@@ -547,6 +551,7 @@ PASS</code></pre></div>
 
 	time.Sleep(<span class="hljs-number">2</span> * time.Second)
 &#125;</code></pre></div>
+
 
 <h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
@@ -575,6 +580,7 @@ PASS</code></pre></div>
 --- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)
 PASS</code></pre></div>
 
+
 <h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
 <p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
@@ -601,6 +607,7 @@ panic: sync/atomic: store of inconsistently typed value into Value [recovered]
 	panic: sync/atomic: store of inconsistently typed value into Value
                 ...
 Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span></code></pre></div>
+
 
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
 <p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
@@ -857,7 +864,7 @@ Process finished with <span class="hljs-keyword">exit</span> code <span class="h
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

@@ -13,24 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="前言先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种通信（IPC）：
-
-
-进程间通信：管道、消息队列、信号等
-线程间通信：互斥锁、条件变量等
-
-
-利用以上通信手段采取的同步措施，最终是为了达到以下两种目的：
-
-
-维持共享数据一致性，并发安全
-控制流程管理，更好的协同工作
-
-
-Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="前言先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种通信（IPC）：   进程间通信：管道、消息队列、信号等 线程间通信：互斥锁、条件变量等   利用以上通信手段采取的同步措施，最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。">
+  
+    <meta name="description" content="前言先回顾一下，在 C 或者其它编程语言的并发编程中，主要存在两种通信（IPC）：   进程间通信：管道、消息队列、信号等 线程间通信：互斥锁、条件变量等   利用以上通信手段采取的同步措施，最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并发编程模型。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go并发编程之传统同步—(1)互斥锁">
 <meta property="og:url" content="https://ilifes.com/golang/ipc-mutex/index.html">
@@ -46,6 +32,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
 <meta property="article:tag" content="互斥锁">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://ilifes.com/images/golang/ipc-mutex-01.jpg">
+  
   
   <title>Go并发编程之传统同步—(1)互斥锁 - Sown</title>
 
@@ -84,7 +71,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -422,7 +409,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      undefined 字
+      3.8k 字
     </span>
   
 
@@ -431,7 +418,7 @@ Go语言中除了保留了传统的同步支持，还提供了特有的 CSP 并�
       <i class="iconfont icon-clock-fill"></i>
       
       
-      NaN 分钟
+      32 分钟
     </span>
   
 
@@ -881,7 +868,7 @@ PASS</code></pre></div>
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

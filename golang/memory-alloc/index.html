@@ -13,10 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="前言本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。 系统内存虚拟内存虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实">
+  
+    <meta name="description" content="前言本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。 系统内存虚拟内存虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go内存管理、分配">
 <meta property="og:url" content="https://ilifes.com/golang/memory-alloc/index.html">
@@ -36,6 +36,7 @@
 <meta property="article:tag" content="内存分配">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://ilifes.com/images/golang/memory-manage-vm-01.png">
+  
   
   <title>Go内存管理、分配 - Sown</title>
 
@@ -74,7 +75,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -412,7 +413,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      undefined 字
+      4.8k 字
     </span>
   
 
@@ -421,7 +422,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      NaN 分钟
+      41 分钟
     </span>
   
 
@@ -831,7 +832,7 @@
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

@@ -13,10 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="后端技术、笔记、教程">
+  
+    <meta name="description" content="后端技术、笔记、教程">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Sown">
 <meta property="og:url" content="https://ilifes.com/page/2/index.html">
@@ -26,6 +26,7 @@
 <meta property="article:author" content="sown">
 <meta property="article:tag" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
 <meta name="twitter:card" content="summary_large_image">
+  
   
   <title>Sown</title>
 
@@ -49,7 +50,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -409,15 +410,7 @@
       <p class="index-excerpt">
         <a href="/golang/ipc-errgroup/" target="_self">
           
-          
-            
-          
-          func WithContext(ctx context.Context) (*Group, context.Context)
-func (g *Group) Go(f func() error)
-func (g *Group) Wait() error
-&lt;-errContext.Done()
-func main() &#123;
-	g, ctx := errgroup.WithContex
+          func WithContext(ctx context.Context) (*Group, context.Context) func (g *Group) Go(f func() error) func (g *Group) Wait() error &lt;-errContext.Done() func main() &amp;#123; 	g, ctx :&#x3D; errgroup.WithContex
         </a>
       </p>
 
@@ -464,21 +457,7 @@ func main() &#123;
       <p class="index-excerpt">
         <a href="/golang/ipc-waitgrouponce/" target="_self">
           
-          
-            
-          
-          WaitGroup方法func (*WaitGroup) Addfunc (*WaitGroup) Donefunc (*WaitGroup) Wait
-代码var wg sync.WaitGroup
-//...
-wg.Add(1)
-//...
-wg.Done()
-//...
-wg.Wait()
-
-好先统一 Add，再并发 Done，最后 Wait。
-Once方法func (*Once) Do
-代
+          WaitGroup方法func (*WaitGroup) Addfunc (*WaitGroup) Donefunc (*WaitGroup) Wait 代码var wg sync.WaitGroup &#x2F;&#x2F;... wg.Add(1) &#x2F;&#x2F;... wg.Done() &#x2F;&#x2F;... wg.Wait()  好先统一 Add，再并发 Done，最后 Wait。 Once方法func (*Once) Do 代
         </a>
       </p>
 
@@ -531,22 +510,7 @@ Once方法func (*Once) Do
       <p class="index-excerpt">
         <a href="/design-pattern/a/" target="_self">
           
-          
-            
-          
-          学习资料极客时间专栏《设计模式之美》
-面向对象
-面向对象的四大特性：封装、抽象、继承、多态
-面向对象编程与面向过程编程的区别和联系
-面向对象分析、面向对象设计、面向对象编程
-接口和抽象类的区别以及各自的应用场景
-基于接口而非实现编程的设计思想
-多用组合少用继承的设计思想
-面向过程的贫血模型和面向对象的充血模型、失血模型
-
-设计原则
-SOLID 原则 -SRP 单一职责原则
-SOLID 原则 -OC
+          学习资料极客时间专栏《设计模式之美》 面向对象 面向对象的四大特性：封装、抽象、继承、多态 面向对象编程与面向过程编程的区别和联系 面向对象分析、面向对象设计、面向对象编程 接口和抽象类的区别以及各自的应用场景 基于接口而非实现编程的设计思想 多用组合少用继承的设计思想 面向过程的贫血模型和面向对象的充血模型、失血模型  设计原则 SOLID 原则 -SRP 单一职责原则 SOLID 原则 -OC
         </a>
       </p>
 
@@ -599,12 +563,7 @@ SOLID 原则 -OC
       <p class="index-excerpt">
         <a href="/mysql/a/" target="_self">
           
-          
-            
-          
-          学习资料极客时间《MySQL实战45讲》书籍《高性能MySQL（第三版）》
-架构连接器长连接 ➕ mysql_reset_connection如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。
-查询缓存建议不要使用缓存
+          学习资料极客时间《MySQL实战45讲》书籍《高性能MySQL（第三版）》 架构连接器长连接 ➕ mysql_reset_connection如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。 查询缓存建议不要使用缓存
         </a>
       </p>
 
@@ -657,17 +616,7 @@ SOLID 原则 -OC
       <p class="index-excerpt">
         <a href="/datastruct-algorithm/a/" target="_self">
           
-          
-            
-          
-          学习资料极客时间专栏《数据结构与算法之美》极客时间专栏《算法面试通关40讲》书籍《算法》第四版书籍《数据结构与算法之美》
-数据结构大部分的数据结构基本上都是由数组或者链表演变而来
-数据库MySQL B+
-MongoDB B
-Redis Skip List
-Memcache Hash
-TiDB LSM Tree
-树基数树 golang的web框架echo和gin都使用了radix tree作为路由查
+          学习资料极客时间专栏《数据结构与算法之美》极客时间专栏《算法面试通关40讲》书籍《算法》第四版书籍《数据结构与算法之美》 数据结构大部分的数据结构基本上都是由数组或者链表演变而来 数据库MySQL B+ MongoDB B Redis Skip List Memcache Hash TiDB LSM Tree 树基数树 golang的web框架echo和gin都使用了radix tree作为路由查
         </a>
       </p>
 
@@ -720,12 +669,7 @@ TiDB LSM Tree
       <p class="index-excerpt">
         <a href="/netprogram/a/" target="_self">
           
-          
-            
-          
-          学习资料极客时间《网络编程实战》微信公众号《开发内功修炼》PDF《理解了实现再谈网络性能》书籍《TCP/IP网络编程》书籍《UNIX环境高级编程（第三版）》https://app.yinxiang.com/fx/7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b
-进程模型PPCPreforkTPCPrethreadReactorIO多路复用+进程/线程 池
-单 Reactor
+          学习资料极客时间《网络编程实战》微信公众号《开发内功修炼》PDF《理解了实现再谈网络性能》书籍《TCP&#x2F;IP网络编程》书籍《UNIX环境高级编程（第三版）》https:&#x2F;&#x2F;app.yinxiang.com&#x2F;fx&#x2F;7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b 进程模型PPCPreforkTPCPrethreadReactorIO多路复用+进程&#x2F;线程 池 单 Reactor
         </a>
       </p>
 
@@ -778,20 +722,7 @@ TiDB LSM Tree
       <p class="index-excerpt">
         <a href="/program/a/" target="_self">
           
-          
-            
-          
-          
-秒杀
-朋友圈
-聊天系统
-游戏体力与消耗
-定时任务限制
-海量日志
-动态短信发送
-
-QPShttps://segmentfault.com/a/1190000010844969
-
+          秒杀 朋友圈 聊天系统 游戏体力与消耗 定时任务限制 海量日志 动态短信发送  QPShttps:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000010844969
         </a>
       </p>
 
@@ -838,9 +769,6 @@ QPShttps://segmentfault.com/a/1190000010844969
       <p class="index-excerpt">
         <a href="/golang/concurrent-programme/" target="_self">
           
-          
-            
-          
           并发编程前言在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。
         </a>
       </p>
@@ -881,13 +809,7 @@ QPShttps://segmentfault.com/a/1190000010844969
       <p class="index-excerpt">
         <a href="/microservices/ha-limit/" target="_self">
           
-          
-            
-          
-          令牌桶正常我的系统处理一个请求需要100ms，那么就每100ms往桶里面放令牌，也就是每秒10个，速率为10，设置桶大小为20。每隔100ms往桶里面放token，一直放到满。如果满着的，则丢弃这个token，不满继续定时放。允许突发，也就是满桶10个令牌同时被拿走。NewLimiter(10, 20);
-漏桶uber 的 ratelimit
-过载保护、单机限流、分布式限流、熔断
-Go可用性(四)
+          令牌桶正常我的系统处理一个请求需要100ms，那么就每100ms往桶里面放令牌，也就是每秒10个，速率为10，设置桶大小为20。每隔100ms往桶里面放token，一直放到满。如果满着的，则丢弃这个token，不满继续定时放。允许突发，也就是满桶10个令牌同时被拿走。NewLimiter(10, 20); 漏桶uber 的 ratelimit 过载保护、单机限流、分布式限流、熔断 Go可用性(四)
         </a>
       </p>
 
@@ -926,40 +848,15 @@ Go可用性(四)
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/microservices/a/" target="_self">
-          微服务系列文章索引
+        <a href="/ios/a/" target="_self">
+          iOS
         </a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/microservices/a/" target="_self">
+        <a href="/ios/a/" target="_self">
           
-          
-            
-          
-          学习资料极客时间《go进阶训练营》极客时间《从0开始学架构》极客时间《Service Mesh实战》DDD
-RPC
-gRPC
-
-基础设施建设
-部署与测试多集群，多租户
-服务注册、发现、负载均衡
-API网关
-
-高可用设计
-隔离
-
-参考Go可用性(一) 隔离设计
-
-限流
-降级
-熔断
-超时
-重试
-
-设计方案CQRS海量评论
-架构模式CQRSPipeline
-
+          极客时间《从0开发一款iOS App》
         </a>
       </p>
 
@@ -976,7 +873,7 @@ API网关
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+              <a href="/categories/iOS/">iOS</a>
             
           </div>
         
@@ -1134,7 +1031,7 @@ API网关
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

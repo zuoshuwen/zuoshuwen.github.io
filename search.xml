@@ -1,11 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>学习资源索引</title>
+    <url>/index/</url>
+    <content><![CDATA[<h2 id="综合"><a href="#综合" class="headerlink" title="综合"></a>综合</h2><p><a href="https://hardcore.feishu.cn/docs/doccngKKrYQWSYu4Rr3puVq20wc">硬核课堂</a><br><a href="https://strikefreedom.top/">strikefreedom</a></p>
+<h2 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h2><p><a href="https://lessisbetter.site/">Go语言充电站</a><br><a href="https://eddycjy.com/">煎鱼</a><br><a href="https://lailin.xyz/">mohuishou</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>数据结构与算法系列文章索引</title>
+    <url>/datastruct-algorithm/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txE">极客时间专栏《数据结构与算法之美》</a><br><a href="http://gk.link/a/10txH">极客时间专栏《算法面试通关40讲》</a><br><a href="https://u.jd.com/6MG4eU3">书籍《算法》第四版</a><br><a href="https://u.jd.com/6D6C87m">书籍《数据结构与算法之美》</a></p>
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p>大部分的数据结构基本上都是由数组或者链表演变而来</p>
+<h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><p><strong>MySQL</strong> B+</p>
+<p><strong>MongoDB</strong> B</p>
+<p><strong>Redis</strong> Skip List</p>
+<p><strong>Memcache</strong> Hash</p>
+<p><strong>TiDB</strong> LSM Tree</p>
+<h3 id="树"><a href="#树" class="headerlink" title="树"></a>树</h3><p><strong>基数树</strong> golang的web框架echo和gin都使用了radix tree作为路由查找的算法</p>
+<h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><h3 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h3><p>TCP流量控制</p>
+<h3 id="进程-线程"><a href="#进程-线程" class="headerlink" title="进程/线程"></a>进程/线程</h3><p><a href="https://zhuanlan.zhihu.com/p/97071815">详解操作系统内核对线程的调度算法</a></p>
+<h3 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h3><p><a href="https://segmentfault.com/a/1190000021199728">图解一致性哈希算法</a><br><a href="http://blog.codinglabs.org/articles/consistent-hashing.html">一致性哈希算法及其在分布式系统中的应用</a><br><a href="https://github.com/RJ/ketama">https://github.com/RJ/ketama</a></p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>文章索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>设计模式文章索引</title>
+    <url>/design-pattern/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txN">极客时间专栏《设计模式之美》</a></p>
+<h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><ul>
+<li>面向对象的四大特性：封装、抽象、继承、多态</li>
+<li>面向对象编程与面向过程编程的区别和联系</li>
+<li>面向对象分析、面向对象设计、面向对象编程</li>
+<li>接口和抽象类的区别以及各自的应用场景</li>
+<li>基于接口而非实现编程的设计思想</li>
+<li>多用组合少用继承的设计思想</li>
+<li>面向过程的贫血模型和面向对象的充血模型、失血模型</li>
+</ul>
+<h1 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h1><ul>
+<li>SOLID 原则 -SRP 单一职责原则</li>
+<li>SOLID 原则 -OCP 开闭原则</li>
+<li>SOLID 原则 -LSP 里式替换原则</li>
+<li>SOLID 原则 -ISP 接口隔离原则</li>
+<li>SOLID 原则 -DIP 依赖倒置原则<ul>
+<li>控制反转、依赖反转、依赖注入</li>
+</ul>
+</li>
+<li>DRY 原则</li>
+<li>KISS 原则</li>
+<li>YAGNI 原则</li>
+<li>LOD 法则</li>
+</ul>
+<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><h1 id="编程规范"><a href="#编程规范" class="headerlink" title="编程规范"></a>编程规范</h1><h1 id="重构技巧"><a href="#重构技巧" class="headerlink" title="重构技巧"></a>重构技巧</h1><h1 id="COW"><a href="#COW" class="headerlink" title="COW"></a>COW</h1><p><strong>参考</strong><br><a href="https://chunlife.top/2019/09/03/copy-on-write%E6%8A%80%E6%9C%AF/">copy-on-write技术</a><br><a href="https://juejin.cn/post/6844903702373859335">COW奶牛！Copy On Write机制了解一下</a><br><a href="https://chunlife.top/2019/09/03/copy-on-write%E6%8A%80%E6%9C%AF/">copy-on-write技术</a></p>
+<p>写入时复制（英语：Copy-on-write，简称COW）是一种计算机程序设计领域的优化策略。</p>
+<p>其核心思想是，如果有多个调用者（callers）同时请求相同资源（如内存或磁盘上的数据存储），他们会共同获取相同的指针指向相同的资源，直到某个调用者试图修改资源的内容时，系统才会真正复制一份专用副本（private copy）给该调用者，而其他调用者所见到的最初的资源仍然保持不变。这过程对其他的调用者都是透明的（transparently）。此作法主要的优点是如果调用者没有修改该资源，就不会有副本（private copy）被创建，因此多个调用者只是读取操作时可以共享同一份资源。</p>
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><p>fork()之后，kernel把父进程中所有的内存页的权限都设为read-only，然后子进程的地址空间指向父进程。当父子进程都只读内存时，相安无事。当其中某个进程写内存时，CPU硬件检测到内存页是read-only的，于是触发页异常中断（page-fault），陷入kernel的一个中断例程。中断例程中，kernel就会把触发的异常的页复制一份，于是父子进程各自持有独立的一份。</p>
+<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><p>redis 有两种方式持久化，一种是 RDB，一种是AOF。<br>在 RDB 中，想要触发持久化操作，可以执行 save、bgsave 命令，或者通过配置文件自动触发，其中 bgsave 的方式，就是 fork 一个子进程来做持久化工作。<br>最初，父进程和子进程拥有相同的内存空间地址，而如果父进程这个时候有写操作，因为内存页设置为 read-only 了，所以会触发 page-fault，父进程中修改数据所在的那个内存页会被指向到新的内存空间地址，而子进程读的还是修改之前的数据。</p>
+<p>有坑吗？有的<br>如果全量更新数据恰好处于 rdb 持久化任务过程中，内存可能就会翻倍。</p>
+<p><a href="https://www.cnblogs.com/javazhiyin/p/11425060.html">10分钟彻底理解Redis的持久化机制：RDB和AOF</a><br><a href="https://www.cnblogs.com/javazhiyin/p/12985656.html">看完这篇还不懂Redis的RDB持久化，你们来打我！</a></p>
+<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p>所有驱动都用到的技术——写时复制（CoW）。CoW就是copy-on-write，表示只在需要写时才去复制，这个是针对已有文件的修改场景。比如基于一个image启动多个Container，如果为每个Container都去分配一个image一样的文件系统，那么将会占用大量的磁盘空间。而CoW技术可以让所有的容器共享image的文件系统，所有数据都从image中读取，只有当要对文件进行写操作时，才从image里把要写的文件复制到自己的文件系统进行修改。所以无论有多少个容器共享同一个image，所做的写操作都是对从image中复制到自己的文件系统中的复本上进行，并不会修改image的源文件，且多个容器操作同一个文件，会在每个容器的文件系统里生成一个复本，每个容器修改的都是自己的复本，相互隔离，相互不影响。使用CoW可以有效的提高磁盘的利用率。</p>
+<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><h3 id="更新配置文件"><a href="#更新配置文件" class="headerlink" title="更新配置文件"></a>更新配置文件</h3><p>比较适用于读多写少的场景，且允许更新有稍许的延迟，复制旧数据到新数据后，修改配置，在利用原子操作进行替换，无锁访问共享数据。<br>既然互斥锁会造成阻塞，那么读写锁呢？<br>下面这段话适合 go 并发编程<br>我们知道读写锁中不互斥的只有”读读”，如果一个资源被上了写锁，其它线程过来读，还是会阻塞的，但是COW方案不会这样。<br>使用COW，就是为了避免使用锁<br>空间换时间</p>
+<h3 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h3><p>Copy-on-write在对数据进行修改的时候，不会直接在原来的数据位置上进行操作，而是重新找个位置修改，这样的好处是一旦系统突然断电，重启之后不需要做Fsck。好处就是能保证数据的完整性，掉电的话容易恢复。<br>比如说：要修改数据块A的内容，先把A读出来，写到B块里面去。如果这时候断电了，原来A的内容还在！</p>
+]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>文章索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>分布式系列文章索引</title>
+    <url>/distributed/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://hardcore.feishu.cn/docs/doccngKKrYQWSYu4Rr3puVq20wc">硬核课堂</a><br><a href="http://gk.link/a/10tCq">极客时间《分布式协议与算法实战》</a></p>
+<h2 id="拜占庭将军"><a href="#拜占庭将军" class="headerlink" title="拜占庭将军"></a>拜占庭将军</h2><h2 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h2><h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><h3 id="一致性-ACID"><a href="#一致性-ACID" class="headerlink" title="一致性 ACID"></a>一致性 ACID</h3><h3 id="可用性-BASE"><a href="#可用性-BASE" class="headerlink" title="可用性 BASE"></a>可用性 BASE</h3><h1 id="Paxos"><a href="#Paxos" class="headerlink" title="Paxos"></a>Paxos</h1><h1 id="Raft"><a href="#Raft" class="headerlink" title="Raft"></a>Raft</h1><p>Raft 算法属于 Multi-Paxos 算法，它是在兰伯特 Multi-Paxos 思想的基础上，做了一些简化和限制，比如增加了日志必须是连续的，只支持领导者、跟随者和候选人三种状态，在理解和算法实现上都相对容易许多。</p>
+<p>Raft 算法是现在分布式系统开发首选的共识算法</p>
+<p>如果要用一句话概括 Raft 算法，我觉得是这样的：从本质上说，Raft 算法是通过一切以领导者为准的方式，实现一系列值的共识和各节点日志的一致。</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h2 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h2><h3 id="领导者（Leader）"><a href="#领导者（Leader）" class="headerlink" title="领导者（Leader）"></a>领导者（Leader）</h3><p>蛮不讲理的霸道总裁，一切以我为准，平常的主要工作内容就是 3 部分，处理写请求、管理日志复制和不断地发送心跳信息，通知其他节点“我是领导者，我还活着，你们现在不要发起新的选举，找个新领导者来替代我。”</p>
+<h3 id="跟随者（Follower）"><a href="#跟随者（Follower）" class="headerlink" title="跟随者（Follower）"></a>跟随者（Follower）</h3><p>就相当于普通群众，默默地接收和处理来自领导者的消息，当等待领导者心跳信息超时的时候，就主动站出来，推荐自己当候选人。</p>
+<h3 id="候选人（Candidate）"><a href="#候选人（Candidate）" class="headerlink" title="候选人（Candidate）"></a>候选人（Candidate）</h3><p>候选人将向其他节点发送请求投票（RequestVote）RPC 消息，通知其他节点来投票，如果赢得了大多数选票，就晋升当领导者。</p>
+<h2 id="选举"><a href="#选举" class="headerlink" title="选举"></a>选举</h2><h3 id="发送心跳"><a href="#发送心跳" class="headerlink" title="发送心跳"></a>发送心跳</h3><p>Raft 算法实现了随机超时时间的特性。也就是说，每个节点等待领导者节点心跳信息的超时时间间隔是随机的。通过上面的图片你可以看到，集群中没有领导者，而节点 A 的等待超时时间最小（150ms），它会最先因为没有等到领导者的心跳信息，发生超时。<br>这个时候，节点 A 就增加自己的任期编号，并推举自己为候选人，先给自己投上一张选票，然后向其他节点发送请求投票 RPC 消息，请它们选举自己为领导者。</p>
+<h3 id="请求投票（RequestVote）"><a href="#请求投票（RequestVote）" class="headerlink" title="请求投票（RequestVote）"></a>请求投票（RequestVote）</h3><p>RPC，是由候选人在选举期间发起，通知各节点进行投票；</p>
+<h3 id="任期编号（term）"><a href="#任期编号（term）" class="headerlink" title="任期编号（term）"></a>任期编号（term）</h3><p>推举自己为候选人时，会增加自己的任期号；<br>发现自己的任期编号比其他节点小，那么它会立即恢复成跟随者状态，那么它会更新自己的编号到较大的编号值；<br>接收到一个包含较小的任期编号值的请求投票消息，那么它会直接拒绝这个请求；</p>
+<h3 id="日志复制（AppendEntries）"><a href="#日志复制（AppendEntries）" class="headerlink" title="日志复制（AppendEntries）"></a>日志复制（AppendEntries）</h3><p>RPC，是由领导者发起，用来复制日志和提供心跳消息；<br>就算任期编号大的节点，如果最后一条日志项对应的任期编号小于其它节点，请求投票也会被拒绝；</p>
+<h3 id="脑裂"><a href="#脑裂" class="headerlink" title="脑裂"></a>脑裂</h3><p>脑裂情况是无效状态，通过随机超时，来重新选举</p>
+<h3 id="投票"><a href="#投票" class="headerlink" title="投票"></a>投票</h3><p>每个任期（term）只能投票一次</p>
+<h2 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h2><h3 id="日志项"><a href="#日志项" class="headerlink" title="日志项"></a>日志项</h3><p>日志项是一种数据格式，它主要包含用户指定的数据，也就是指令（Command），还包含一些附加信息，比如索引值（Log index）、任期编号（Term）</p>
+<h3 id="第一阶段，日志项预执行：日志复制"><a href="#第一阶段，日志项预执行：日志复制" class="headerlink" title="第一阶段，日志项预执行：日志复制"></a>第一阶段，日志项预执行：日志复制</h3><p>首先，领导者进入第一阶段，通过日志复制（AppendEntries）RPC 消息，将日志项复制到集群其他节点上。<br>接着，如果领导者接收到大多数的“复制成功”响应后，它将日志项应用到它的状态机，并返回成功给客户端。如果领导者没有接收到大多数的“复制成功”响应，那么就返回错误给客户端。</p>
+<h3 id="第二阶段，心跳或者新的日志复制带有日志项索引值：状态机"><a href="#第二阶段，心跳或者新的日志复制带有日志项索引值：状态机" class="headerlink" title="第二阶段，心跳或者新的日志复制带有日志项索引值：状态机"></a>第二阶段，心跳或者新的日志复制带有日志项索引值：状态机</h3><p>这是 Raft 中的一个优化，领导者不直接发送消息通知其他节点应用指定日志项。因为领导者的日志复制 RPC 消息或心跳消息，包含了当前最大的，将会被提交（Commit）的日志项索引值。所以通过日志复制 RPC 消息或心跳消息，跟随者就可以知道领导者的日志提交位置信息。<br>因此，当其他节点接受领导者的心跳消息，或者新的日志复制 RPC 消息后，就会将这条日志项应用到它的状态机。而这个优化，降低了处理客户端请求的延迟，将二阶段提交优化为了一段提交，降低了一半的消息延迟。</p>
+<h3 id="一致性维护"><a href="#一致性维护" class="headerlink" title="一致性维护"></a>一致性维护</h3><p>首先，领导者通过日志复制 RPC 的一致性检查，找到跟随者节点上，与自己相同日志项的最大索引值。也就是说，这个索引值之前的日志，领导者和跟随者是一致的，之后的日志是不一致的了。<br>然后，领导者强制跟随者更新覆盖的不一致日志项，实现日志的一致。</p>
+<h1 id="Gossip"><a href="#Gossip" class="headerlink" title="Gossip"></a>Gossip</h1><h1 id="Quorum"><a href="#Quorum" class="headerlink" title="Quorum"></a>Quorum</h1><h1 id="PBFT"><a href="#PBFT" class="headerlink" title="PBFT"></a>PBFT</h1><h1 id="PoW"><a href="#PoW" class="headerlink" title="PoW"></a>PoW</h1><h1 id="ZAB"><a href="#ZAB" class="headerlink" title="ZAB"></a>ZAB</h1><h1 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h1><h1 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h1><p>拜占庭容错算法<br>口信消息型<br>签名消息型<br>数字货币的区块链技术中</p>
+<p>非拜占庭容错算法<br>解决的是分布式的系统中存在故障，但不存在恶意节点的场景下的共识问题</p>
+]]></content>
+      <categories>
+        <category>分布式</category>
+      </categories>
+      <tags>
+        <tag>文章索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>分布式共识算法Raft实现之Etcd</title>
+    <url>/etcd/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://etcd.io/docs/">etcd doc</a><br><a href="https://hardcore.feishu.cn/docs/doccnMRVFcMWn1zsEYBrbsDf8De#">Raft -论文导读 与 ETCD源码解读</a><br><a href="https://www.zhihu.com/column/c_1382353468817117184">etcd-源码学习</a><br><a href="https://lessisbetter.site/tags/Raft/">Etcd Raft架构设计和源码剖析</a></p>
+<h2 id="raft"><a href="#raft" class="headerlink" title="raft"></a>raft</h2><h2 id="node"><a href="#node" class="headerlink" title="node"></a>node</h2><h2 id="log"><a href="#log" class="headerlink" title="log"></a>log</h2><h2 id="docker-image"><a href="#docker-image" class="headerlink" title="docker image"></a>docker image</h2><p><a href="https://registry.hub.docker.com/r/bitnami/etcd">https://registry.hub.docker.com/r/bitnami/etcd</a></p>
+<h2 id="安装使用"><a href="#安装使用" class="headerlink" title="安装使用"></a>安装使用</h2><p><a href="https://www.huweihuang.com/kubernetes-notes/etcd/etcdctl-v3.html">www.huweihuang.com</a><br><a href="https://segmentfault.com/a/1190000040203666">GO 中 ETCD 的编码案例分享</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/configuration">配置</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/container">在容器内运行 etcd 集群</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/clustering">搭建 etcd 集群</a><br><a href="https://zhuanlan.zhihu.com/p/260019277">ubuntu+docker搭建etcd集群</a><br><a href="https://github.com/zuoshuwen/example/etcd">docker example etcd</a></p>
+]]></content>
+      <categories>
+        <category>分布式</category>
+      </categories>
+      <tags>
+        <tag>etcd</tag>
+        <tag>raft</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go系列文章索引</title>
+    <url>/golang/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txP">极客时间《GO并发编程实战课》</a><br><a href="http://gk.link/a/10txQ">极客时间《Go语言从入门到实战》</a><br><a href="http://gk.link/a/10txR">极客时间《Go语言核心36讲》</a><br><a href="http://gk.link/a/10o2G">极客时间《Go语言编程模式实战》</a><br><a href="http://gk.link/a/10sIo">极客时间《Go进阶训练营》</a><br><a href="https://learnku.com/docs/effective-go/2020">电子书《高效的 Go 编程 Effective Go》</a><br><a href="https://lessisbetter.site/">博客《Go语言充电站》</a><br><a href="https://eddycjy.com/">博客《煎鱼》</a><br><a href="https://lailin.xyz/">博客《mohuishou》</a><br><a href="http://gk.link/a/10sIo">极客时间《go进阶训练营》</a></p>
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p><strong>参考</strong></p>
+<p><strong>笔记</strong></p>
+<ol>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/datastruct-arrayslice/" title="Go数据结构之数组与切片">Go数据结构之数组与切片</a></li>
+<li><del>Go数据结构之Map</del></li>
+</ol>
+<h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><p><strong>参考</strong></p>
+<p><strong>笔记</strong></p>
+<ol>
+<li><input type="checkbox" disabled ><a href="/golang/oop/" title="Go面向对象">Go面向对象</a></li>
+</ol>
+<h1 id="Runtime"><a href="#Runtime" class="headerlink" title="Runtime"></a>Runtime</h1><p><strong>参考</strong></p>
+<p><strong>笔记</strong></p>
+<ol>
+<li><input type="checkbox" disabled ><a href="/golang/scheduling/" title="GoMPG与调度">GoMPG与调度</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/memory-alloc/" title="Go内存管理、分配">Go内存管理、分配</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/memory-gc/" title="Go内存GC">Go内存GC</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/memory-leak-escape/" title="Go内存泄漏、逃逸">Go内存泄漏、逃逸</a></li>
+</ol>
+<h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><p>启动 goroutine 应该在方法外，不应该在方法里面，并发行为，交给调用者。<br>搞清楚channel什么时候退出，控制这个channel的退出，并发扔给调用者，这三个关键点<br>log.Fatal()不能随便用，因为会导致defer不能执行</p>
+<p><strong>参考</strong></p>
+<p><strong>笔记</strong></p>
+<ol>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/concurrent-programme/" title="并发编程">并发编程</a></li>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a></li>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-cond/" title="Go并发编程之传统同步—(2)条件变量">Go并发编程之传统同步—(2)条件变量</a></li>
+<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-atomic/" title="Go并发编程之传统同步—(3)原子操作">Go并发编程之传统同步—(3)原子操作</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-waitgrouponce/" title="Go并发编程之任务协作—(1)WaitGroup、Once">Go并发编程之任务协作—(1)WaitGroup、Once</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-errgroup/" title="Go并发编程之任务协作—(1)ErrGroup">Go并发编程之任务协作—(1)ErrGroup</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-context/" title="Go并发编程之任务协作—(2)Context">Go并发编程之任务协作—(2)Context</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-map/" title="Go并发编程之数据共享—(1)Map">Go并发编程之数据共享—(1)Map</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-pool/" title="Go并发编程之数据共享—(2)Pool">Go并发编程之数据共享—(2)Pool</a></li>
+<li><input type="checkbox" disabled ><a href="/golang/ipc-channel/" title="Go并发编程之终极武器—channel">Go并发编程之终极武器—channel</a></li>
+<li><input type="checkbox" disabled >data race</li>
+<li>singleflight</li>
+</ol>
+<h1 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h1><h1 id="项目工程"><a href="#项目工程" class="headerlink" title="项目工程"></a>项目工程</h1><p><strong>参考</strong><br><a href="https://github.com/golang-standards/project-layout/blob/master/README_zh.md">project-layout</a></p>
+<h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><p><strong>参考</strong><br><a href="https://lailin.xyz/post/go-training-03.html">Go错误处理最佳实践</a></p>
+<h3 id="幂等"><a href="#幂等" class="headerlink" title="幂等"></a>幂等</h3><p>幂等：客户端要进行版本号创建与更新，并且按接口区分，对于同一个接口，只有在 response 返回时，才更新于接口对应的版本号。所以当用户连续两次点击的时候，还没有任何response返回，版本号肯定是一样的。</p>
+<h3 id="gomod"><a href="#gomod" class="headerlink" title="gomod"></a>gomod</h3><p>开启了gomod 项目就不要放在 src 目录下，一定要拿出来</p>
+<h3 id="开源项目"><a href="#开源项目" class="headerlink" title="开源项目"></a>开源项目</h3><p><a href="https://github.com/LyricTian/gin-admin">gin-admin</a></p>
+<h1 id="编程模式"><a href="#编程模式" class="headerlink" title="编程模式"></a>编程模式</h1><p>选项模式</p>
+<h1 id="go-module"><a href="#go-module" class="headerlink" title="go module"></a>go module</h1><p><a href="https://colobu.com/2019/09/23/review-go-module-again/">https://colobu.com/2019/09/23/review-go-module-again/</a></p>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>1.无锁编程<br>2. <a href="https://www.jianshu.com/p/1390dbf87471">Go语言学习之——if else</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>文章索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>并发编程</title>
+    <url>/golang/concurrent-programme/</url>
+    <content><![CDATA[<h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
+<span id="more"></span>
+
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
+<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
+<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
+<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
+<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
+<p>调度过程示例：</p>
+<ol>
+<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
+<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
+<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
+</ol>
+<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
+<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
+<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
+<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
+<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
+<p>常见的有：</p>
+<ul>
+<li>线程&amp;锁</li>
+<li>Actor</li>
+<li>CSP</li>
+<li>Lambda 架构</li>
+</ul>
+<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
+<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
+<blockquote>
+<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
+</blockquote>
+<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
+<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
+<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
+<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
+<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
+<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
+<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
+<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
+<p>Go 代码片段的封装。</p>
+<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
+<span class="hljs-comment">//  ...</span>
+&#125;()</code></pre></div>
+
+
+<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
+<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
+<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
+<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
+</ol>
+<div class="note note-success">
+            <p>并发编程三大特性（并发安全的三个重要指标）——原子性、可见性、有序性</p>
+          </div>
+
+<div class="note note-success">
+            <p>并发、并行不是一回事儿</p>
+          </div>
+
+<h1 id="CPU、内存"><a href="#CPU、内存" class="headerlink" title="CPU、内存"></a>CPU、内存</h1><h2 id="CPU-Cache"><a href="#CPU-Cache" class="headerlink" title="CPU Cache"></a>CPU Cache</h2><p>CPU Cache，是位于 CPU 与 内存 之间的临时存储，要比直接读取内存快；除了速度快，CPU 还会根据一些规则 预热数据，以 Cache line 为单位存储在 CPU Cache 中。<br>CPU Cache 可以分为一级缓存（L1），二级缓存（L2），三级缓存（L3）。</p>
+<h3 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://www.cnblogs.com/cyfonly/p/5800758.html">https://www.cnblogs.com/cyfonly/p/5800758.html</a></p>
+<h3 id="相关问题"><a href="#相关问题" class="headerlink" title="相关问题"></a>相关问题</h3><p>下面的代码有什么问题？<br>没有用到 cpu cache 加速</p>
+<h2 id="可见性：由-CPU-Cache-所带来的问题"><a href="#可见性：由-CPU-Cache-所带来的问题" class="headerlink" title="可见性：由 CPU Cache 所带来的问题"></a>可见性：由 CPU Cache 所带来的问题</h2><p>为了解决 CPU 读取内存速度慢的问题，所以增加了CPU缓存，但这也导致了可见性问题。<br>可见性的意思就是线程A修改了一个东西，要对线程B可见。</p>
+<h3 id="缓存一致性"><a href="#缓存一致性" class="headerlink" title="缓存一致性"></a>缓存一致性</h3><p>由于 CPU Cache 导致内存不一致的问题，叫做 False sharing，为了解决了这个问题，CPU Cache 引入了缓存一致性协议 MESI。</p>
+<h3 id="相关文章-1"><a href="#相关文章-1" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://www.cnblogs.com/cyfonly/p/5800758.html">https://www.cnblogs.com/cyfonly/p/5800758.html</a></p>
+<h2 id="有序性：重排所引发的问题"><a href="#有序性：重排所引发的问题" class="headerlink" title="有序性：重排所引发的问题"></a>有序性：重排所引发的问题</h2><p>重排存在于两种情况，如下：<br>CPU重排：会对读写指令进行重排，也可以说是内存重排。<br>编译器重排：编译器在生成指令序列时和CPU执行指令序列时，有可能重排序。</p>
+<h3 id="相关文章-2"><a href="#相关文章-2" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://segmentfault.com/a/1190000011458941">https://segmentfault.com/a/1190000011458941</a></p>
+<h2 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h2><p>为了解决可见性，提出了 happens-before 原则，来指导多线程内存共享层面的设计。</p>
+<p>下面是原则描述，但具体的规则指定，各个语言不同。</p>
+<ul>
+<li>如果一个操作 happens-before 另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。</li>
+<li>两个操作之间存在 happens-before 关系，并不意味着一定要按照 happens-before 原则制定的顺序来执行。如果重排序之后的执行结果与按照 happens-before 关系来执行的结果一致，那么这种重排序并不非法。</li>
+</ul>
+<h3 id="相关文章-3"><a href="#相关文章-3" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://golang.org/ref/mem">https://golang.org/ref/mem</a><br><a href="https://www.jianshu.com/p/5e44168f47a3">https://www.jianshu.com/p/5e44168f47a3</a><br><a href="https://tiancaiamao.gitbooks.io/go-internals/content/zh/10.1.html">https://tiancaiamao.gitbooks.io/go-internals/content/zh/10.1.html</a><br><a href="https://segmentfault.com/a/1190000021829769">https://segmentfault.com/a/1190000021829769</a><br><a href="https://segmentfault.com/a/1190000011458941">https://segmentfault.com/a/1190000011458941</a><br><a href="https://blog.csdn.net/q5706503/article/details/84994964">https://blog.csdn.net/q5706503/article/details/84994964</a><br><a href="https://www.jianshu.com/p/ba9114542bb7">https://www.jianshu.com/p/ba9114542bb7</a></p>
+<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><p>内存屏障（Memory Barriers、fence）是一种底层原语。</p>
+<p>上面说过，CPU Cache 提高了内存读写性能，但是导致了可见性的相关问题，所以 happens-before 提供了一种原则，提供给编程语言底层在内存管理、并发安全方面的设计。<br>上面还说过，编译器重排、CPU重排，所以，内存屏障也分为编译器屏障和CPU内存屏障。</p>
+<p>CPU 级别的指令支持，它要求：barrier 指令要求所有对内存的操作都必须要“扩散”到 memory 之后才能继续执行其他对 memory 的操作。<br>比如在 Go 语言中，atomic 标准库的 CAS（比较并交换），两个操作合二为一，保证原子且有序。</p>
+<h4 id="相关文章-4"><a href="#相关文章-4" class="headerlink" title="相关文章"></a>相关文章</h4><p><a href="https://www.jianshu.com/p/89b3e128ebd0?utm_campaign=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com">https://www.jianshu.com/p/89b3e128ebd0?utm_campaign=studygolang.com&amp;utm_medium=studygolang.com&amp;utm_source=studygolang.com</a><br><a href="https://lday.me/2017/11/04/0016_what_is_memory_barriers/">https://lday.me/2017/11/04/0016_what_is_memory_barriers/</a></p>
+<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>可以理解为，计算机中最小粒度的操作。</p>
+<p>a = b 是原子操作吗？答案是：非原子操作<br>因为 a = b 实际为两步：先取出 b 的值，再赋值给 a。</p>
+<p>继续讨论<br>在第一步，取出 b 的值，是原子操作吗？<br>如果涉及内存访问，就算只有一条汇编指令的在多核系统上也不一定是原子操作。为啥这么说呢，因为：</p>
+<p>32位系统CPU一次可处理32位数据，即一次处理4个字节(4 * 8 bit)。<br>64位系统CPU一次可处理64位数据，即一次处理8个字节(8 * 8 bit)。</p>
+<p>go的内存模型就是为了解决 single（64位系统处理8字节，确实是原子的，但是不是可见的，因为有cacheline,cpu的应对方法就是mesi，go的方法就是内存屏障）</p>
+<p><a href="https://www.cnblogs.com/yeyang/p/13576636.html">https://www.cnblogs.com/yeyang/p/13576636.html</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Go数据结构之数组与切片</title>
     <url>/golang/datastruct-arrayslice/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
 <p>切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="声明-amp-初始化"><a href="#声明-amp-初始化" class="headerlink" title="声明&amp;初始化"></a>声明&amp;初始化</h3><p>在 Go 中声明即初始化，如果在声明的时候没有初始化值，那么就会赋值为声明类型的「零值」。</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo1(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
@@ -39,6 +310,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 len:&quot;</span>, <span class="hljs-params">len</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 &#125;</code></pre></div>
+
 <p>在声明的时候就初始化：</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo2(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
 	<span class="hljs-comment">// 数组</span>
@@ -72,6 +344,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 &#125;</code></pre></div>
 
+
 <h3 id="添加-amp-更新元素值"><a href="#添加-amp-更新元素值" class="headerlink" title="添加&amp;更新元素值"></a>添加&amp;更新元素值</h3><p>数组因为长度固定，且的值都是初始化好了的，所以只有更新。</p>
 <p>切片更新操作和数据一样，只不过新增元素只能通过 append() 方法。</p>
 <blockquote>
@@ -99,6 +372,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice1 len:&quot;</span>, <span class="hljs-params">len</span>(<span class="hljs-params">slice1</span>)</span>) <span class="hljs-comment">// 6</span>
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice1 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice1</span>)</span>) <span class="hljs-comment">// 10</span>
 &#125;</code></pre></div>
+
 
 <h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>数组与切片，都可以使用表达式截取，截取之后的数据它的类型为切片。</p>
 <div class="code-wrapper"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo4(t *testing.T) &#123;
@@ -130,6 +404,7 @@
 	t.Log(<span class="hljs-string">&quot;slice4 len:&quot;</span>, len(slice4)) <span class="hljs-regexp">//</span> <span class="hljs-number">3</span>
 	t.Log(<span class="hljs-string">&quot;slice4 cap:&quot;</span>, cap(slice4)) <span class="hljs-regexp">//</span> <span class="hljs-number">6</span>
 &#125;</code></pre></div>
+
 <h3 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h3><p>使用 for、range</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	array1 := [...]<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">9</span>, <span class="hljs-number">1</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">2</span>, <span class="hljs-number">8</span>, <span class="hljs-number">4</span>&#125;
@@ -142,6 +417,7 @@
 		fmt.Println(k, <span class="hljs-string">&quot;-&quot;</span>, v)
 	&#125;
 &#125;</code></pre></div>
+
 <h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p>数组与数组可以使用 == 比较，不能与 nil 比较</p>
 <p>切片与切片不能使用 == 比较，可以使用 reflect.DeepEqual 比较，可以与 nil 比较</p>
 <div class="code-wrapper"><pre><code class="hljs jboss-cli">func TestDemo6<span class="hljs-params">(t *testing.T)</span> &#123;
@@ -167,12 +443,14 @@
 	t.Logf<span class="hljs-params">(&quot;<span class="hljs-attr">slice1</span> == slice3 %t\n&quot;, reflect.DeepEqual(slice1, slice3)</span>) <span class="hljs-string">//</span> <span class="hljs-literal">true</span>
 &#125;</code></pre></div>
 
+
 <h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>需使用 append()、切片表达式 结合来完成</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo7</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	slice1 := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">9</span>, <span class="hljs-number">1</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">2</span>, <span class="hljs-number">8</span>, <span class="hljs-number">4</span>&#125;
 	slice1 = <span class="hljs-built_in">append</span>(slice1[:<span class="hljs-number">2</span>], slice1[<span class="hljs-number">3</span>:]...)
 	t.Log(slice1)
 &#125;</code></pre></div>
+
 
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="数组与切片的关系"><a href="#数组与切片的关系" class="headerlink" title="数组与切片的关系"></a>数组与切片的关系</h3><p><strong>数组为值类型，切片为引用类型</strong>，他们又有何关系呢？</p>
 <p>程序示例：</p>
@@ -241,6 +519,7 @@
 	t.Log(<span class="hljs-string">&quot;array1 len:&quot;</span>, <span class="hljs-built_in">len</span>(array1)) <span class="hljs-comment">// 10</span>
 	t.Log(<span class="hljs-string">&quot;array1 cap:&quot;</span>, <span class="hljs-built_in">cap</span>(array1)) <span class="hljs-comment">// 10</span>
 &#125;</code></pre></div>
+
 
 <h3 id="传递"><a href="#传递" class="headerlink" title="传递"></a>传递</h3><p>切片，如果不使用 copy() 进行深复制出一个新的切片，直接传递过去的切片底层还是同一个数组，当然，append() 发生了扩容之后，就不会是同一个数组了。</p>
 <p>数组，直接传递会变成两个数组，如果运用了指针，会指向同一个。</p>
@@ -313,6 +592,7 @@
 	t.Log(<span class="hljs-string">&quot;slice2&quot;</span>, slice2) <span class="hljs-comment">// slice2 [999 1 7 3 0 5 6 2 8 4]</span>
 &#125;</code></pre></div>
 
+
 <h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p>一段连续的内存空间。</p>
 <h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><p>make 只能用于 slice、map、channel，返回的初始化后的（非零）值。</p>
 <h3 id="引用类型"><a href="#引用类型" class="headerlink" title="引用类型"></a>引用类型</h3><ul>
@@ -347,7 +627,7 @@
     <url>/golang/ipc-atomic/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前文章中介绍的互斥锁虽然能够保证同串行化，但是却保证不了执行过程中的中断。<br>要么成功、要么失败，没有中断的情况，我们叫它叫原子性，这种由硬件 CPU 提供支持的特性，是非常可靠的。</p>
 <p><a href="https://baike.baidu.com/item/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C">百度百科</a>上关于原子操作的介绍。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>由 sync/atomic 包提供操作支持。</p>
 <h3 id="加法（add）"><a href="#加法（add）" class="headerlink" title="加法（add）"></a>加法（add）</h3><p>实现累加</p>
@@ -369,6 +649,7 @@
 <span class="hljs-bullet">--- </span>PASS: TestDemo1 (2.00s)
 PASS</code></pre></div>
 
+
 <h3 id="减法（add）"><a href="#减法（add）" class="headerlink" title="减法（add）"></a>减法（add）</h3><p>对于做减法，是没有直接提供的方法的，而 Add（-1）这种是不能对 uint 类型使用的，可以通过补码的方式实现</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo2</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">uint64</span> = <span class="hljs-number">100</span>
@@ -387,6 +668,7 @@ PASS</code></pre></div>
 2020/10/11 00:32:05 counter: 0
 <span class="hljs-bullet">--- </span>PASS: TestDemo2 (2.00s)
 PASS</code></pre></div>
+
 
 <h3 id="比较并交换（compare-and-swap，简称-CAS）"><a href="#比较并交换（compare-and-swap，简称-CAS）" class="headerlink" title="比较并交换（compare and swap，简称 CAS）"></a>比较并交换（compare and swap，简称 CAS）</h3><p>并发编程中，在没有使用互斥锁的前提下，对共享数据先取出做判断，再根据判断的结果做后续操作，必然是会出问题的，使用 CAS 可以避免这种问题。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo3</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
@@ -410,6 +692,7 @@ PASS</code></pre></div>
 <span class="hljs-bullet">--- </span>PASS: TestDemo3 (2.01s)
 PASS</code></pre></div>
 
+
 <h3 id="加载（load）"><a href="#加载（load）" class="headerlink" title="加载（load）"></a>加载（load）</h3><p>加载操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo4</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
@@ -424,6 +707,7 @@ PASS</code></pre></div>
 	time.Sleep(<span class="hljs-number">2</span> * time.Second)
 &#125;</code></pre></div>
 
+
 <h3 id="存储（store）"><a href="#存储（store）" class="headerlink" title="存储（store）"></a>存储（store）</h3><p>存储操作在进行时只会有一个，不会有其它的读写操作同时进行。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	<span class="hljs-keyword">var</span> counter <span class="hljs-keyword">int64</span> = <span class="hljs-number">0</span>
@@ -437,6 +721,7 @@ PASS</code></pre></div>
 
 	time.Sleep(<span class="hljs-number">2</span> * time.Second)
 &#125;</code></pre></div>
+
 
 <h3 id="交换（swap）"><a href="#交换（swap）" class="headerlink" title="交换（swap）"></a>交换（swap）</h3><p>swap 方法返回被替换之前的旧值。</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo6</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
@@ -465,6 +750,7 @@ PASS</code></pre></div>
 --- <span class="hljs-attr">PASS:</span> TestDemo6 (<span class="hljs-number">2.00</span>s)
 PASS</code></pre></div>
 
+
 <h3 id="原子值（value）"><a href="#原子值（value）" class="headerlink" title="原子值（value）"></a>原子值（value）</h3><p>value是一个结构体，内部值定义为 interface{}，所以它是可以接受任何类型的值。</p>
 <p>第一次赋值的时候，原子值的类型就确认了，后面不能赋值其它类型的值。</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo7(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
@@ -492,6 +778,7 @@ panic: sync/atomic: store of inconsistently typed value into Value [recovered]
                 ...
 Process finished with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span></code></pre></div>
 
+
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p><em>此处暂时先介绍一下，后面有机会出文章再一起学习进步。</em></p>
 <p>放弃互斥锁，采用原子操作，常见方法有以下几种：</p>
 <h4 id="针对计数器"><a href="#针对计数器" class="headerlink" title="针对计数器"></a>针对计数器</h4><p>可以使用例如上面介绍的 Add 方法。</p>
@@ -513,6 +800,27 @@ Process finished with <span class="hljs-keyword">exit</span> code <span class="h
       </tags>
   </entry>
   <entry>
+    <title>Go并发编程之终极武器—channel</title>
+    <url>/golang/ipc-channel/</url>
+    <content><![CDATA[<p>三种状态<br>nil，未初始化的状态，只进行了声明，或者手动赋值为nil<br>active，正常的channel，可读或者可写<br>closed，已关闭，千万不要误认为关闭channel后，channel的值是nil</p>
+<p>三种操作<br>读<br>写<br>关闭</p>
+<p>panic的三种操作<br>close()已关闭的channel<br>close()nil的channel<br>写已关闭的channel</p>
+<p>关闭一定要在发送方</p>
+<p>_,ok=ch<br>和 range ch 来判断 通道是否关闭。<br>*注意，看到好多人说关闭之后就会从中返回，其实不太准确，应该说是，把所有数据都读取完之后，才会退出</p>
+<p>使用无缓冲的时候要特别注意，在运行时的逻辑上，向channel发送消息后，后面的逻辑没有接收操作了，那就会报死锁错误。<br>解决办法：</p>
+<ol>
+<li>有缓冲的：加个缓冲就可以了</li>
+<li>无缓冲的：消费最后那次发送</li>
+</ol>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go并发编程之传统同步—(2)条件变量</title>
     <url>/golang/ipc-cond/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>回顾上篇文章 <a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a> 其中说到，同步最终是为了达到以下两种目的：</p>
@@ -523,7 +831,7 @@ Process finished with <span class="hljs-keyword">exit</span> code <span class="h
 </ul>
 </blockquote>
 <p>示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>上篇文章的示例程序，仅仅实现了累加功能，但在现实的工作场景中，需求往往不可能这么简单，现在扩展一下这个程序，给它加上累减的功能。</p>
 <p>加上了累减的示例程序，可以抽象的理解为一个固定容量的“储水池”，可以注水、排水。</p>
@@ -803,6 +1111,7 @@ Process finished with <span class="hljs-keyword">exit</span> code <span class="h
 <span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span>
 
 <span class="hljs-comment">// 两种写法都不会报错 </span></code></pre></div>
+
 <p>在 go 的发送通知方法（Broadcast、Signal）上有这么一段话：</p>
 <blockquote>
 <p>// It is allowed but not required for the caller to hold c.L<br>// during the call.</p>
@@ -835,6 +1144,180 @@ pthread<span class="hljs-constructor">_mutex_unlock(&amp;<span class="hljs-param
       <tags>
         <tag>同步</tag>
         <tag>条件变量</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之任务协作—(2)Context</title>
+    <url>/golang/ipc-context/</url>
+    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><ul>
+<li>根 Context：通过 context.Background() 创建</li>
+<li>子 Context: 通过 context.WithCancel(parentContext) 创建<ul>
+<li>ctx, cancel := context.WithCancel(context.Background())</li>
+</ul>
+</li>
+<li>当前 Context 被取消时，其它的子 context 都会被取消</li>
+<li>接收取消通知 &lt;-ctx.Done()</li>
+</ul>
+<p>只执行一次</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+	timer := time.NewTimer(time.Second * <span class="hljs-number">5</span>)
+	data := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">999</span>, <span class="hljs-number">8</span>, <span class="hljs-number">345</span>, <span class="hljs-number">7</span>, <span class="hljs-number">98</span>, <span class="hljs-number">33</span>, <span class="hljs-number">66</span>, <span class="hljs-number">77</span>, <span class="hljs-number">88</span>, <span class="hljs-number">68</span>, <span class="hljs-number">96</span>&#125;
+	dataLen := <span class="hljs-built_in">len</span>(data)
+	size := <span class="hljs-number">3</span>
+	target := <span class="hljs-number">345</span>
+	ctx, cancel := context.WithCancel(context.Background())
+	resultChan := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">bool</span>)
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; dataLen; i += size &#123;
+		end := i + size
+		<span class="hljs-keyword">if</span> end &gt;= dataLen &#123;
+			end = dataLen - <span class="hljs-number">1</span>
+		&#125;
+		<span class="hljs-keyword">go</span> SearchTarget(ctx, data[i:end], target, resultChan)
+	&#125;
+	<span class="hljs-keyword">select</span> &#123;
+	<span class="hljs-keyword">case</span> &lt;-timer.C:
+		fmt.Fprintln(os.Stderr, <span class="hljs-string">&quot;Timeout! Not Found&quot;</span>)
+		cancel()
+	<span class="hljs-keyword">case</span> &lt;- resultChan:
+		fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;Found it!\n&quot;</span>)
+		cancel()
+	&#125;
+
+	time.Sleep(time.Second * <span class="hljs-number">2</span>)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">SearchTarget</span><span class="hljs-params">(ctx context.Context, data []<span class="hljs-keyword">int</span>, target <span class="hljs-keyword">int</span>, resultChan <span class="hljs-keyword">chan</span> <span class="hljs-keyword">bool</span>)</span></span> &#123;
+	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> data &#123;
+		<span class="hljs-keyword">select</span> &#123;
+		<span class="hljs-keyword">case</span> &lt;- ctx.Done():
+			fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;Task cancelded! \n&quot;</span>)
+			<span class="hljs-keyword">return</span>
+		<span class="hljs-keyword">default</span>:
+		&#125;
+		<span class="hljs-comment">// 模拟一个耗时查找，这里只是比对值，真实开发中可以是其他操作</span>
+		fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;v: %d \n&quot;</span>, v)
+		time.Sleep(time.Millisecond * <span class="hljs-number">1500</span>)
+		<span class="hljs-keyword">if</span> target == v &#123;
+			resultChan &lt;- <span class="hljs-literal">true</span>
+			<span class="hljs-keyword">return</span>
+		&#125;
+	&#125;
+&#125;</code></pre></div>
+
+<p>gin</p>
+<div class="code-wrapper"><pre><code class="hljs go">
+</code></pre></div>]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之任务协作—(1)ErrGroup</title>
+    <url>/golang/ipc-errgroup/</url>
+    <content><![CDATA[<p><code>func WithContext(ctx context.Context) (*Group, context.Context)</code></p>
+<p><code>func (g *Group) Go(f func() error)</code></p>
+<p><code>func (g *Group) Wait() error</code></p>
+<p><code>&lt;-errContext.Done()</code></p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+	g, ctx := errgroup.WithContext(context.Background())
+
+	mux := http.NewServeMux()
+	mux.HandleFunc(<span class="hljs-string">&quot;/ping&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+		w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">&quot;pong&quot;</span>))
+	&#125;)
+
+	<span class="hljs-comment">// 模拟单个服务错误退出</span>
+	serverOut := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)
+	mux.HandleFunc(<span class="hljs-string">&quot;/shutdown&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
+		serverOut &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125;
+	&#125;)
+
+	server := http.Server&#123;
+		Handler: mux,
+		Addr:    <span class="hljs-string">&quot;:8080&quot;</span>,
+	&#125;
+
+	<span class="hljs-comment">// g1</span>
+	<span class="hljs-comment">// g1 退出了所有的协程都能退出么？</span>
+	<span class="hljs-comment">// g1 退出后, context 将不再阻塞，g2, g3 都会随之退出</span>
+	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
+	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
+		<span class="hljs-keyword">return</span> server.ListenAndServe()
+	&#125;)
+
+	<span class="hljs-comment">// g2</span>
+	<span class="hljs-comment">// g2 退出了所有的协程都能退出么？</span>
+	<span class="hljs-comment">// g2 退出时，调用了 shutdown，g1 会退出</span>
+	<span class="hljs-comment">// g2 退出后, context 将不再阻塞，g3 会随之退出</span>
+	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
+	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
+		<span class="hljs-keyword">select</span> &#123;
+		<span class="hljs-keyword">case</span> &lt;-ctx.Done():
+			log.Println(<span class="hljs-string">&quot;errgroup exit...&quot;</span>)
+		<span class="hljs-keyword">case</span> &lt;-serverOut:
+			log.Println(<span class="hljs-string">&quot;server will out...&quot;</span>)
+		&#125;
+
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">3</span>*time.Second)
+		<span class="hljs-comment">// 这里不是必须的，但是如果使用 _ 的话静态扫描工具会报错，加上也无伤大雅</span>
+		<span class="hljs-keyword">defer</span> cancel()
+
+		log.Println(<span class="hljs-string">&quot;shutting down server...&quot;</span>)
+		<span class="hljs-keyword">return</span> server.Shutdown(timeoutCtx)
+	&#125;)
+
+	<span class="hljs-comment">// g3</span>
+	<span class="hljs-comment">// g3 捕获到 os 退出信号将会退出</span>
+	<span class="hljs-comment">// g3 退出了所有的协程都能退出么？</span>
+	<span class="hljs-comment">// g3 退出后, context 将不再阻塞，g2 会随之退出</span>
+	<span class="hljs-comment">// g2 退出时，调用了 shutdown，g1 会退出</span>
+	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
+	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
+		quit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">0</span>)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+		<span class="hljs-keyword">select</span> &#123;
+		<span class="hljs-keyword">case</span> &lt;-ctx.Done():
+			<span class="hljs-keyword">return</span> ctx.Err()
+		<span class="hljs-keyword">case</span> sig := &lt;-quit:
+			<span class="hljs-keyword">return</span> errors.Errorf(<span class="hljs-string">&quot;get os signal: %v&quot;</span>, sig)
+		&#125;
+	&#125;)
+
+	fmt.Printf(<span class="hljs-string">&quot;errgroup exiting: %+v\n&quot;</span>, g.Wait())
+&#125;</code></pre></div>]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之数据共享—(1)Map</title>
+    <url>/golang/ipc-map/</url>
+    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p><code>func (*Map) Delete</code><br><code>func (*Map) Load</code><br><code>func (*Map) LoadAndDelete</code><br><code>func (*Map) LoadOrStore</code><br><code>func (*Map) Range</code><br><code>func (*Map) Store</code></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go并发编程之数据共享—(2)Pool</title>
+    <url>/golang/ipc-pool/</url>
+    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p><code>func (*Pool) Get</code><br><code>func (*Pool) Put</code></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>同步</tag>
       </tags>
   </entry>
   <entry>
@@ -1016,240 +1499,169 @@ PASS</code></pre></div>
       </tags>
   </entry>
   <entry>
-    <title>GoMPG与调度</title>
-    <url>/golang/scheduling/</url>
-    <content><![CDATA[<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
-<h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>源码</th>
-<th>说明</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>全局M列表</td>
-<td>runtime.allm</td>
-<td>所有M的单链表</td>
-<td>创建之后先进全局，随即进行初始化</td>
-</tr>
-<tr>
-<td>全局P列表</td>
-<td>runtime.allp</td>
-<td>所有P的数组</td>
-<td>创建之后先进全局，随即进行初始化</td>
-</tr>
-<tr>
-<td>全局G列表</td>
-<td>runtime.allgs</td>
-<td>所有P的切片</td>
-<td>创建之后先进全局，随即进行初始化</td>
-</tr>
-<tr>
-<td>调度器的空闲M列表</td>
-<td>runtime.sched.midle</td>
-<td>空闲M的单链表</td>
-<td>暂时不用；用时再取</td>
-</tr>
-<tr>
-<td>调度器的空闲P列表</td>
-<td>runtime.sched.midle</td>
-<td>空闲P的单链表</td>
-<td>P不在关联M，P中可运行G为空，加入该列表；M需要P关联，从此列表取；</td>
-</tr>
-<tr>
-<td>调度器的可运行G队列</td>
-<td>runtime.sched.runq.head；runtime.sched.runq.tail</td>
-<td>可运行的G队列</td>
-<td>如果P的可运行G队列满，加入此队列</td>
-</tr>
-<tr>
-<td>调度器的自由G列表</td>
-<td>runtime.sched.gFree.stack(有栈)；runtime.sched.gFree.noStack (无栈)</td>
-<td>自由的G的两个单链表</td>
-<td>本地P自由G列表缺G，此列表给补；本地P自由G列表满G，此列表收取；</td>
-</tr>
-<tr>
-<td>P的可运行G队列</td>
-<td>runtime.p.runq；runtime.p.runqhead；runtime.p.runqtail</td>
-<td>P中的可运行G的队列</td>
-<td>调度器初始化过的G，加入该队列</td>
-</tr>
-<tr>
-<td>P的自由G列表</td>
-<td>runtime.p.gfree</td>
-<td>P中的自由G的单链表</td>
-<td>包含一些已经运行完成的G；go启用G，先从此处寻找现成的G；</td>
-</tr>
-</tbody></table>
-<h2 id="M"><a href="#M" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>类型</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>g0</td>
-<td>*g</td>
-<td>特殊的 goroutine，在 runtime 启动之初创建的，用于执行一些运行时任务</td>
-</tr>
-<tr>
-<td>mstartfn</td>
-<td>func()</td>
-<td>在新的 M 上启动特殊任务（系统监控、GC辅助、M自旋）</td>
-</tr>
-<tr>
-<td>curg</td>
-<td>*g</td>
-<td>当前 M 正在运行的 G 的指针</td>
-</tr>
-<tr>
-<td>p</td>
-<td>puintptr</td>
-<td>当前 M 正在关联的那个 P</td>
-</tr>
-<tr>
-<td>nextp</td>
-<td>puintptr</td>
-<td>暂存与当前 M 有潜在关联的 P（预连）</td>
-</tr>
-<tr>
-<td>spinning</td>
-<td>bool</td>
-<td>是否在寻找可运行的 G，寻找过程中 M 自旋</td>
-</tr>
-<tr>
-<td>lockedg</td>
-<td>*g</td>
-<td>当前 M 锁定的 G</td>
-</tr>
-</tbody></table>
-<h2 id="P"><a href="#P" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
-<thead>
-<tr>
-<th>状态</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Pidle</td>
-<td>当前 P 未与任何 M 关联</td>
-</tr>
-<tr>
-<td>Prunning</td>
-<td>当前 P 正在于 M 关联</td>
-</tr>
-<tr>
-<td>Psyscall</td>
-<td>当前 P 中的运行的那个 G 正在进行系统调用</td>
-</tr>
-<tr>
-<td>Pgcstop</td>
-<td>运行时系统需要停止调度。例如，运行时系统正在垃圾回收的某些步骤前，就会试图把runtime.allp（全局 P 列表）都置于此状态</td>
-</tr>
-<tr>
-<td>Pdead</td>
-<td>当前 P 已经不会再被使用。例如，运行过程中，通过 runtime.GOMAXPROCS 函数减少了 p 的最大数量</td>
-</tr>
-</tbody></table>
-<p><img src="/images/golang/scheduling-p-status-01.png" alt="P状态流转"></p>
-<h2 id="G"><a href="#G" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
-<thead>
-<tr>
-<th>状态</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Gidle</td>
-<td>刚被新分配，但还未初始化</td>
-</tr>
-<tr>
-<td>Grunnable</td>
-<td>可运行队列中等待运行</td>
-</tr>
-<tr>
-<td>Grunning</td>
-<td>运行</td>
-</tr>
-<tr>
-<td>Gsyscall</td>
-<td>执行某个系统调用</td>
-</tr>
-<tr>
-<td>Gwaiting</td>
-<td>阻塞</td>
-</tr>
-<tr>
-<td>Gdead</td>
-<td>闲置</td>
-</tr>
-<tr>
-<td>Gcopystack</td>
-<td>栈被移动，移动的原因可能是栈的扩展或收缩</td>
-</tr>
-<tr>
-<td>Gscan</td>
-<td>组合状态，发生在 GC 扫描</td>
-</tr>
-</tbody></table>
-<p><img src="/images/golang/scheduling-g-status-01.png" alt="G状态流转"></p>
-<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" alt="MPG调度"></p>
-<ol>
-<li>我们通过 go func () 来创建一个 goroutine</li>
-<li>有两个存储 G 的队列，一个是局部调度器 P 的本地队列、一个是全局 G 队列。新创建的 G 会先保存在 P 的本地队列中，如果 P 的本地队列已经满了就会保存在全局的队列中</li>
-<li>G 只能运行在 M 中，一个 M 必须持有一个 P，M 与 P 是 1：1 的关系。M 会从 P 的本地队列弹出一个可执行状态的 G 来执行，如果 P 的本地队列为空，就会想其他的 MP 组合偷取一个可执行的 G 来执行</li>
-<li>一个 M 调度 G 执行的过程是一个循环机制</li>
-<li>当 M 执行某一个 G 时候如果发生了 syscall 或则其余阻塞操作，M 会阻塞，如果当前有一些 G 在执行，runtime 会把这个线程 M 从 P 中摘除 (detach)，然后再创建一个新的操作系统的线程 (如果有空闲的线程可用就复用空闲线程) 来服务于这个 P</li>
-<li>当 M 系统调用结束时候，这个 G 会尝试获取一个空闲的 P 执行，并放入到这个 P 的本地队列。如果获取不到 P，那么这个线程 M 变成休眠状态， 加入到空闲线程中，然后这个 G 会被放入全局队列中</li>
-</ol>
-<h2 id="一些细节"><a href="#一些细节" class="headerlink" title="一些细节"></a>一些细节</h2><h3 id="work-stealing"><a href="#work-stealing" class="headerlink" title="work stealing"></a>work stealing</h3><p>当本线程无可运行的 G 时，尝试从其他线程绑定的 P 偷取 G，而不是销毁线程。</p>
-<h3 id="syscall"><a href="#syscall" class="headerlink" title="syscall"></a>syscall</h3><p>当G被阻塞在某个系统调用上时，此时G会阻塞在_Gsyscall状态，M也处于block on syscall状态，此时的M可被抢占调度：执行该G的M会与P解绑，而P则尝试与其它idle的M绑定，继续执行其它G。如果没有其它idle的M，但P的Local队列中仍然有G需要执行，则创建一个新的M；当系统调用完成后，G会重新尝试获取一个idle的P进入它的Local队列恢复执行，如果没有idle的P，G会被标记为runnable加入到Global队列。</p>
-<h3 id="handoff"><a href="#handoff" class="headerlink" title="handoff"></a>handoff</h3><ol>
-<li><p>利用并行<br>GOMAXPROCS 设置 P 的数量，最多有 GOMAXPROCS 个线程分布在多个 CPU 上同时运行。GOMAXPROCS 也限制了并发的程度，比如 GOMAXPROCS = 核数/2，则最多利用了一半的 CPU 核进行并行</p>
-</li>
-<li><p>抢占<br>在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这就是 goroutine 不同于 coroutine 的一个地方<br>异步抢占，注册 sigurg 信号，通过sysmon 检测，对 M 对应的线程发送信号，触发注册的 handler，它往当前 G 的 PC 中插入一条指令(调用某个方法)，在处理完 handler，G 恢复后，自己把自己推到了 global queue 中。</p>
-</li>
-<li><p>全局 G 队列<br>在新的调度器中依然有全局 G 队列，但功能已经被弱化了，当 M 执行 work stealing 从其他 P 偷不到 G 时，它可以从全局 G 队列获取 G</p>
-</li>
-</ol>
-<h3 id="gopark"><a href="#gopark" class="headerlink" title="gopark"></a>gopark</h3><p>系统调用；<br>channel读写条件不满足；<br>抢占式调度时间片结束；</p>
-<p>解除当前goroutine的m的绑定关系，将当前goroutine状态机切换为等待状态；<br>调用一次schedule()函数，在局部调度器P发起一轮新的调度。</p>
-<h3 id="sysmon"><a href="#sysmon" class="headerlink" title="sysmon"></a>sysmon</h3><p>P的数量影响了同时运行go代码的协程数. 如果P被占用很久, 就会影响调度. sysmon协程的一个功能就是进行抢占.<br>sysmon协程是在go runtime初始化之后, 执行用户编写的代码之前, 由runtime启动的不与任何P绑定, 直接由一个M执行的协程. 类似于 linux中的执行一些系统任务的内核线程.<br>可认为是10ms执行一次. (初始运行间隔为20us(微秒), sysmon运行1ms后逐渐翻倍, 最终每10ms运行一次. 如果有发生过抢占成功, 则又恢复成 初始20us的运行间隔, 如此循环)</p>
-<p>sysmon 也叫监控线程，它无需 P 也可以运行，他是一个死循环，每20us~10ms循环一次，循环完一次就 sleep 一会，为什么会是一个变动的周期呢，主要是避免空转，如果每次循环都没什么需要做的事，那么 sleep 的时间就会加大。<br>释放闲置超过5分钟的 span 物理内存；<br>如果超过2分钟没有垃圾回收，强制执行；<br>将长时间未处理的 netpoll 添加到全局队列；<br>向长时间运行的 G 任务发出抢占调度；<br>收回因 syscall 长时间阻塞的 P；</p>
-<h3 id="mcall"><a href="#mcall" class="headerlink" title="mcall"></a>mcall</h3><p>mcall在golang需要进行协程切换时被调用，用来保存被切换出去协程的信息，并在当前线程的g0协程堆栈上执行新的函数。一般情况下，会在新函数中执行一次schedule()来挑选新的协程来运行。接下来我们就看看mcall的实现。</p>
-<h3 id="M-的状态"><a href="#M-的状态" class="headerlink" title="M 的状态"></a>M 的状态</h3><p>当M2线程在syscall返回后变得空闲时。如何处理这个空闲的M2线程。从理论上讲，如果线程完成了所需的操作，则应将其销毁，然后再安排进程中的其他线程到CPU上执行。这就是我们通常所说的操作系统中线程的“抢占式调度”。</p>
-<p>考虑上述syscall中的情况。如果我们销毁了M2线程，而同时M3线程即将进入syscall。此时，在OS创建新的内核线程并将其调度执行之前，我们无法处理可运行的goroutine。频繁的线程前抢占操作不仅会增加OS的负载，而且对于性能要求更高的程序几乎是不可接受的。</p>
-<p>因此，为了适当地利用操作系统的资源并防止频繁的线程抢占给操作系统带来的负担，我们不会销毁内核线程M2，而是使其执行自旋操作并以备将来使用。尽管这看起来是在浪费一些资源。但是，与线程之间的频繁抢占以及频繁的创建和销毁操作相比，“空闲线程”要付出的代价更少。</p>
-<p>Spinning Thread(自旋线程) — 例如，在具有一个内核线程M（1）和一个逻辑处理器（P）的Go程序中，如果正在执行的M被syscall阻塞，则运行时会请求与P数量相同的“Spinning Threads”以允许等待的可运行goroutine继续执行。因此，在此期间，内核线程的数量M将大于P的数量（自旋线程+阻塞线程）。因此，即使将runtime.GOMAXPROCS的值设置为1，程序也将处于多线程状态。</p>
-<p>m 取到 g 了，判断如果 m 是自旋状态，则从自旋到非自旋，在没有自旋状态的 m 的情况下，再多创建一个新的自旋状态的 m</p>
-<h3 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h3><p>在channel上发送和接收<br>每个channel都有一个recvq(waitq)，用于存储试图从该channel读取数据而阻塞的goroutine。Sendq(waitq)存储试图将数据发送到channel而被阻止的goroutine。</p>
-<p>网络I/O操作<br>底层使用epoll，不会阻塞</p>
-<p>阻塞的系统调用<br>当G被阻塞在某个系统调用上时，此时G会阻塞在_Gsyscall状态，M也处于block on syscall状态，此时的M可被抢占调度：执行该G的M会与P解绑，而P则尝试与其它idle的M绑定，继续执行其它G。如果没有其它idle的M，但P的Local队列中仍然有G需要执行，则创建一个新的M；当系统调用完成后，G会重新尝试获取一个idle的P进入它的Local队列恢复执行，如果没有idle的P，G会被标记为runnable加入到Global队列。</p>
-<p>使用定时器<br>抢占式调度来解决这个问题。只要你这个任务执行超过一定的时间（10ms），那么这个任务就会被标识为可抢占的，那么别的goroutine就可以抢先进来执行。只要下次这个goroutine进行函数调用，那么就会被强占，同时也会保护现场，然后重新放入P的本地队列里面等待下次执行。（sysmon完成监控）<br>通过向线程发送系统信号的方式来中断 M 的执行，进而达到抢占的目的。</p>
-<p>使用互斥锁<br>当互斥锁不断地试图获得一个永远无法获得的锁时，它可能会遇到饥饿问题。<br>在版本1.9中，Go通过添加一个新的饥饿模式来解决先前的问题，所有等待锁定超过一毫秒的 goroutine，也称为有界等待，将被标记为饥饿。当标记为饥饿时，解锁方法现在将把锁直接移交给第一位等待着。</p>
-<h3 id="如何停止长时间占用资源的g，信号协作"><a href="#如何停止长时间占用资源的g，信号协作" class="headerlink" title="如何停止长时间占用资源的g，信号协作"></a>如何停止长时间占用资源的g，信号协作</h3><p>发送系统信号，中断<br>异步抢占，注册 sigurg 信号，通过sysmon 检测，对 M 对应的线程发送信号，触发注册的 handler，它往当前 G 的 PC 中插入一条指令(调用某个方法)，在处理完 handler，G 恢复后，自己把自己推到了 global queue 中。</p>
-<h3 id="g0"><a href="#g0" class="headerlink" title="g0"></a>g0</h3><ul>
-<li>Go 基于两种断点将 G 调度到线程上：<br>当 G 阻塞时：系统调用、互斥锁或 chan。阻塞的 G 进入睡眠模式/进入队列，并允许Go 安排和运行等待其他的 G。<br>在函数调用期间，如果 G 必须扩展其堆栈。这个断点允许 Go 调度另一个 G 并避免运行 G 占用CPU。<br>在这两种情况下，运行调度程序的 g0 将当前G 替换为另一个 G，即 ready to run。然后，选择的 G 替换 g0 并在线程上运行。与常规 G 相反，g0 有一个固定和更大的栈。</li>
-<li>Defer 函数的分配</li>
-<li>GC 收集，比如 STW、扫描 G 的堆栈和标记、清楚操作</li>
-<li>栈扩容，当需要的时候，由 g0 进行扩栈操作</li>
-</ul>
-<p><a href="https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011">https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011</a></p>
+    <title>Go并发编程之任务协作—(1)WaitGroup、Once</title>
+    <url>/golang/ipc-waitgrouponce/</url>
+    <content><![CDATA[<h1 id="WaitGroup"><a href="#WaitGroup" class="headerlink" title="WaitGroup"></a>WaitGroup</h1><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p><code>func (*WaitGroup) Add</code><br><code>func (*WaitGroup) Done</code><br><code>func (*WaitGroup) Wait</code></p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> wg sync.WaitGroup
+<span class="hljs-comment">//...</span>
+wg.Add(<span class="hljs-number">1</span>)
+<span class="hljs-comment">//...</span>
+wg.Done()
+<span class="hljs-comment">//...</span>
+wg.Wait()</code></pre></div>
+
+<p>好先统一 Add，再并发 Done，最后 Wait。</p>
+<h1 id="Once"><a href="#Once" class="headerlink" title="Once"></a>Once</h1><h2 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h2><p><code>func (*Once) Do</code></p>
+<h2 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h2><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> once sync.Once
+once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+<span class="hljs-comment">//...</span>
+&#125;)</code></pre></div>
+
+
 ]]></content>
       <categories>
         <category>golang</category>
       </categories>
       <tags>
-        <tag>CSP</tag>
-        <tag>MPG</tag>
-        <tag>调度</tag>
-        <tag>线程</tag>
-        <tag>goroutine</tag>
-        <tag>并发</tag>
+        <tag>同步</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go内存管理、分配</title>
+    <url>/golang/memory-alloc/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。</p>
+<h1 id="系统内存"><a href="#系统内存" class="headerlink" title="系统内存"></a>系统内存</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><img src="/images/golang/memory-manage-vm-01.png" alt="虚拟内存"><br>虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实际上，它通常是被分隔成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。<br>目前，大多数操作系统都使用了虚拟内存，如Windows家族的“虚拟内存”；Linux的“交换空间”等。</p>
+<ul>
+<li>访问内存，实际访问的是虚拟内存</li>
+<li>虚拟内存通过页表查看，当前要访问的虚拟内存地址，是否已经加载到了物理内存，如果已经在物理内存，则取物理内存数据，如果没有对应的物理内存，则从磁盘加载数据到物理内存，并把物理内存地址和虚拟内存地址更新到页表。</li>
+<li>每个进程都要各自的虚拟内存，内存的并发访问问题的粒度从多进程级别，可以降低到多线程级别。</li>
+</ul>
+<h2 id="堆、栈"><a href="#堆、栈" class="headerlink" title="堆、栈"></a>堆、栈</h2><p><img src="/images/golang/memory-manage-vm-02.png" alt="堆、栈"></p>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
+<li>栈在高地址，从高地址向低地址增长；堆在低地址，从低地址向高地址增长。</li>
+<li>栈的内存不需要回收；堆需要回收，无论是主动free、垃圾回收。</li>
+<li>栈上的内存有更好的局部性；堆上内存访访问2块数据可能在不同的页上。</li>
+<li>栈是操作系统管理的；堆是用户管理的</li>
+<li>栈是静态内存分配；堆是动态内存分配</li>
+</ul>
+<h3 id="栈还有以下特点"><a href="#栈还有以下特点" class="headerlink" title="栈还有以下特点"></a>栈还有以下特点</h3><ul>
+<li>LIFO，每当一个函数声明一个新变量时，它就被“推”到堆栈的最顶层块上。然后，每当一个函数退出时，最上面的块就会被清除</li>
+<li>每个线程一个 stack</li>
+</ul>
+<h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" alt="TCMalloc"></p>
+<p>内存分配策略的实现，我们也可以叫它内存分配器，相当于在用户编写的程序与虚拟内存中间建立了”内存池”，而避免手写内存池。</p>
+<p>下面是比较成熟的内存池实现库</p>
+<ul>
+<li>glibc 的 ptmalloc2</li>
+<li>google 的 tcmalloc</li>
+<li>facebook 的 jemalloc</li>
+</ul>
+<p>Golang 正是使用了 <a href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> 的设计思想。</p>
+<h2 id="Page"><a href="#Page" class="headerlink" title="Page"></a>Page</h2><p>操作系统对内存管理以页为单位，TCMalloc 也是这样，只不过 TCMalloc 里的 Page 大小与操作系统里的大小并不一定相等，而是倍数关系，x64 下 Page 大小是 8KB。</p>
+<h2 id="Span"><a href="#Span" class="headerlink" title="Span"></a>Span</h2><p>一组连续的 Page 被称为 Span，比如可以有 2 个页大小的 Span，也可以有 16 页大小的 Span，Span 比 Page 高一个层级，是为了方便管理一定大小的内存区域，Span 是 TCMalloc 中内存管理的基本单位。</p>
+<h2 id="ThreadCache"><a href="#ThreadCache" class="headerlink" title="ThreadCache"></a>ThreadCache</h2><p>每个线程各自的 Cache，一个Cache包含多个空闲内存块链表，每个链表连接的都是内存块，同一个链表上内存块的大小是相同的，也可以说按内存块大小，给内存块分了个类，这样可以根据申请的内存大小，快速从合适的链表选择空闲内存块。由于每个线程有自己的 ThreadCache，所以 ThreadCache 访问是无锁的。</p>
+<h2 id="CentralCache"><a href="#CentralCache" class="headerlink" title="CentralCache"></a>CentralCache</h2><p>是所有线程共享的缓存，也是保存的空闲内存块链表，链表的数量与 ThreadCache 中链表数量相同，当 ThreadCache 内存块不足时，可以从 CentralCache 取，当 ThreadCache 内存块多时，可以放回 CentralCache。由于 CentralCache 是共享的，所以它的访问是要加锁的。</p>
+<h2 id="PageHeap"><a href="#PageHeap" class="headerlink" title="PageHeap"></a>PageHeap</h2><p>PageHeap 是堆内存的抽象，PageHeap 存的也是若干链表，链表保存的是 Span，当 CentralCache 没有内存的时，会从 PageHeap 取，把1个 Span 拆成若干内存块，添加到对应大小的链表中，当 CentralCache 内存多的时候，会放回 PageHeap。毫无疑问，PageHeap 也是要加锁的。</p>
+<h2 id="对象大小"><a href="#对象大小" class="headerlink" title="对象大小"></a>对象大小</h2><ul>
+<li>小对象大小：0~256KB</li>
+<li>中对象大小：257~1024kb</li>
+<li>大对象大小：&gt; 1024kb</li>
+</ul>
+<h1 id="GoMalloc"><a href="#GoMalloc" class="headerlink" title="GoMalloc"></a>GoMalloc</h1><p><img src="/images/golang/memory-manage-gomalloc-01.png" alt="Golang内存管理"></p>
+<h2 id="大小维度"><a href="#大小维度" class="headerlink" title="大小维度"></a>大小维度</h2><h2 id="object-size"><a href="#object-size" class="headerlink" title="object size"></a>object size</h2><p>是申请对象的大小，比如，申请一个 8byte object size。</p>
+<h2 id="size-class"><a href="#size-class" class="headerlink" title="size class"></a>size class</h2><p>8byte-到32kb<br><code>object size</code> 的分类、级别，比如 8b ~ 16b，16 ~ 32b，32b ~ 48b …，共 67 个<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go">_NumSizeClasses = <span class="hljs-number">67</span></code></pre></div>
+
+<h2 id="span-class"><a href="#span-class" class="headerlink" title="span class"></a>span class</h2><p><code>span</code> 的分类、级别，共 134 个，是 size class 的一倍<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go">numSpanClasses = _NumSizeClasses &lt;&lt; <span class="hljs-number">1</span></code></pre></div>
+<p>其中 67 个是 scan (对象中含有指针的），另外 67 个是 noscan（对象中不含有指针的）</p>
+<h1 id="分配器结构"><a href="#分配器结构" class="headerlink" title="分配器结构"></a>分配器结构</h1><h2 id="page"><a href="#page" class="headerlink" title="page"></a>page</h2><p>与 TCMalloc 中的 Page 定义相同。</p>
+<h2 id="mspan"><a href="#mspan" class="headerlink" title="mspan"></a>mspan</h2><p>与 TCMalloc 中的 Span 定义相同。<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mspan <span class="hljs-keyword">struct</span> &#123;
+    allocBits  *gcBits
+	gcmarkBits *gcBits
+&#125;</code></pre></div>
+
+<h2 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h2><p>与 TCMalloc 中的 ThreadCache 定义相同，但在 Golang 中每个 P（MPG中的P）拥有独立的 mcache，可以做到无锁访问。<br>在 mcache 中缓存着 134 个 mspan， 在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcache <span class="hljs-keyword">struct</span> &#123;
+    alloc [numSpanClasses]*mspan</code></pre></div>
+
+<h2 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h2><p>所有 P 的共享缓存，访问是要加锁的。<br>在代码中是这样的：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcentral <span class="hljs-keyword">struct</span> &#123;
+    nonempty mSpanList <span class="hljs-comment">// 有空闲对象的 mspan 链表</span>
+	empty    mSpanList <span class="hljs-comment">// 没有空闲对象或 span 已经被 mcache 缓存的 span 链表</span></code></pre></div>
+<p>那 mcentral 有多少个呢？往下看 mheap</p>
+<h2 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h2><p>mcentral 被 mheap 所管理，也是 134 个</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mheap <span class="hljs-keyword">struct</span> &#123;
+    arenas [<span class="hljs-number">1</span> &lt;&lt; arenaL1Bits]*[<span class="hljs-number">1</span> &lt;&lt; arenaL2Bits]*heapArena
+    
+    central [numSpanClasses]<span class="hljs-keyword">struct</span> &#123;
+    mcentral mcentral
+    pad      [cpu.CacheLinePadSize - unsafe.Sizeof(mcentral&#123;&#125;)%cpu.CacheLinePadSize]<span class="hljs-keyword">byte</span>
+    &#125;</code></pre></div>
+
+<h2 id="pageCache"><a href="#pageCache" class="headerlink" title="pageCache"></a>pageCache</h2><p>在向mheap申请small内存的时候，会先访问 P 中的 pcache，P 结构如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> p <span class="hljs-keyword">struct</span> &#123;
+    pcache      pageCache
+&#125;</code></pre></div>
+<p>pageCache结构如下</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> pageCache <span class="hljs-keyword">struct</span> &#123;
+	base  <span class="hljs-keyword">uintptr</span> <span class="hljs-comment">// base address of the chunk</span>
+	cache <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing free pages (1 means free)</span>
+	scav  <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing scavenged pages (1 means scavenged)</span>
+&#125;</code></pre></div>
+
+<h2 id="fixalloc"><a href="#fixalloc" class="headerlink" title="fixalloc"></a>fixalloc</h2><p>基于自由列表的固定大小的分配器</p>
+<h1 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h1><h2 id="小内存"><a href="#小内存" class="headerlink" title="小内存"></a>小内存</h2><p>mcache-&gt;mcentral-&gt;mheap位图查找-&gt;pageCache → mheap基数树查找→操作系统分配</p>
+<h2 id="大内存"><a href="#大内存" class="headerlink" title="大内存"></a>大内存</h2><p>大对象是大小大于32KB的内存，不与 mcache 和 mcentral 沟通，并直接通过 mheap 进行分配。经历mheap基数树查找→操作系统分配 的过程。每一个大对象是一个特殊的span, 它的class是0。</p>
+<h2 id="寻找-span"><a href="#寻找-span" class="headerlink" title="寻找 span"></a>寻找 span</h2><ol>
+<li>计算对象所需内存大小size</li>
+<li>根据size到size class映射，计算出所需的size class</li>
+<li>根据size class和对象是否包含指针计算出span class</li>
+<li>获取该span class指向的span。</li>
+</ol>
+<p>以分配一个不包含指针的，大小为24Byte的对象为例。</p>
+<p>根据映射表：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// class  bytes/obj  bytes/span  objects  tail waste  max waste</span>
+<span class="hljs-comment">//     1          8        8192     1024           0     87.50%</span>
+<span class="hljs-comment">//     2         16        8192      512           0     43.75%</span>
+<span class="hljs-comment">//     3         32        8192      256           0     46.88%</span>
+<span class="hljs-comment">//     4         48        8192      170          32     31.52%</span>
+<span class="hljs-comment">//     5         64        8192      128           0     23.44%</span>
+<span class="hljs-comment">//     6         80        8192      102          32     19.07%</span>
+<span class="hljs-comment">//     7         96        8192       85          32     15.95%</span>
+<span class="hljs-comment">//     8        112        8192       73          16     13.56%</span>
+<span class="hljs-comment">//     9        128        8192       64           0     11.72%</span>
+<span class="hljs-comment">//    10        144        8192       56         128     11.82%</span>
+<span class="hljs-comment">//    11        160        8192       51          32      9.73%</span></code></pre></div>
+<p>size class 3，它的对象大小范围是(16,32]Byte，24Byte刚好在此区间，所以此对象的size class为3。<br>Size class到span class的计算如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// noscan为true代表对象不包含指针</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeSpanClass</span><span class="hljs-params">(sizeclass <span class="hljs-keyword">uint8</span>, noscan <span class="hljs-keyword">bool</span>)</span> <span class="hljs-title">spanClass</span></span> &#123;
+	<span class="hljs-keyword">return</span> spanClass(sizeclass&lt;&lt;<span class="hljs-number">1</span>) | spanClass(bool2int(noscan))
+&#125;</code></pre></div>
+<p>所以，对应的span class为：</p>
+<div class="code-wrapper"><pre><code class="hljs go">span class = <span class="hljs-number">3</span> &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span> = <span class="hljs-number">7</span></code></pre></div>
+<p>所以该对象需要的是span class 7指向的span。</p>
+<h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><p>在 GO 目前的版本中，内存管理使用了 位图（bitmap）、基数树（radix tree）。</p>
+<h2 id="BitMap"><a href="#BitMap" class="headerlink" title="BitMap"></a>BitMap</h2><p>图（Bitmap），即位（Bit）的集合，是一种数据结构，可用于记录大量的0-1状态，在很多地方都会用到，比如Linux内核（如inode，磁盘块）、Bloom Filter算法等，其优势是可以在一个非常高的空间利用率下保存大量0-1状态。<br>BitMap算法的核心思想是用bit数组来记录0-1两种状态，然后再将具体数据映射到这个比特数组的具体位置，这个比特位设置成0表示数据不存在，设置成1表示数据存在。<br>BitMap算在在大量数据查询、去重等应用场景中使用的比较多，这个算法具有比较高的空间利用率。<br>在《编程珠玑》第一章中，就有利用bitmap进行大量文件的排序。<br>JDK<br>google</p>
+<p>应该是GC的时候使用。</p>
+<h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><p><img src="/images/golang/memory-manage-trie-01.png" alt="前缀树"><br>在计算机科学中，trie，又称前缀树或字典树，是一种有序树，用于保存关联数组，其中的键通常是字符串。与二叉查找树不同，键不是直接保存在节点中，而是由节点在树中的位置决定。一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，而根节点对应空字符串。一般情况下，不是所有的节点都有对应的值，只有叶子节点和部分内部节点所对应的键才有相关的值。<br>应用场景<br>trie树常用于搜索提示。如当输入一个网址，可以自动搜索出可能的选择。当没有完全匹配的搜索结果，可以返回前缀最相似的可能。</p>
+<h2 id="基数树"><a href="#基数树" class="headerlink" title="基数树"></a>基数树</h2><p><img src="/images/golang/memory-manage-radix-01.png" alt="基数树"><br>在计算机科学中，基数树，或称Patricia trie/tree，或crit bit tree，压缩前缀树，是一种更节省空间的Trie（前缀树）。对于基数树的每个节点，如果该节点是唯一的子树的话，就和父节点合并。<br>应用场景<br>用于IP 路由。 信息检索中用于文本文档的倒排索引。</p>
+<h2 id="go-内存管理中的位图、基数树"><a href="#go-内存管理中的位图、基数树" class="headerlink" title="go 内存管理中的位图、基数树"></a>go 内存管理中的位图、基数树</h2><p>在Go1.12的时候,Go语言采用了 Treap 进行内存的管理，Treap 是一种引入了随机数的二叉树搜索树，其实现简单，并且引入的随机数以及必要时的旋转保证了比较好的平衡特性。</p>
+<h3 id="mspan-的实现-基数树（radix-tree）"><a href="#mspan-的实现-基数树（radix-tree）" class="headerlink" title="mspan 的实现 基数树（radix tree）"></a>mspan 的实现 基数树（radix tree）</h3><p>管理线性的地址空间的位图结构叫做基数树<br>mpagealloc.go</p>
+<h1 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h1><ul>
+<li>mpagealloc.go：Page allocator、radix tree</li>
+<li>malloc.go：mallocgc() 申请内存的入口</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>bitmap 管理内存页<br>radix tree 内存管理的结构</p>
+<h1 id="参考借鉴"><a href="#参考借鉴" class="headerlink" title="参考借鉴"></a>参考借鉴</h1><p><a href="https://lessisbetter.site/2019/07/06/go-memory-allocation/">Go内存分配那些事，就这么简单！</a><br><a href="https://www.bilibili.com/video/av288263284/">GopherCon 2020: Michael Knyszek - Evolving the Go Memory Manager’s RAM</a><br><a href="https://juejin.cn/post/6844903769201704973">漫画：什么是Bitmap算法？</a><br><a href="http://c.biancheng.net/view/1270.html">什么是虚拟内存，虚拟内存及其作用详解</a></p>
+]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>内存管理</tag>
+        <tag>内存分配</tag>
       </tags>
   </entry>
   <entry>
@@ -1315,8 +1727,187 @@ PASS</code></pre></div>
         <category>golang</category>
       </categories>
       <tags>
-        <tag>垃圾回收</tag>
         <tag>GC</tag>
+        <tag>垃圾回收</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go内存泄漏、逃逸</title>
+    <url>/golang/memory-leak-escape/</url>
+    <content><![CDATA[<h1 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h1><p><a href="https://segmentfault.com/a/1190000019222661">实战Go内存泄露</a></p>
+<h1 id="内存逃逸"><a href="#内存逃逸" class="headerlink" title="内存逃逸"></a>内存逃逸</h1><h2 id="关于-堆和栈"><a href="#关于-堆和栈" class="headerlink" title="关于 堆和栈"></a>关于 堆和栈</h2><p>栈 可以简单得理解成一次函数调用内部申请到的内存，它们会随着函数的返回把内存还给系统。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
+	temp := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)
+	...
+&#125;</code></pre></div>
+<p>类似于上面代码里面的temp变量，只是内函数内部申请的临时变量，并不会作为返回值返回，它就是被编译器申请到栈里面。</p>
+<p>申请到 栈内存 好处：函数返回直接释放，不会引起垃圾回收，对性能没有影响。</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span> []<span class="hljs-title">int</span></span>&#123;
+	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)
+	<span class="hljs-keyword">return</span> a
+&#125;</code></pre></div>
+<p>而上面这段代码，申请的代码一模一样，但是申请后作为返回值返回了，编译器会认为变量之后还会被使用，当函数返回之后并不会将其内存归还，那么它就会被申请到 堆 上面了。</p>
+<p>申请到堆上面的内存才会引起垃圾回收，如果这个过程（特指垃圾回收不断被触发）过于高频就会导致 gc 压力过大，程序性能出问题。</p>
+<p>我们再看看如下几个例子：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
+	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)     <span class="hljs-comment">// 栈 空间小</span>
+	b := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20000</span>) <span class="hljs-comment">// 堆 空间过大</span>
+ 
+	l := <span class="hljs-number">20</span>
+	c := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, l) <span class="hljs-comment">// 堆 动态分配不定空间</span>
+&#125;</code></pre></div>
+<p>像是 b 这种 即使是临时变量，申请过大也会在堆上面申请。<br>对于 c 编译器对于这种不定长度的申请方式，也会在堆上面申请，即使申请的长度很短。</p>
+<h2 id="逃逸分析（Escape-analysis）"><a href="#逃逸分析（Escape-analysis）" class="headerlink" title="逃逸分析（Escape analysis）"></a>逃逸分析（Escape analysis）</h2><p>所谓逃逸分析（Escape analysis）是指由编译器决定内存分配的位置，不需要程序员指定。</p>
+<p>在函数中申请一个新的对象：</p>
+<ul>
+<li>如果分配 在栈中，则函数执行结束可自动将内存回收；</li>
+<li>如果分配在堆中，则函数执行结束可交给GC（垃圾回收）处理;<br>注意，对于函数外部没有引用的对象，也有可能放到堆中，比如内存过大超过栈的存储能力。</li>
+</ul>
+<h2 id="逃逸场景（什么情况才分配到堆中）"><a href="#逃逸场景（什么情况才分配到堆中）" class="headerlink" title="逃逸场景（什么情况才分配到堆中）"></a>逃逸场景（什么情况才分配到堆中）</h2><h3 id="指针逃逸"><a href="#指针逃逸" class="headerlink" title="指针逃逸"></a>指针逃逸</h3><p>Go可以返回局部变量指针，这其实是一个典型的变量逃逸案例，示例代码如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">type</span> Student <span class="hljs-keyword">struct</span> &#123;
+    Name <span class="hljs-keyword">string</span>
+    Age  <span class="hljs-keyword">int</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">StudentRegister</span><span class="hljs-params">(name <span class="hljs-keyword">string</span>, age <span class="hljs-keyword">int</span>)</span> *<span class="hljs-title">Student</span></span> &#123;
+    s := <span class="hljs-built_in">new</span>(Student) <span class="hljs-comment">//局部变量s逃逸到堆</span>
+
+    s.Name = name
+    s.Age = age
+
+    <span class="hljs-keyword">return</span> s
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    StudentRegister(<span class="hljs-string">&quot;Jim&quot;</span>, <span class="hljs-number">18</span>)
+&#125;</code></pre></div>
+<p>虽然 在函数 StudentRegister() 内部 s 为局部变量，其值通过函数返回值返回，s 本身为一指针，其指向的内存地址不会是栈而是堆，这就是典型的逃逸案例。</p>
+<p>终端运行命令查看逃逸分析日志：<br><code>go build -gcflags=-m</code><br>可见在StudentRegister()函数中，也即代码第9行显示”escapes to heap”，代表该行内存分配发生了逃逸现象。</p>
+<h3 id="栈空间不足逃逸（空间开辟过大）"><a href="#栈空间不足逃逸（空间开辟过大）" class="headerlink" title="栈空间不足逃逸（空间开辟过大）"></a>栈空间不足逃逸（空间开辟过大）</h3><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Slice</span><span class="hljs-params">()</span></span> &#123;
+    s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">1000</span>, <span class="hljs-number">1000</span>)
+
+    <span class="hljs-keyword">for</span> index, _ := <span class="hljs-keyword">range</span> s &#123;
+        s[index] = index
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    Slice()
+&#125;</code></pre></div>
+<p>上面代码Slice()函数中分配了一个1000个长度的切片，是否逃逸取决于栈空间是否足够大。 直接查看编译提示，如下：</p>
+<p>所以只是1000的长度还不足以发生逃逸现象。然后就x10倍吧</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Slice</span><span class="hljs-params">()</span></span> &#123;
+    s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">10000</span>, <span class="hljs-number">10000</span>)
+
+    <span class="hljs-keyword">for</span> index, _ := <span class="hljs-keyword">range</span> s &#123;
+        s[index] = index
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    Slice()
+&#125;</code></pre></div>
+<p>分析如下：<br>当切片长度扩大到10000时就会逃逸。<br>实际上当栈空间不足以存放当前对象时或无法判断当前切片长度时会将对象分配到堆中。</p>
+<h3 id="动态类型逃逸（不确定长度大小）"><a href="#动态类型逃逸（不确定长度大小）" class="headerlink" title="动态类型逃逸（不确定长度大小）"></a>动态类型逃逸（不确定长度大小）</h3><p>很多函数参数为interface类型，比如fmt.Println(a …interface{})，编译期间很难确定其参数的具体类型，也能产生逃逸。</p>
+<p>如下代码所示：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    s := <span class="hljs-string">&quot;Escape&quot;</span>
+    fmt.Println(s)
+&#125;</code></pre></div>
+<div class="code-wrapper"><pre><code class="hljs shell">D:\SourceCode\GoExpert\src&gt;go build -gcflags=-m
+<span class="hljs-meta">#</span><span class="bash"> _/D_/SourceCode/GoExpert/src</span>
+.\main.go:7: s escapes to heap
+.\main.go:7: main ... argument does not escape</code></pre></div>
+<p>又或者像前面提到的例子：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
+	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)     <span class="hljs-comment">// 栈 空间小</span>
+	b := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20000</span>) <span class="hljs-comment">// 堆 空间过大 逃逸</span>
+ 
+	l := <span class="hljs-number">20</span>
+	c := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, l) <span class="hljs-comment">// 堆 动态分配不定空间 逃逸</span>
+&#125;</code></pre></div>
+<h3 id="闭包引用对象逃逸"><a href="#闭包引用对象逃逸" class="headerlink" title="闭包引用对象逃逸"></a>闭包引用对象逃逸</h3><p>Fibonacci数列的函数：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Fibonacci</span><span class="hljs-params">()</span> <span class="hljs-title">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+    a, b := <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
+        a, b = b, a+b
+        <span class="hljs-keyword">return</span> a
+    &#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
+    f := Fibonacci()
+
+    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
+        fmt.Printf(<span class="hljs-string">&quot;Fibonacci: %d\n&quot;</span>, f())
+    &#125;
+&#125;</code></pre></div>
+<p>输出如下：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">~/go/src/gitHub/test/pool  go run main.go
+Fibonacci: 1
+Fibonacci: 1
+Fibonacci: 2
+Fibonacci: 3
+Fibonacci: 5
+Fibonacci: 8
+Fibonacci: 13
+Fibonacci: 21
+Fibonacci: 34
+Fibonacci: 55</code></pre></div>
+<p>逃逸如下：</p>
+<div class="code-wrapper"><pre><code class="hljs shell"> ~/go/src/gitHub/test/pool  go build -gcflags=-m
+<span class="hljs-meta">#</span><span class="bash"> gitHub/<span class="hljs-built_in">test</span>/pool</span>
+./main.go:7:9: can inline Fibonacci.func1
+./main.go:7:9: func literal escapes to heap
+./main.go:7:9: func literal escapes to heap
+./main.go:8:10: &amp;b escapes to heap
+./main.go:6:5: moved to heap: b
+./main.go:8:13: &amp;a escapes to heap
+./main.go:6:2: moved to heap: a
+./main.go:17:34: f() escapes to heap
+./main.go:17:13: main ... argument does not escape</code></pre></div>
+<p>Fibonacci()函数中原本属于局部变量的a和b由于闭包的引用，不得不将二者放到堆上，以致产生逃逸。</p>
+<h2 id="逃逸分析的作用是什么呢？"><a href="#逃逸分析的作用是什么呢？" class="headerlink" title="逃逸分析的作用是什么呢？"></a>逃逸分析的作用是什么呢？</h2><ul>
+<li>逃逸分析的好处是为了减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除。</li>
+<li>逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(逃逸的局部变量会在堆上分配 ,而没有发生逃逸的则有编译器在栈上分配)。</li>
+<li>同步消除，如果你定义的对象的方法上有同步锁，但在运行时，却只有一个线程在访问，此时逃逸分析后的机器码，会去掉同步锁运行。</li>
+</ul>
+<h2 id="逃逸总结："><a href="#逃逸总结：" class="headerlink" title="逃逸总结："></a>逃逸总结：</h2><ul>
+<li>栈上分配内存比在堆中分配内存有更高的效率</li>
+<li>栈上分配的内存不需要GC处理</li>
+<li>堆上分配的内存使用完毕会交给GC处理</li>
+<li>逃逸分析目的是决定内分配地址是栈还是堆</li>
+<li>逃逸分析在编译阶段完成</li>
+</ul>
+<h2 id="提问：函数传递指针真的比传值效率高吗？"><a href="#提问：函数传递指针真的比传值效率高吗？" class="headerlink" title="提问：函数传递指针真的比传值效率高吗？"></a>提问：函数传递指针真的比传值效率高吗？</h2><p>我们知道传递指针可以减少底层值的拷贝，可以提高效率，但是如果拷贝的数据量小，由于指针传递会产生逃逸，可能会使用堆，也可能会增加GC的负担，所以传递指针不一定是高效的。<br>在官网 (golang.org) FAQ 上有一个关于变量分配的问题如下：<br>From a correctness standpoint, you don’t need to know. Each variable in Go exists as long as there are references to it. The storage location chosen by the implementation is irrelevant to the semantics of the language.</p>
+<p>The storage location does have an effect on writing efficient programs. When possible, the Go compilers will allocate variables that are local to a function in that function’s stack frame.</p>
+<p>However, if the compiler cannot prove that the variable is not referenced after the function returns, then the compiler must allocate the variable on the garbage-collected heap to avoid dangling pointer errors. Also, if a local variable is very large, it might make more sense to store it on the heap rather than the stack.</p>
+<p>In the current compilers, if a variable has its address taken, that variable is a candidate for allocation on the heap. However, a basic escape analysis recognizes some cases when such variables will not live past the return from the function and can reside on the stack.</p>
+<p>翻译如下：</p>
+<p>如何得知变量是分配在栈（stack）上还是堆（heap）上？</p>
+<p>准确地说，你并不需要知道。Golang 中的变量只要被引用就一直会存活，存储在堆上还是栈上由内部实现决定而和具体的语法没有关系。</p>
+<p>知道变量的存储位置确实和效率编程有关系。如果可能，Golang 编译器会将函数的局部变量分配到函数栈帧（stack frame）上。 然而，如果编译器不能确保变量在函数 return之后不再被引用，编译器就会将变量分配到堆上。而且，如果一个局部变量非常大，那么它也应该被分配到堆上而不是栈上。</p>
+<p>当前情况下，如果一个变量被取地址，那么它就有可能被分配到堆上。然而，还要对这些变量做逃逸分析，如果函数return之后，变量不再被引用，则将其分配到栈上。</p>
+<h1 id="内存碎片"><a href="#内存碎片" class="headerlink" title="内存碎片"></a>内存碎片</h1><h1 id="内存优化"><a href="#内存优化" class="headerlink" title="内存优化"></a>内存优化</h1>]]></content>
+      <categories>
+        <category>golang</category>
+      </categories>
+      <tags>
+        <tag>Go内存泄漏、逃逸</tag>
       </tags>
   </entry>
   <entry>
@@ -1770,376 +2361,252 @@ PASS</code></pre></div>
       </tags>
   </entry>
   <entry>
-    <title>Go系列文章索引</title>
-    <url>/golang/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txP">极客时间《GO并发编程实战课》</a><br><a href="http://gk.link/a/10txQ">极客时间《Go语言从入门到实战》</a><br><a href="http://gk.link/a/10txR">极客时间《Go语言核心36讲》</a><br><a href="http://gk.link/a/10o2G">极客时间《Go语言编程模式实战》</a><br><a href="http://gk.link/a/10sIo">极客时间《Go进阶训练营》</a><br><a href="https://learnku.com/docs/effective-go/2020">电子书《高效的 Go 编程 Effective Go》</a><br><a href="https://lessisbetter.site/">博客《Go语言充电站》</a><br><a href="https://eddycjy.com/">博客《煎鱼》</a><br><a href="https://lailin.xyz/">博客《mohuishou》</a><br><a href="http://gk.link/a/10sIo">极客时间《go进阶训练营》</a></p>
-<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p><strong>参考</strong></p>
-<p><strong>笔记</strong></p>
+    <title>GoMPG与调度</title>
+    <url>/golang/scheduling/</url>
+    <content><![CDATA[<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><h2 id="宏观关系"><a href="#宏观关系" class="headerlink" title="宏观关系"></a>宏观关系</h2><p><img src="/images/golang/scheduling-mpg-01.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-02.png" alt="MPG关系图"><br><img src="/images/golang/scheduling-mpg-03.png" alt="MPG关系图"></p>
+<h2 id="核心容器"><a href="#核心容器" class="headerlink" title="核心容器"></a>核心容器</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>源码</th>
+<th>说明</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全局M列表</td>
+<td>runtime.allm</td>
+<td>所有M的单链表</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局P列表</td>
+<td>runtime.allp</td>
+<td>所有P的数组</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>全局G列表</td>
+<td>runtime.allgs</td>
+<td>所有P的切片</td>
+<td>创建之后先进全局，随即进行初始化</td>
+</tr>
+<tr>
+<td>调度器的空闲M列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲M的单链表</td>
+<td>暂时不用；用时再取</td>
+</tr>
+<tr>
+<td>调度器的空闲P列表</td>
+<td>runtime.sched.midle</td>
+<td>空闲P的单链表</td>
+<td>P不在关联M，P中可运行G为空，加入该列表；M需要P关联，从此列表取；</td>
+</tr>
+<tr>
+<td>调度器的可运行G队列</td>
+<td>runtime.sched.runq.head；runtime.sched.runq.tail</td>
+<td>可运行的G队列</td>
+<td>如果P的可运行G队列满，加入此队列</td>
+</tr>
+<tr>
+<td>调度器的自由G列表</td>
+<td>runtime.sched.gFree.stack(有栈)；runtime.sched.gFree.noStack (无栈)</td>
+<td>自由的G的两个单链表</td>
+<td>本地P自由G列表缺G，此列表给补；本地P自由G列表满G，此列表收取；</td>
+</tr>
+<tr>
+<td>P的可运行G队列</td>
+<td>runtime.p.runq；runtime.p.runqhead；runtime.p.runqtail</td>
+<td>P中的可运行G的队列</td>
+<td>调度器初始化过的G，加入该队列</td>
+</tr>
+<tr>
+<td>P的自由G列表</td>
+<td>runtime.p.gfree</td>
+<td>P中的自由G的单链表</td>
+<td>包含一些已经运行完成的G；go启用G，先从此处寻找现成的G；</td>
+</tr>
+</tbody></table>
+<h2 id="M"><a href="#M" class="headerlink" title="M"></a>M</h2><h3 id="结构体成员"><a href="#结构体成员" class="headerlink" title="结构体成员"></a>结构体成员</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g0</td>
+<td>*g</td>
+<td>特殊的 goroutine，在 runtime 启动之初创建的，用于执行一些运行时任务</td>
+</tr>
+<tr>
+<td>mstartfn</td>
+<td>func()</td>
+<td>在新的 M 上启动特殊任务（系统监控、GC辅助、M自旋）</td>
+</tr>
+<tr>
+<td>curg</td>
+<td>*g</td>
+<td>当前 M 正在运行的 G 的指针</td>
+</tr>
+<tr>
+<td>p</td>
+<td>puintptr</td>
+<td>当前 M 正在关联的那个 P</td>
+</tr>
+<tr>
+<td>nextp</td>
+<td>puintptr</td>
+<td>暂存与当前 M 有潜在关联的 P（预连）</td>
+</tr>
+<tr>
+<td>spinning</td>
+<td>bool</td>
+<td>是否在寻找可运行的 G，寻找过程中 M 自旋</td>
+</tr>
+<tr>
+<td>lockedg</td>
+<td>*g</td>
+<td>当前 M 锁定的 G</td>
+</tr>
+</tbody></table>
+<h2 id="P"><a href="#P" class="headerlink" title="P"></a>P</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pidle</td>
+<td>当前 P 未与任何 M 关联</td>
+</tr>
+<tr>
+<td>Prunning</td>
+<td>当前 P 正在于 M 关联</td>
+</tr>
+<tr>
+<td>Psyscall</td>
+<td>当前 P 中的运行的那个 G 正在进行系统调用</td>
+</tr>
+<tr>
+<td>Pgcstop</td>
+<td>运行时系统需要停止调度。例如，运行时系统正在垃圾回收的某些步骤前，就会试图把runtime.allp（全局 P 列表）都置于此状态</td>
+</tr>
+<tr>
+<td>Pdead</td>
+<td>当前 P 已经不会再被使用。例如，运行过程中，通过 runtime.GOMAXPROCS 函数减少了 p 的最大数量</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-p-status-01.png" alt="P状态流转"></p>
+<h2 id="G"><a href="#G" class="headerlink" title="G"></a>G</h2><h3 id="状态-1"><a href="#状态-1" class="headerlink" title="状态"></a>状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gidle</td>
+<td>刚被新分配，但还未初始化</td>
+</tr>
+<tr>
+<td>Grunnable</td>
+<td>可运行队列中等待运行</td>
+</tr>
+<tr>
+<td>Grunning</td>
+<td>运行</td>
+</tr>
+<tr>
+<td>Gsyscall</td>
+<td>执行某个系统调用</td>
+</tr>
+<tr>
+<td>Gwaiting</td>
+<td>阻塞</td>
+</tr>
+<tr>
+<td>Gdead</td>
+<td>闲置</td>
+</tr>
+<tr>
+<td>Gcopystack</td>
+<td>栈被移动，移动的原因可能是栈的扩展或收缩</td>
+</tr>
+<tr>
+<td>Gscan</td>
+<td>组合状态，发生在 GC 扫描</td>
+</tr>
+</tbody></table>
+<p><img src="/images/golang/scheduling-g-status-01.png" alt="G状态流转"></p>
+<h2 id="MPG调度"><a href="#MPG调度" class="headerlink" title="MPG调度"></a>MPG调度</h2><p><img src="/images/golang/scheduling-mpg-04.png" alt="MPG调度"></p>
 <ol>
-<li><input type="checkbox" disabled checked="checked"><a href="/golang/datastruct-arrayslice/" title="Go数据结构之数组与切片">Go数据结构之数组与切片</a></li>
-<li><del>Go数据结构之Map</del></li>
+<li>我们通过 go func () 来创建一个 goroutine</li>
+<li>有两个存储 G 的队列，一个是局部调度器 P 的本地队列、一个是全局 G 队列。新创建的 G 会先保存在 P 的本地队列中，如果 P 的本地队列已经满了就会保存在全局的队列中</li>
+<li>G 只能运行在 M 中，一个 M 必须持有一个 P，M 与 P 是 1：1 的关系。M 会从 P 的本地队列弹出一个可执行状态的 G 来执行，如果 P 的本地队列为空，就会想其他的 MP 组合偷取一个可执行的 G 来执行</li>
+<li>一个 M 调度 G 执行的过程是一个循环机制</li>
+<li>当 M 执行某一个 G 时候如果发生了 syscall 或则其余阻塞操作，M 会阻塞，如果当前有一些 G 在执行，runtime 会把这个线程 M 从 P 中摘除 (detach)，然后再创建一个新的操作系统的线程 (如果有空闲的线程可用就复用空闲线程) 来服务于这个 P</li>
+<li>当 M 系统调用结束时候，这个 G 会尝试获取一个空闲的 P 执行，并放入到这个 P 的本地队列。如果获取不到 P，那么这个线程 M 变成休眠状态， 加入到空闲线程中，然后这个 G 会被放入全局队列中</li>
 </ol>
-<h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><p><strong>参考</strong></p>
-<p><strong>笔记</strong></p>
-<ol>
-<li><input type="checkbox" disabled ><a href="/golang/oop/" title="Go面向对象">Go面向对象</a></li>
+<h2 id="一些细节"><a href="#一些细节" class="headerlink" title="一些细节"></a>一些细节</h2><h3 id="work-stealing"><a href="#work-stealing" class="headerlink" title="work stealing"></a>work stealing</h3><p>当本线程无可运行的 G 时，尝试从其他线程绑定的 P 偷取 G，而不是销毁线程。</p>
+<h3 id="syscall"><a href="#syscall" class="headerlink" title="syscall"></a>syscall</h3><p>当G被阻塞在某个系统调用上时，此时G会阻塞在_Gsyscall状态，M也处于block on syscall状态，此时的M可被抢占调度：执行该G的M会与P解绑，而P则尝试与其它idle的M绑定，继续执行其它G。如果没有其它idle的M，但P的Local队列中仍然有G需要执行，则创建一个新的M；当系统调用完成后，G会重新尝试获取一个idle的P进入它的Local队列恢复执行，如果没有idle的P，G会被标记为runnable加入到Global队列。</p>
+<h3 id="handoff"><a href="#handoff" class="headerlink" title="handoff"></a>handoff</h3><ol>
+<li><p>利用并行<br>GOMAXPROCS 设置 P 的数量，最多有 GOMAXPROCS 个线程分布在多个 CPU 上同时运行。GOMAXPROCS 也限制了并发的程度，比如 GOMAXPROCS = 核数/2，则最多利用了一半的 CPU 核进行并行</p>
+</li>
+<li><p>抢占<br>在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这就是 goroutine 不同于 coroutine 的一个地方<br>异步抢占，注册 sigurg 信号，通过sysmon 检测，对 M 对应的线程发送信号，触发注册的 handler，它往当前 G 的 PC 中插入一条指令(调用某个方法)，在处理完 handler，G 恢复后，自己把自己推到了 global queue 中。</p>
+</li>
+<li><p>全局 G 队列<br>在新的调度器中依然有全局 G 队列，但功能已经被弱化了，当 M 执行 work stealing 从其他 P 偷不到 G 时，它可以从全局 G 队列获取 G</p>
+</li>
 </ol>
-<h1 id="Runtime"><a href="#Runtime" class="headerlink" title="Runtime"></a>Runtime</h1><p><strong>参考</strong></p>
-<p><strong>笔记</strong></p>
-<ol>
-<li><input type="checkbox" disabled ><a href="/golang/scheduling/" title="GoMPG与调度">GoMPG与调度</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/memory-alloc/" title="Go内存管理、分配">Go内存管理、分配</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/memory-gc/" title="Go内存GC">Go内存GC</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/memory-leak-escape/" title="Go内存泄漏、逃逸">Go内存泄漏、逃逸</a></li>
-</ol>
-<h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><p>启动 goroutine 应该在方法外，不应该在方法里面，并发行为，交给调用者。<br>搞清楚channel什么时候退出，控制这个channel的退出，并发扔给调用者，这三个关键点<br>log.Fatal()不能随便用，因为会导致defer不能执行</p>
-<p><strong>参考</strong></p>
-<p><strong>笔记</strong></p>
-<ol>
-<li><input type="checkbox" disabled checked="checked"><a href="/golang/concurrent-programme/" title="并发编程">并发编程</a></li>
-<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-mutex/" title="Go并发编程之传统同步—(1)互斥锁">Go并发编程之传统同步—(1)互斥锁</a></li>
-<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-cond/" title="Go并发编程之传统同步—(2)条件变量">Go并发编程之传统同步—(2)条件变量</a></li>
-<li><input type="checkbox" disabled checked="checked"><a href="/golang/ipc-atomic/" title="Go并发编程之传统同步—(3)原子操作">Go并发编程之传统同步—(3)原子操作</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-waitgrouponce/" title="Go并发编程之任务协作—(1)WaitGroup、Once">Go并发编程之任务协作—(1)WaitGroup、Once</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-errgroup/" title="Go并发编程之任务协作—(1)ErrGroup">Go并发编程之任务协作—(1)ErrGroup</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-context/" title="Go并发编程之任务协作—(2)Context">Go并发编程之任务协作—(2)Context</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-map/" title="Go并发编程之数据共享—(1)Map">Go并发编程之数据共享—(1)Map</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-pool/" title="Go并发编程之数据共享—(2)Pool">Go并发编程之数据共享—(2)Pool</a></li>
-<li><input type="checkbox" disabled ><a href="/golang/ipc-channel/" title="Go并发编程之终极武器—channel">Go并发编程之终极武器—channel</a></li>
-<li><input type="checkbox" disabled >data race</li>
-<li>singleflight</li>
-</ol>
-<h1 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h1><h1 id="项目工程"><a href="#项目工程" class="headerlink" title="项目工程"></a>项目工程</h1><p><strong>参考</strong><br><a href="https://github.com/golang-standards/project-layout/blob/master/README_zh.md">project-layout</a></p>
-<h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><p><strong>参考</strong><br><a href="https://lailin.xyz/post/go-training-03.html">Go错误处理最佳实践</a></p>
-<h3 id="幂等"><a href="#幂等" class="headerlink" title="幂等"></a>幂等</h3><p>幂等：客户端要进行版本号创建与更新，并且按接口区分，对于同一个接口，只有在 response 返回时，才更新于接口对应的版本号。所以当用户连续两次点击的时候，还没有任何response返回，版本号肯定是一样的。</p>
-<h3 id="gomod"><a href="#gomod" class="headerlink" title="gomod"></a>gomod</h3><p>开启了gomod 项目就不要放在 src 目录下，一定要拿出来</p>
-<h3 id="开源项目"><a href="#开源项目" class="headerlink" title="开源项目"></a>开源项目</h3><p><a href="https://github.com/LyricTian/gin-admin">gin-admin</a></p>
-<h1 id="编程模式"><a href="#编程模式" class="headerlink" title="编程模式"></a>编程模式</h1><p>选项模式</p>
-<h1 id="go-module"><a href="#go-module" class="headerlink" title="go module"></a>go module</h1><p><a href="https://colobu.com/2019/09/23/review-go-module-again/">https://colobu.com/2019/09/23/review-go-module-again/</a></p>
-<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>1.无锁编程<br>2. <a href="https://www.jianshu.com/p/1390dbf87471">Go语言学习之——if else</a></p>
+<h3 id="gopark"><a href="#gopark" class="headerlink" title="gopark"></a>gopark</h3><p>系统调用；<br>channel读写条件不满足；<br>抢占式调度时间片结束；</p>
+<p>解除当前goroutine的m的绑定关系，将当前goroutine状态机切换为等待状态；<br>调用一次schedule()函数，在局部调度器P发起一轮新的调度。</p>
+<h3 id="sysmon"><a href="#sysmon" class="headerlink" title="sysmon"></a>sysmon</h3><p>P的数量影响了同时运行go代码的协程数. 如果P被占用很久, 就会影响调度. sysmon协程的一个功能就是进行抢占.<br>sysmon协程是在go runtime初始化之后, 执行用户编写的代码之前, 由runtime启动的不与任何P绑定, 直接由一个M执行的协程. 类似于 linux中的执行一些系统任务的内核线程.<br>可认为是10ms执行一次. (初始运行间隔为20us(微秒), sysmon运行1ms后逐渐翻倍, 最终每10ms运行一次. 如果有发生过抢占成功, 则又恢复成 初始20us的运行间隔, 如此循环)</p>
+<p>sysmon 也叫监控线程，它无需 P 也可以运行，他是一个死循环，每20us~10ms循环一次，循环完一次就 sleep 一会，为什么会是一个变动的周期呢，主要是避免空转，如果每次循环都没什么需要做的事，那么 sleep 的时间就会加大。<br>释放闲置超过5分钟的 span 物理内存；<br>如果超过2分钟没有垃圾回收，强制执行；<br>将长时间未处理的 netpoll 添加到全局队列；<br>向长时间运行的 G 任务发出抢占调度；<br>收回因 syscall 长时间阻塞的 P；</p>
+<h3 id="mcall"><a href="#mcall" class="headerlink" title="mcall"></a>mcall</h3><p>mcall在golang需要进行协程切换时被调用，用来保存被切换出去协程的信息，并在当前线程的g0协程堆栈上执行新的函数。一般情况下，会在新函数中执行一次schedule()来挑选新的协程来运行。接下来我们就看看mcall的实现。</p>
+<h3 id="M-的状态"><a href="#M-的状态" class="headerlink" title="M 的状态"></a>M 的状态</h3><p>当M2线程在syscall返回后变得空闲时。如何处理这个空闲的M2线程。从理论上讲，如果线程完成了所需的操作，则应将其销毁，然后再安排进程中的其他线程到CPU上执行。这就是我们通常所说的操作系统中线程的“抢占式调度”。</p>
+<p>考虑上述syscall中的情况。如果我们销毁了M2线程，而同时M3线程即将进入syscall。此时，在OS创建新的内核线程并将其调度执行之前，我们无法处理可运行的goroutine。频繁的线程前抢占操作不仅会增加OS的负载，而且对于性能要求更高的程序几乎是不可接受的。</p>
+<p>因此，为了适当地利用操作系统的资源并防止频繁的线程抢占给操作系统带来的负担，我们不会销毁内核线程M2，而是使其执行自旋操作并以备将来使用。尽管这看起来是在浪费一些资源。但是，与线程之间的频繁抢占以及频繁的创建和销毁操作相比，“空闲线程”要付出的代价更少。</p>
+<p>Spinning Thread(自旋线程) — 例如，在具有一个内核线程M（1）和一个逻辑处理器（P）的Go程序中，如果正在执行的M被syscall阻塞，则运行时会请求与P数量相同的“Spinning Threads”以允许等待的可运行goroutine继续执行。因此，在此期间，内核线程的数量M将大于P的数量（自旋线程+阻塞线程）。因此，即使将runtime.GOMAXPROCS的值设置为1，程序也将处于多线程状态。</p>
+<p>m 取到 g 了，判断如果 m 是自旋状态，则从自旋到非自旋，在没有自旋状态的 m 的情况下，再多创建一个新的自旋状态的 m</p>
+<h3 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h3><p>在channel上发送和接收<br>每个channel都有一个recvq(waitq)，用于存储试图从该channel读取数据而阻塞的goroutine。Sendq(waitq)存储试图将数据发送到channel而被阻止的goroutine。</p>
+<p>网络I/O操作<br>底层使用epoll，不会阻塞</p>
+<p>阻塞的系统调用<br>当G被阻塞在某个系统调用上时，此时G会阻塞在_Gsyscall状态，M也处于block on syscall状态，此时的M可被抢占调度：执行该G的M会与P解绑，而P则尝试与其它idle的M绑定，继续执行其它G。如果没有其它idle的M，但P的Local队列中仍然有G需要执行，则创建一个新的M；当系统调用完成后，G会重新尝试获取一个idle的P进入它的Local队列恢复执行，如果没有idle的P，G会被标记为runnable加入到Global队列。</p>
+<p>使用定时器<br>抢占式调度来解决这个问题。只要你这个任务执行超过一定的时间（10ms），那么这个任务就会被标识为可抢占的，那么别的goroutine就可以抢先进来执行。只要下次这个goroutine进行函数调用，那么就会被强占，同时也会保护现场，然后重新放入P的本地队列里面等待下次执行。（sysmon完成监控）<br>通过向线程发送系统信号的方式来中断 M 的执行，进而达到抢占的目的。</p>
+<p>使用互斥锁<br>当互斥锁不断地试图获得一个永远无法获得的锁时，它可能会遇到饥饿问题。<br>在版本1.9中，Go通过添加一个新的饥饿模式来解决先前的问题，所有等待锁定超过一毫秒的 goroutine，也称为有界等待，将被标记为饥饿。当标记为饥饿时，解锁方法现在将把锁直接移交给第一位等待着。</p>
+<h3 id="如何停止长时间占用资源的g，信号协作"><a href="#如何停止长时间占用资源的g，信号协作" class="headerlink" title="如何停止长时间占用资源的g，信号协作"></a>如何停止长时间占用资源的g，信号协作</h3><p>发送系统信号，中断<br>异步抢占，注册 sigurg 信号，通过sysmon 检测，对 M 对应的线程发送信号，触发注册的 handler，它往当前 G 的 PC 中插入一条指令(调用某个方法)，在处理完 handler，G 恢复后，自己把自己推到了 global queue 中。</p>
+<h3 id="g0"><a href="#g0" class="headerlink" title="g0"></a>g0</h3><ul>
+<li>Go 基于两种断点将 G 调度到线程上：<br>当 G 阻塞时：系统调用、互斥锁或 chan。阻塞的 G 进入睡眠模式/进入队列，并允许Go 安排和运行等待其他的 G。<br>在函数调用期间，如果 G 必须扩展其堆栈。这个断点允许 Go 调度另一个 G 并避免运行 G 占用CPU。<br>在这两种情况下，运行调度程序的 g0 将当前G 替换为另一个 G，即 ready to run。然后，选择的 G 替换 g0 并在线程上运行。与常规 G 相反，g0 有一个固定和更大的栈。</li>
+<li>Defer 函数的分配</li>
+<li>GC 收集，比如 STW、扫描 G 的堆栈和标记、清楚操作</li>
+<li>栈扩容，当需要的时候，由 g0 进行扩栈操作</li>
+</ul>
+<p><a href="https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011">https://xie.infoq.cn/article/3e533bf31a08f8dd2f62f6011</a></p>
 ]]></content>
       <categories>
         <category>golang</category>
+      </categories>
+      <tags>
+        <tag>MPG</tag>
+        <tag>调度</tag>
+        <tag>线程</tag>
+        <tag>goroutine</tag>
+        <tag>并发</tag>
+        <tag>CSP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS</title>
+    <url>/ios/a/</url>
+    <content><![CDATA[<p><a href="http://gk.link/a/10tyZ">极客时间《从0开发一款iOS App》</a></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
       </categories>
       <tags>
         <tag>文章索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go内存管理、分配</title>
-    <url>/golang/memory-alloc/</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是以 go 1.15 为基础编写，而就在我写这篇文章的时候，go master 分支已经发生了与 1.15 不同的变化，可能在 1.16 及以后的源码会与文章内容有些出入，但总体差异应该不会太大，比如申请内存的流程、内存的模型设计，所以这篇文章应该不会很快过时。</p>
-<h1 id="系统内存"><a href="#系统内存" class="headerlink" title="系统内存"></a>系统内存</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><img src="/images/golang/memory-manage-vm-01.png" alt="虚拟内存"><br>虚拟内存是计算机系统内存管理的一种技术。它使得应用程序认为它拥有连续的可用的内存（一个连续完整的地址空间），而实际上，它通常是被分隔成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。<br>目前，大多数操作系统都使用了虚拟内存，如Windows家族的“虚拟内存”；Linux的“交换空间”等。</p>
-<ul>
-<li>访问内存，实际访问的是虚拟内存</li>
-<li>虚拟内存通过页表查看，当前要访问的虚拟内存地址，是否已经加载到了物理内存，如果已经在物理内存，则取物理内存数据，如果没有对应的物理内存，则从磁盘加载数据到物理内存，并把物理内存地址和虚拟内存地址更新到页表。</li>
-<li>每个进程都要各自的虚拟内存，内存的并发访问问题的粒度从多进程级别，可以降低到多线程级别。</li>
-</ul>
-<h2 id="堆、栈"><a href="#堆、栈" class="headerlink" title="堆、栈"></a>堆、栈</h2><p><img src="/images/golang/memory-manage-vm-02.png" alt="堆、栈"></p>
-<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
-<li>栈在高地址，从高地址向低地址增长；堆在低地址，从低地址向高地址增长。</li>
-<li>栈的内存不需要回收；堆需要回收，无论是主动free、垃圾回收。</li>
-<li>栈上的内存有更好的局部性；堆上内存访访问2块数据可能在不同的页上。</li>
-<li>栈是操作系统管理的；堆是用户管理的</li>
-<li>栈是静态内存分配；堆是动态内存分配</li>
-</ul>
-<h3 id="栈还有以下特点"><a href="#栈还有以下特点" class="headerlink" title="栈还有以下特点"></a>栈还有以下特点</h3><ul>
-<li>LIFO，每当一个函数声明一个新变量时，它就被“推”到堆栈的最顶层块上。然后，每当一个函数退出时，最上面的块就会被清除</li>
-<li>每个线程一个 stack</li>
-</ul>
-<h1 id="TCMalloc"><a href="#TCMalloc" class="headerlink" title="TCMalloc"></a>TCMalloc</h1><p><img src="/images/golang/memory-manage-tcmalloc-01.png" alt="TCMalloc"></p>
-<p>内存分配策略的实现，我们也可以叫它内存分配器，相当于在用户编写的程序与虚拟内存中间建立了”内存池”，而避免手写内存池。</p>
-<p>下面是比较成熟的内存池实现库</p>
-<ul>
-<li>glibc 的 ptmalloc2</li>
-<li>google 的 tcmalloc</li>
-<li>facebook 的 jemalloc</li>
-</ul>
-<p>Golang 正是使用了 <a href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> 的设计思想。</p>
-<h2 id="Page"><a href="#Page" class="headerlink" title="Page"></a>Page</h2><p>操作系统对内存管理以页为单位，TCMalloc 也是这样，只不过 TCMalloc 里的 Page 大小与操作系统里的大小并不一定相等，而是倍数关系，x64 下 Page 大小是 8KB。</p>
-<h2 id="Span"><a href="#Span" class="headerlink" title="Span"></a>Span</h2><p>一组连续的 Page 被称为 Span，比如可以有 2 个页大小的 Span，也可以有 16 页大小的 Span，Span 比 Page 高一个层级，是为了方便管理一定大小的内存区域，Span 是 TCMalloc 中内存管理的基本单位。</p>
-<h2 id="ThreadCache"><a href="#ThreadCache" class="headerlink" title="ThreadCache"></a>ThreadCache</h2><p>每个线程各自的 Cache，一个Cache包含多个空闲内存块链表，每个链表连接的都是内存块，同一个链表上内存块的大小是相同的，也可以说按内存块大小，给内存块分了个类，这样可以根据申请的内存大小，快速从合适的链表选择空闲内存块。由于每个线程有自己的 ThreadCache，所以 ThreadCache 访问是无锁的。</p>
-<h2 id="CentralCache"><a href="#CentralCache" class="headerlink" title="CentralCache"></a>CentralCache</h2><p>是所有线程共享的缓存，也是保存的空闲内存块链表，链表的数量与 ThreadCache 中链表数量相同，当 ThreadCache 内存块不足时，可以从 CentralCache 取，当 ThreadCache 内存块多时，可以放回 CentralCache。由于 CentralCache 是共享的，所以它的访问是要加锁的。</p>
-<h2 id="PageHeap"><a href="#PageHeap" class="headerlink" title="PageHeap"></a>PageHeap</h2><p>PageHeap 是堆内存的抽象，PageHeap 存的也是若干链表，链表保存的是 Span，当 CentralCache 没有内存的时，会从 PageHeap 取，把1个 Span 拆成若干内存块，添加到对应大小的链表中，当 CentralCache 内存多的时候，会放回 PageHeap。毫无疑问，PageHeap 也是要加锁的。</p>
-<h2 id="对象大小"><a href="#对象大小" class="headerlink" title="对象大小"></a>对象大小</h2><ul>
-<li>小对象大小：0~256KB</li>
-<li>中对象大小：257~1024kb</li>
-<li>大对象大小：&gt; 1024kb</li>
-</ul>
-<h1 id="GoMalloc"><a href="#GoMalloc" class="headerlink" title="GoMalloc"></a>GoMalloc</h1><p><img src="/images/golang/memory-manage-gomalloc-01.png" alt="Golang内存管理"></p>
-<h2 id="大小维度"><a href="#大小维度" class="headerlink" title="大小维度"></a>大小维度</h2><h2 id="object-size"><a href="#object-size" class="headerlink" title="object size"></a>object size</h2><p>是申请对象的大小，比如，申请一个 8byte object size。</p>
-<h2 id="size-class"><a href="#size-class" class="headerlink" title="size class"></a>size class</h2><p>8byte-到32kb<br><code>object size</code> 的分类、级别，比如 8b ~ 16b，16 ~ 32b，32b ~ 48b …，共 67 个<br>在代码中是这样的：</p>
-<div class="code-wrapper"><pre><code class="hljs go">_NumSizeClasses = <span class="hljs-number">67</span></code></pre></div>
-
-<h2 id="span-class"><a href="#span-class" class="headerlink" title="span class"></a>span class</h2><p><code>span</code> 的分类、级别，共 134 个，是 size class 的一倍<br>在代码中是这样的：</p>
-<div class="code-wrapper"><pre><code class="hljs go">numSpanClasses = _NumSizeClasses &lt;&lt; <span class="hljs-number">1</span></code></pre></div>
-<p>其中 67 个是 scan (对象中含有指针的），另外 67 个是 noscan（对象中不含有指针的）</p>
-<h1 id="分配器结构"><a href="#分配器结构" class="headerlink" title="分配器结构"></a>分配器结构</h1><h2 id="page"><a href="#page" class="headerlink" title="page"></a>page</h2><p>与 TCMalloc 中的 Page 定义相同。</p>
-<h2 id="mspan"><a href="#mspan" class="headerlink" title="mspan"></a>mspan</h2><p>与 TCMalloc 中的 Span 定义相同。<br>在代码中是这样的：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mspan <span class="hljs-keyword">struct</span> &#123;
-    allocBits  *gcBits
-	gcmarkBits *gcBits
-&#125;</code></pre></div>
-
-<h2 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h2><p>与 TCMalloc 中的 ThreadCache 定义相同，但在 Golang 中每个 P（MPG中的P）拥有独立的 mcache，可以做到无锁访问。<br>在 mcache 中缓存着 134 个 mspan， 在代码中是这样的：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcache <span class="hljs-keyword">struct</span> &#123;
-    alloc [numSpanClasses]*mspan</code></pre></div>
-
-<h2 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h2><p>所有 P 的共享缓存，访问是要加锁的。<br>在代码中是这样的：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mcentral <span class="hljs-keyword">struct</span> &#123;
-    nonempty mSpanList <span class="hljs-comment">// 有空闲对象的 mspan 链表</span>
-	empty    mSpanList <span class="hljs-comment">// 没有空闲对象或 span 已经被 mcache 缓存的 span 链表</span></code></pre></div>
-<p>那 mcentral 有多少个呢？往下看 mheap</p>
-<h2 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h2><p>mcentral 被 mheap 所管理，也是 134 个</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> mheap <span class="hljs-keyword">struct</span> &#123;
-    arenas [<span class="hljs-number">1</span> &lt;&lt; arenaL1Bits]*[<span class="hljs-number">1</span> &lt;&lt; arenaL2Bits]*heapArena
-    
-    central [numSpanClasses]<span class="hljs-keyword">struct</span> &#123;
-    mcentral mcentral
-    pad      [cpu.CacheLinePadSize - unsafe.Sizeof(mcentral&#123;&#125;)%cpu.CacheLinePadSize]<span class="hljs-keyword">byte</span>
-    &#125;</code></pre></div>
-
-<h2 id="pageCache"><a href="#pageCache" class="headerlink" title="pageCache"></a>pageCache</h2><p>在向mheap申请small内存的时候，会先访问 P 中的 pcache，P 结构如下：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> p <span class="hljs-keyword">struct</span> &#123;
-    pcache      pageCache
-&#125;</code></pre></div>
-<p>pageCache结构如下</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> pageCache <span class="hljs-keyword">struct</span> &#123;
-	base  <span class="hljs-keyword">uintptr</span> <span class="hljs-comment">// base address of the chunk</span>
-	cache <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing free pages (1 means free)</span>
-	scav  <span class="hljs-keyword">uint64</span>  <span class="hljs-comment">// 64-bit bitmap representing scavenged pages (1 means scavenged)</span>
-&#125;</code></pre></div>
-
-<h2 id="fixalloc"><a href="#fixalloc" class="headerlink" title="fixalloc"></a>fixalloc</h2><p>基于自由列表的固定大小的分配器</p>
-<h1 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h1><h2 id="小内存"><a href="#小内存" class="headerlink" title="小内存"></a>小内存</h2><p>mcache-&gt;mcentral-&gt;mheap位图查找-&gt;pageCache → mheap基数树查找→操作系统分配</p>
-<h2 id="大内存"><a href="#大内存" class="headerlink" title="大内存"></a>大内存</h2><p>大对象是大小大于32KB的内存，不与 mcache 和 mcentral 沟通，并直接通过 mheap 进行分配。经历mheap基数树查找→操作系统分配 的过程。每一个大对象是一个特殊的span, 它的class是0。</p>
-<h2 id="寻找-span"><a href="#寻找-span" class="headerlink" title="寻找 span"></a>寻找 span</h2><ol>
-<li>计算对象所需内存大小size</li>
-<li>根据size到size class映射，计算出所需的size class</li>
-<li>根据size class和对象是否包含指针计算出span class</li>
-<li>获取该span class指向的span。</li>
-</ol>
-<p>以分配一个不包含指针的，大小为24Byte的对象为例。</p>
-<p>根据映射表：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// class  bytes/obj  bytes/span  objects  tail waste  max waste</span>
-<span class="hljs-comment">//     1          8        8192     1024           0     87.50%</span>
-<span class="hljs-comment">//     2         16        8192      512           0     43.75%</span>
-<span class="hljs-comment">//     3         32        8192      256           0     46.88%</span>
-<span class="hljs-comment">//     4         48        8192      170          32     31.52%</span>
-<span class="hljs-comment">//     5         64        8192      128           0     23.44%</span>
-<span class="hljs-comment">//     6         80        8192      102          32     19.07%</span>
-<span class="hljs-comment">//     7         96        8192       85          32     15.95%</span>
-<span class="hljs-comment">//     8        112        8192       73          16     13.56%</span>
-<span class="hljs-comment">//     9        128        8192       64           0     11.72%</span>
-<span class="hljs-comment">//    10        144        8192       56         128     11.82%</span>
-<span class="hljs-comment">//    11        160        8192       51          32      9.73%</span></code></pre></div>
-<p>size class 3，它的对象大小范围是(16,32]Byte，24Byte刚好在此区间，所以此对象的size class为3。<br>Size class到span class的计算如下：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// noscan为true代表对象不包含指针</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeSpanClass</span><span class="hljs-params">(sizeclass <span class="hljs-keyword">uint8</span>, noscan <span class="hljs-keyword">bool</span>)</span> <span class="hljs-title">spanClass</span></span> &#123;
-	<span class="hljs-keyword">return</span> spanClass(sizeclass&lt;&lt;<span class="hljs-number">1</span>) | spanClass(bool2int(noscan))
-&#125;</code></pre></div>
-<p>所以，对应的span class为：</p>
-<div class="code-wrapper"><pre><code class="hljs go">span class = <span class="hljs-number">3</span> &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span> = <span class="hljs-number">7</span></code></pre></div>
-<p>所以该对象需要的是span class 7指向的span。</p>
-<h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><p>在 GO 目前的版本中，内存管理使用了 位图（bitmap）、基数树（radix tree）。</p>
-<h2 id="BitMap"><a href="#BitMap" class="headerlink" title="BitMap"></a>BitMap</h2><p>图（Bitmap），即位（Bit）的集合，是一种数据结构，可用于记录大量的0-1状态，在很多地方都会用到，比如Linux内核（如inode，磁盘块）、Bloom Filter算法等，其优势是可以在一个非常高的空间利用率下保存大量0-1状态。<br>BitMap算法的核心思想是用bit数组来记录0-1两种状态，然后再将具体数据映射到这个比特数组的具体位置，这个比特位设置成0表示数据不存在，设置成1表示数据存在。<br>BitMap算在在大量数据查询、去重等应用场景中使用的比较多，这个算法具有比较高的空间利用率。<br>在《编程珠玑》第一章中，就有利用bitmap进行大量文件的排序。<br>JDK<br>google</p>
-<p>应该是GC的时候使用。</p>
-<h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><p><img src="/images/golang/memory-manage-trie-01.png" alt="前缀树"><br>在计算机科学中，trie，又称前缀树或字典树，是一种有序树，用于保存关联数组，其中的键通常是字符串。与二叉查找树不同，键不是直接保存在节点中，而是由节点在树中的位置决定。一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，而根节点对应空字符串。一般情况下，不是所有的节点都有对应的值，只有叶子节点和部分内部节点所对应的键才有相关的值。<br>应用场景<br>trie树常用于搜索提示。如当输入一个网址，可以自动搜索出可能的选择。当没有完全匹配的搜索结果，可以返回前缀最相似的可能。</p>
-<h2 id="基数树"><a href="#基数树" class="headerlink" title="基数树"></a>基数树</h2><p><img src="/images/golang/memory-manage-radix-01.png" alt="基数树"><br>在计算机科学中，基数树，或称Patricia trie/tree，或crit bit tree，压缩前缀树，是一种更节省空间的Trie（前缀树）。对于基数树的每个节点，如果该节点是唯一的子树的话，就和父节点合并。<br>应用场景<br>用于IP 路由。 信息检索中用于文本文档的倒排索引。</p>
-<h2 id="go-内存管理中的位图、基数树"><a href="#go-内存管理中的位图、基数树" class="headerlink" title="go 内存管理中的位图、基数树"></a>go 内存管理中的位图、基数树</h2><p>在Go1.12的时候,Go语言采用了 Treap 进行内存的管理，Treap 是一种引入了随机数的二叉树搜索树，其实现简单，并且引入的随机数以及必要时的旋转保证了比较好的平衡特性。</p>
-<h3 id="mspan-的实现-基数树（radix-tree）"><a href="#mspan-的实现-基数树（radix-tree）" class="headerlink" title="mspan 的实现 基数树（radix tree）"></a>mspan 的实现 基数树（radix tree）</h3><p>管理线性的地址空间的位图结构叫做基数树<br>mpagealloc.go</p>
-<h1 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h1><ul>
-<li>mpagealloc.go：Page allocator、radix tree</li>
-<li>malloc.go：mallocgc() 申请内存的入口</li>
-</ul>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>bitmap 管理内存页<br>radix tree 内存管理的结构</p>
-<h1 id="参考借鉴"><a href="#参考借鉴" class="headerlink" title="参考借鉴"></a>参考借鉴</h1><p><a href="https://lessisbetter.site/2019/07/06/go-memory-allocation/">Go内存分配那些事，就这么简单！</a><br><a href="https://www.bilibili.com/video/av288263284/">GopherCon 2020: Michael Knyszek - Evolving the Go Memory Manager’s RAM</a><br><a href="https://juejin.cn/post/6844903769201704973">漫画：什么是Bitmap算法？</a><br><a href="http://c.biancheng.net/view/1270.html">什么是虚拟内存，虚拟内存及其作用详解</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>内存管理</tag>
-        <tag>内存分配</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go内存泄漏、逃逸</title>
-    <url>/golang/memory-leak-escape/</url>
-    <content><![CDATA[<h1 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h1><p><a href="https://segmentfault.com/a/1190000019222661">实战Go内存泄露</a></p>
-<h1 id="内存逃逸"><a href="#内存逃逸" class="headerlink" title="内存逃逸"></a>内存逃逸</h1><h2 id="关于-堆和栈"><a href="#关于-堆和栈" class="headerlink" title="关于 堆和栈"></a>关于 堆和栈</h2><p>栈 可以简单得理解成一次函数调用内部申请到的内存，它们会随着函数的返回把内存还给系统。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
-	temp := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)
-	...
-&#125;</code></pre></div>
-<p>类似于上面代码里面的temp变量，只是内函数内部申请的临时变量，并不会作为返回值返回，它就是被编译器申请到栈里面。</p>
-<p>申请到 栈内存 好处：函数返回直接释放，不会引起垃圾回收，对性能没有影响。</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span> []<span class="hljs-title">int</span></span>&#123;
-	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)
-	<span class="hljs-keyword">return</span> a
-&#125;</code></pre></div>
-<p>而上面这段代码，申请的代码一模一样，但是申请后作为返回值返回了，编译器会认为变量之后还会被使用，当函数返回之后并不会将其内存归还，那么它就会被申请到 堆 上面了。</p>
-<p>申请到堆上面的内存才会引起垃圾回收，如果这个过程（特指垃圾回收不断被触发）过于高频就会导致 gc 压力过大，程序性能出问题。</p>
-<p>我们再看看如下几个例子：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
-	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)     <span class="hljs-comment">// 栈 空间小</span>
-	b := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20000</span>) <span class="hljs-comment">// 堆 空间过大</span>
- 
-	l := <span class="hljs-number">20</span>
-	c := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, l) <span class="hljs-comment">// 堆 动态分配不定空间</span>
-&#125;</code></pre></div>
-<p>像是 b 这种 即使是临时变量，申请过大也会在堆上面申请。<br>对于 c 编译器对于这种不定长度的申请方式，也会在堆上面申请，即使申请的长度很短。</p>
-<h2 id="逃逸分析（Escape-analysis）"><a href="#逃逸分析（Escape-analysis）" class="headerlink" title="逃逸分析（Escape analysis）"></a>逃逸分析（Escape analysis）</h2><p>所谓逃逸分析（Escape analysis）是指由编译器决定内存分配的位置，不需要程序员指定。</p>
-<p>在函数中申请一个新的对象：</p>
-<ul>
-<li>如果分配 在栈中，则函数执行结束可自动将内存回收；</li>
-<li>如果分配在堆中，则函数执行结束可交给GC（垃圾回收）处理;<br>注意，对于函数外部没有引用的对象，也有可能放到堆中，比如内存过大超过栈的存储能力。</li>
-</ul>
-<h2 id="逃逸场景（什么情况才分配到堆中）"><a href="#逃逸场景（什么情况才分配到堆中）" class="headerlink" title="逃逸场景（什么情况才分配到堆中）"></a>逃逸场景（什么情况才分配到堆中）</h2><h3 id="指针逃逸"><a href="#指针逃逸" class="headerlink" title="指针逃逸"></a>指针逃逸</h3><p>Go可以返回局部变量指针，这其实是一个典型的变量逃逸案例，示例代码如下：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
-
-<span class="hljs-keyword">type</span> Student <span class="hljs-keyword">struct</span> &#123;
-    Name <span class="hljs-keyword">string</span>
-    Age  <span class="hljs-keyword">int</span>
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">StudentRegister</span><span class="hljs-params">(name <span class="hljs-keyword">string</span>, age <span class="hljs-keyword">int</span>)</span> *<span class="hljs-title">Student</span></span> &#123;
-    s := <span class="hljs-built_in">new</span>(Student) <span class="hljs-comment">//局部变量s逃逸到堆</span>
-
-    s.Name = name
-    s.Age = age
-
-    <span class="hljs-keyword">return</span> s
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-    StudentRegister(<span class="hljs-string">&quot;Jim&quot;</span>, <span class="hljs-number">18</span>)
-&#125;</code></pre></div>
-<p>虽然 在函数 StudentRegister() 内部 s 为局部变量，其值通过函数返回值返回，s 本身为一指针，其指向的内存地址不会是栈而是堆，这就是典型的逃逸案例。</p>
-<p>终端运行命令查看逃逸分析日志：<br><code>go build -gcflags=-m</code><br>可见在StudentRegister()函数中，也即代码第9行显示”escapes to heap”，代表该行内存分配发生了逃逸现象。</p>
-<h3 id="栈空间不足逃逸（空间开辟过大）"><a href="#栈空间不足逃逸（空间开辟过大）" class="headerlink" title="栈空间不足逃逸（空间开辟过大）"></a>栈空间不足逃逸（空间开辟过大）</h3><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Slice</span><span class="hljs-params">()</span></span> &#123;
-    s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">1000</span>, <span class="hljs-number">1000</span>)
-
-    <span class="hljs-keyword">for</span> index, _ := <span class="hljs-keyword">range</span> s &#123;
-        s[index] = index
-    &#125;
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-    Slice()
-&#125;</code></pre></div>
-<p>上面代码Slice()函数中分配了一个1000个长度的切片，是否逃逸取决于栈空间是否足够大。 直接查看编译提示，如下：</p>
-<p>所以只是1000的长度还不足以发生逃逸现象。然后就x10倍吧</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Slice</span><span class="hljs-params">()</span></span> &#123;
-    s := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">10000</span>, <span class="hljs-number">10000</span>)
-
-    <span class="hljs-keyword">for</span> index, _ := <span class="hljs-keyword">range</span> s &#123;
-        s[index] = index
-    &#125;
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-    Slice()
-&#125;</code></pre></div>
-<p>分析如下：<br>当切片长度扩大到10000时就会逃逸。<br>实际上当栈空间不足以存放当前对象时或无法判断当前切片长度时会将对象分配到堆中。</p>
-<h3 id="动态类型逃逸（不确定长度大小）"><a href="#动态类型逃逸（不确定长度大小）" class="headerlink" title="动态类型逃逸（不确定长度大小）"></a>动态类型逃逸（不确定长度大小）</h3><p>很多函数参数为interface类型，比如fmt.Println(a …interface{})，编译期间很难确定其参数的具体类型，也能产生逃逸。</p>
-<p>如下代码所示：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
-
-<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-    s := <span class="hljs-string">&quot;Escape&quot;</span>
-    fmt.Println(s)
-&#125;</code></pre></div>
-<div class="code-wrapper"><pre><code class="hljs shell">D:\SourceCode\GoExpert\src&gt;go build -gcflags=-m
-<span class="hljs-meta">#</span><span class="bash"> _/D_/SourceCode/GoExpert/src</span>
-.\main.go:7: s escapes to heap
-.\main.go:7: main ... argument does not escape</code></pre></div>
-<p>又或者像前面提到的例子：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">F</span><span class="hljs-params">()</span></span> &#123;
-	a := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20</span>)     <span class="hljs-comment">// 栈 空间小</span>
-	b := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">20000</span>) <span class="hljs-comment">// 堆 空间过大 逃逸</span>
- 
-	l := <span class="hljs-number">20</span>
-	c := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, l) <span class="hljs-comment">// 堆 动态分配不定空间 逃逸</span>
-&#125;</code></pre></div>
-<h3 id="闭包引用对象逃逸"><a href="#闭包引用对象逃逸" class="headerlink" title="闭包引用对象逃逸"></a>闭包引用对象逃逸</h3><p>Fibonacci数列的函数：</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main
-
-<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Fibonacci</span><span class="hljs-params">()</span> <span class="hljs-title">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
-    a, b := <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">int</span></span> &#123;
-        a, b = b, a+b
-        <span class="hljs-keyword">return</span> a
-    &#125;
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-    f := Fibonacci()
-
-    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;
-        fmt.Printf(<span class="hljs-string">&quot;Fibonacci: %d\n&quot;</span>, f())
-    &#125;
-&#125;</code></pre></div>
-<p>输出如下：</p>
-<div class="code-wrapper"><pre><code class="hljs shell">~/go/src/gitHub/test/pool  go run main.go
-Fibonacci: 1
-Fibonacci: 1
-Fibonacci: 2
-Fibonacci: 3
-Fibonacci: 5
-Fibonacci: 8
-Fibonacci: 13
-Fibonacci: 21
-Fibonacci: 34
-Fibonacci: 55</code></pre></div>
-<p>逃逸如下：</p>
-<div class="code-wrapper"><pre><code class="hljs shell"> ~/go/src/gitHub/test/pool  go build -gcflags=-m
-<span class="hljs-meta">#</span><span class="bash"> gitHub/<span class="hljs-built_in">test</span>/pool</span>
-./main.go:7:9: can inline Fibonacci.func1
-./main.go:7:9: func literal escapes to heap
-./main.go:7:9: func literal escapes to heap
-./main.go:8:10: &amp;b escapes to heap
-./main.go:6:5: moved to heap: b
-./main.go:8:13: &amp;a escapes to heap
-./main.go:6:2: moved to heap: a
-./main.go:17:34: f() escapes to heap
-./main.go:17:13: main ... argument does not escape</code></pre></div>
-<p>Fibonacci()函数中原本属于局部变量的a和b由于闭包的引用，不得不将二者放到堆上，以致产生逃逸。</p>
-<h2 id="逃逸分析的作用是什么呢？"><a href="#逃逸分析的作用是什么呢？" class="headerlink" title="逃逸分析的作用是什么呢？"></a>逃逸分析的作用是什么呢？</h2><ul>
-<li>逃逸分析的好处是为了减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除。</li>
-<li>逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(逃逸的局部变量会在堆上分配 ,而没有发生逃逸的则有编译器在栈上分配)。</li>
-<li>同步消除，如果你定义的对象的方法上有同步锁，但在运行时，却只有一个线程在访问，此时逃逸分析后的机器码，会去掉同步锁运行。</li>
-</ul>
-<h2 id="逃逸总结："><a href="#逃逸总结：" class="headerlink" title="逃逸总结："></a>逃逸总结：</h2><ul>
-<li>栈上分配内存比在堆中分配内存有更高的效率</li>
-<li>栈上分配的内存不需要GC处理</li>
-<li>堆上分配的内存使用完毕会交给GC处理</li>
-<li>逃逸分析目的是决定内分配地址是栈还是堆</li>
-<li>逃逸分析在编译阶段完成</li>
-</ul>
-<h2 id="提问：函数传递指针真的比传值效率高吗？"><a href="#提问：函数传递指针真的比传值效率高吗？" class="headerlink" title="提问：函数传递指针真的比传值效率高吗？"></a>提问：函数传递指针真的比传值效率高吗？</h2><p>我们知道传递指针可以减少底层值的拷贝，可以提高效率，但是如果拷贝的数据量小，由于指针传递会产生逃逸，可能会使用堆，也可能会增加GC的负担，所以传递指针不一定是高效的。<br>在官网 (golang.org) FAQ 上有一个关于变量分配的问题如下：<br>From a correctness standpoint, you don’t need to know. Each variable in Go exists as long as there are references to it. The storage location chosen by the implementation is irrelevant to the semantics of the language.</p>
-<p>The storage location does have an effect on writing efficient programs. When possible, the Go compilers will allocate variables that are local to a function in that function’s stack frame.</p>
-<p>However, if the compiler cannot prove that the variable is not referenced after the function returns, then the compiler must allocate the variable on the garbage-collected heap to avoid dangling pointer errors. Also, if a local variable is very large, it might make more sense to store it on the heap rather than the stack.</p>
-<p>In the current compilers, if a variable has its address taken, that variable is a candidate for allocation on the heap. However, a basic escape analysis recognizes some cases when such variables will not live past the return from the function and can reside on the stack.</p>
-<p>翻译如下：</p>
-<p>如何得知变量是分配在栈（stack）上还是堆（heap）上？</p>
-<p>准确地说，你并不需要知道。Golang 中的变量只要被引用就一直会存活，存储在堆上还是栈上由内部实现决定而和具体的语法没有关系。</p>
-<p>知道变量的存储位置确实和效率编程有关系。如果可能，Golang 编译器会将函数的局部变量分配到函数栈帧（stack frame）上。 然而，如果编译器不能确保变量在函数 return之后不再被引用，编译器就会将变量分配到堆上。而且，如果一个局部变量非常大，那么它也应该被分配到堆上而不是栈上。</p>
-<p>当前情况下，如果一个变量被取地址，那么它就有可能被分配到堆上。然而，还要对这些变量做逃逸分析，如果函数return之后，变量不再被引用，则将其分配到栈上。</p>
-<h1 id="内存碎片"><a href="#内存碎片" class="headerlink" title="内存碎片"></a>内存碎片</h1><h1 id="内存优化"><a href="#内存优化" class="headerlink" title="内存优化"></a>内存优化</h1>]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>Go内存泄漏、逃逸</tag>
       </tags>
   </entry>
   <entry>
@@ -2176,55 +2643,6 @@ Fibonacci: 55</code></pre></div>
       </tags>
   </entry>
   <entry>
-    <title>Redash Gunicorn 超时</title>
-    <url>/python/gunicorn-timeout/</url>
-    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
-<span id="more"></span>
-
-<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
-<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
-<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
-<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
-</ul>
-<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
-<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
-<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
-</ul>
-<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
-<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
-<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
-<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
-<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
-<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
-<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
-<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
-<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
-<p>输出：</p>
-<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
-<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
-<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
-<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
-<p>原来是被父进程搞死了。。。</p>
-<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
-<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
-<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
-<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
-<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
-<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
-<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
-]]></content>
-      <categories>
-        <category>python</category>
-      </categories>
-      <tags>
-        <tag>gunicorn</tag>
-        <tag>timeout</tag>
-        <tag>redash</tag>
-        <tag>超时</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>限流</title>
     <url>/microservices/ha-limit/</url>
     <content><![CDATA[<p>令牌桶<br>正常我的系统处理一个请求需要100ms，那么就每100ms往桶里面放令牌，也就是每秒10个，速率为10，设置桶大小为20。<br>每隔100ms往桶里面放token，一直放到满。<br>如果满着的，则丢弃这个token，不满继续定时放。<br>允许突发，也就是满桶10个令牌同时被拿走。<br><code>NewLimiter(10, 20);</code></p>
@@ -2241,440 +2659,6 @@ Fibonacci: 55</code></pre></div>
       </categories>
       <tags>
         <tag>可用性</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>网络编程文章索引</title>
-    <url>/netprogram/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txL">极客时间《网络编程实战》</a><br><a href="">微信公众号《开发内功修炼》</a><br><a href="">PDF《理解了实现再谈网络性能》</a><br><a href="">书籍《TCP/IP网络编程》</a><br><a href="https://u.jd.com/6D6qdVu">书籍《UNIX环境高级编程（第三版）》</a><br><a href="https://app.yinxiang.com/fx/7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b">https://app.yinxiang.com/fx/7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b</a></p>
-<h1 id="进程模型"><a href="#进程模型" class="headerlink" title="进程模型"></a>进程模型</h1><h3 id="PPC"><a href="#PPC" class="headerlink" title="PPC"></a>PPC</h3><h3 id="Prefork"><a href="#Prefork" class="headerlink" title="Prefork"></a>Prefork</h3><h3 id="TPC"><a href="#TPC" class="headerlink" title="TPC"></a>TPC</h3><h3 id="Prethread"><a href="#Prethread" class="headerlink" title="Prethread"></a>Prethread</h3><h3 id="Reactor"><a href="#Reactor" class="headerlink" title="Reactor"></a>Reactor</h3><p>IO多路复用+进程/线程 池</p>
-<h4 id="单-Reactor-单进程-线程"><a href="#单-Reactor-单进程-线程" class="headerlink" title="单 Reactor 单进程/线程"></a>单 Reactor 单进程/线程</h4><h4 id="单-Reactor-多线程"><a href="#单-Reactor-多线程" class="headerlink" title="单 Reactor 多线程**"></a>单 Reactor 多线程**</h4><h4 id="多-Reactor-多进程-线程"><a href="#多-Reactor-多进程-线程" class="headerlink" title="多 Reactor 多进程/线程**"></a>多 Reactor 多进程/线程**</h4><h3 id="Proactor"><a href="#Proactor" class="headerlink" title="Proactor"></a>Proactor</h3><h1 id="IO模型"><a href="#IO模型" class="headerlink" title="IO模型"></a>IO模型</h1><h3 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h3><h4 id="Blocking-IO-阻塞I-O"><a href="#Blocking-IO-阻塞I-O" class="headerlink" title="Blocking IO - 阻塞I O"></a>Blocking IO - 阻塞I O</h4><h4 id="Nonblocking-IO-非阻塞IO"><a href="#Nonblocking-IO-非阻塞IO" class="headerlink" title="Nonblocking IO - 非阻塞IO"></a>Nonblocking IO - 非阻塞IO</h4><h4 id="IO-multiplexing-IO-多路复用"><a href="#IO-multiplexing-IO-多路复用" class="headerlink" title="IO multiplexing - IO 多路复用"></a>IO multiplexing - IO 多路复用</h4><h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><h4 id="Signal-driven-IO-信号驱动式IO（异步阻塞）"><a href="#Signal-driven-IO-信号驱动式IO（异步阻塞）" class="headerlink" title="Signal-driven IO - 信号驱动式IO（异步阻塞）"></a>Signal-driven IO - 信号驱动式IO（异步阻塞）</h4><h4 id="Asynchronous-IO-异步IO"><a href="#Asynchronous-IO-异步IO" class="headerlink" title="Asynchronous IO - 异步IO"></a>Asynchronous IO - 异步IO</h4><h1 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h1><h3 id="线程与锁"><a href="#线程与锁" class="headerlink" title="线程与锁"></a>线程与锁</h3><h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><h3 id="Clojure之道——分离标识与状态"><a href="#Clojure之道——分离标识与状态" class="headerlink" title="Clojure之道——分离标识与状态"></a>Clojure之道——分离标识与状态</h3><h3 id="actor"><a href="#actor" class="headerlink" title="actor"></a>actor</h3><h3 id="通信顺序进程-CSP"><a href="#通信顺序进程-CSP" class="headerlink" title="通信顺序进程 CSP"></a>通信顺序进程 CSP</h3><p>CSP vs Actor<br>CSP 通过 channel 进行通信，更松耦合。<br>GO 中的 channel 有容量限制并且独立于处理 goroutine，如 Erlang、Actor 模式中的 mailbox 容量是无限的，接收进程也总是被动的处理消息。</p>
-<h3 id="数据级并行"><a href="#数据级并行" class="headerlink" title="数据级并行"></a>数据级并行</h3><h3 id="Lambda架构"><a href="#Lambda架构" class="headerlink" title="Lambda架构"></a>Lambda架构</h3><h1 id="C语言同步函数"><a href="#C语言同步函数" class="headerlink" title="C语言同步函数"></a>C语言同步函数</h1><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>int pthread_mutex_init(pthread_mutex_t * __restrict, const pthread_mutexattr_t * _Nullable __restrict);：初始化<br>int pthread_mutex_destroy(pthread_mutex_t *)：销毁<br>int pthread_mutex_lock(pthread_mutex_t *)：加锁<br>int pthread_mutex_unlock(pthread_mutex_t *)：解锁</p>
-<h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>int pthread_cond_init(pthread_cond_t * __restrict, const pthread_condattr_t * _Nullable __restrict)：初始化<br>int pthread_cond_destroy(pthread_cond_t *)：销毁<br>int pthread_cond_wait(pthread_cond_t * __restrict, pthread_mutex_t * __restrict)：等待<br>int pthread_cond_signal(pthread_cond_t *)：发送单发通知<br>int pthread_cond_broadcast(pthread_cond_t *)：发送广播通知</p>
-<h3 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h3><p>int pthread_create(pthread_t _Nullable * _Nonnull __restrict, const pthread_attr_t * _Nullable __restrict, void * _Nullable (* _Nonnull)(void * _Nullable), void * _Nullable __restrict)：创建</p>
-<h1 id="http2"><a href="#http2" class="headerlink" title="http2"></a>http2</h1><p>http2最大的不同就是 服务端可以给客户端发请求，最大的好处就是 少了 很多 客户端对服务端的试探、询问，客户端直接就告诉服务端，应该在什么时间的时候通知我就OK了，仔细想想，这像不像epoll的事件注册中的 边缘触发。</p>
-]]></content>
-      <categories>
-        <category>网络编程</category>
-      </categories>
-      <tags>
-        <tag>文章索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构与算法系列文章索引</title>
-    <url>/datastruct-algorithm/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txE">极客时间专栏《数据结构与算法之美》</a><br><a href="http://gk.link/a/10txH">极客时间专栏《算法面试通关40讲》</a><br><a href="https://u.jd.com/6MG4eU3">书籍《算法》第四版</a><br><a href="https://u.jd.com/6D6C87m">书籍《数据结构与算法之美》</a></p>
-<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p>大部分的数据结构基本上都是由数组或者链表演变而来</p>
-<h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><p><strong>MySQL</strong> B+</p>
-<p><strong>MongoDB</strong> B</p>
-<p><strong>Redis</strong> Skip List</p>
-<p><strong>Memcache</strong> Hash</p>
-<p><strong>TiDB</strong> LSM Tree</p>
-<h3 id="树"><a href="#树" class="headerlink" title="树"></a>树</h3><p><strong>基数树</strong> golang的web框架echo和gin都使用了radix tree作为路由查找的算法</p>
-<h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><h3 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h3><p>TCP流量控制</p>
-<h3 id="进程-线程"><a href="#进程-线程" class="headerlink" title="进程/线程"></a>进程/线程</h3><p><a href="https://zhuanlan.zhihu.com/p/97071815">详解操作系统内核对线程的调度算法</a></p>
-<h3 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h3><p><a href="https://segmentfault.com/a/1190000021199728">图解一致性哈希算法</a><br><a href="http://blog.codinglabs.org/articles/consistent-hashing.html">一致性哈希算法及其在分布式系统中的应用</a><br><a href="https://github.com/RJ/ketama">https://github.com/RJ/ketama</a></p>
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>文章索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>设计模式文章索引</title>
-    <url>/design-pattern/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txN">极客时间专栏《设计模式之美》</a></p>
-<h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><ul>
-<li>面向对象的四大特性：封装、抽象、继承、多态</li>
-<li>面向对象编程与面向过程编程的区别和联系</li>
-<li>面向对象分析、面向对象设计、面向对象编程</li>
-<li>接口和抽象类的区别以及各自的应用场景</li>
-<li>基于接口而非实现编程的设计思想</li>
-<li>多用组合少用继承的设计思想</li>
-<li>面向过程的贫血模型和面向对象的充血模型、失血模型</li>
-</ul>
-<h1 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h1><ul>
-<li>SOLID 原则 -SRP 单一职责原则</li>
-<li>SOLID 原则 -OCP 开闭原则</li>
-<li>SOLID 原则 -LSP 里式替换原则</li>
-<li>SOLID 原则 -ISP 接口隔离原则</li>
-<li>SOLID 原则 -DIP 依赖倒置原则<ul>
-<li>控制反转、依赖反转、依赖注入</li>
-</ul>
-</li>
-<li>DRY 原则</li>
-<li>KISS 原则</li>
-<li>YAGNI 原则</li>
-<li>LOD 法则</li>
-</ul>
-<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><h1 id="编程规范"><a href="#编程规范" class="headerlink" title="编程规范"></a>编程规范</h1><h1 id="重构技巧"><a href="#重构技巧" class="headerlink" title="重构技巧"></a>重构技巧</h1><h1 id="COW"><a href="#COW" class="headerlink" title="COW"></a>COW</h1><p><strong>参考</strong><br><a href="https://chunlife.top/2019/09/03/copy-on-write%E6%8A%80%E6%9C%AF/">copy-on-write技术</a><br><a href="https://juejin.cn/post/6844903702373859335">COW奶牛！Copy On Write机制了解一下</a><br><a href="https://chunlife.top/2019/09/03/copy-on-write%E6%8A%80%E6%9C%AF/">copy-on-write技术</a></p>
-<p>写入时复制（英语：Copy-on-write，简称COW）是一种计算机程序设计领域的优化策略。</p>
-<p>其核心思想是，如果有多个调用者（callers）同时请求相同资源（如内存或磁盘上的数据存储），他们会共同获取相同的指针指向相同的资源，直到某个调用者试图修改资源的内容时，系统才会真正复制一份专用副本（private copy）给该调用者，而其他调用者所见到的最初的资源仍然保持不变。这过程对其他的调用者都是透明的（transparently）。此作法主要的优点是如果调用者没有修改该资源，就不会有副本（private copy）被创建，因此多个调用者只是读取操作时可以共享同一份资源。</p>
-<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><p>fork()之后，kernel把父进程中所有的内存页的权限都设为read-only，然后子进程的地址空间指向父进程。当父子进程都只读内存时，相安无事。当其中某个进程写内存时，CPU硬件检测到内存页是read-only的，于是触发页异常中断（page-fault），陷入kernel的一个中断例程。中断例程中，kernel就会把触发的异常的页复制一份，于是父子进程各自持有独立的一份。</p>
-<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><p>redis 有两种方式持久化，一种是 RDB，一种是AOF。<br>在 RDB 中，想要触发持久化操作，可以执行 save、bgsave 命令，或者通过配置文件自动触发，其中 bgsave 的方式，就是 fork 一个子进程来做持久化工作。<br>最初，父进程和子进程拥有相同的内存空间地址，而如果父进程这个时候有写操作，因为内存页设置为 read-only 了，所以会触发 page-fault，父进程中修改数据所在的那个内存页会被指向到新的内存空间地址，而子进程读的还是修改之前的数据。</p>
-<p>有坑吗？有的<br>如果全量更新数据恰好处于 rdb 持久化任务过程中，内存可能就会翻倍。</p>
-<p><a href="https://www.cnblogs.com/javazhiyin/p/11425060.html">10分钟彻底理解Redis的持久化机制：RDB和AOF</a><br><a href="https://www.cnblogs.com/javazhiyin/p/12985656.html">看完这篇还不懂Redis的RDB持久化，你们来打我！</a></p>
-<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p>所有驱动都用到的技术——写时复制（CoW）。CoW就是copy-on-write，表示只在需要写时才去复制，这个是针对已有文件的修改场景。比如基于一个image启动多个Container，如果为每个Container都去分配一个image一样的文件系统，那么将会占用大量的磁盘空间。而CoW技术可以让所有的容器共享image的文件系统，所有数据都从image中读取，只有当要对文件进行写操作时，才从image里把要写的文件复制到自己的文件系统进行修改。所以无论有多少个容器共享同一个image，所做的写操作都是对从image中复制到自己的文件系统中的复本上进行，并不会修改image的源文件，且多个容器操作同一个文件，会在每个容器的文件系统里生成一个复本，每个容器修改的都是自己的复本，相互隔离，相互不影响。使用CoW可以有效的提高磁盘的利用率。</p>
-<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><h3 id="更新配置文件"><a href="#更新配置文件" class="headerlink" title="更新配置文件"></a>更新配置文件</h3><p>比较适用于读多写少的场景，且允许更新有稍许的延迟，复制旧数据到新数据后，修改配置，在利用原子操作进行替换，无锁访问共享数据。<br>既然互斥锁会造成阻塞，那么读写锁呢？<br>下面这段话适合 go 并发编程<br>我们知道读写锁中不互斥的只有”读读”，如果一个资源被上了写锁，其它线程过来读，还是会阻塞的，但是COW方案不会这样。<br>使用COW，就是为了避免使用锁<br>空间换时间</p>
-<h3 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h3><p>Copy-on-write在对数据进行修改的时候，不会直接在原来的数据位置上进行操作，而是重新找个位置修改，这样的好处是一旦系统突然断电，重启之后不需要做Fsck。好处就是能保证数据的完整性，掉电的话容易恢复。<br>比如说：要修改数据块A的内容，先把A读出来，写到B块里面去。如果这时候断电了，原来A的内容还在！</p>
-]]></content>
-      <categories>
-        <category>设计模式</category>
-      </categories>
-      <tags>
-        <tag>文章索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>并发编程</title>
-    <url>/golang/concurrent-programme/</url>
-    <content><![CDATA[<h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始学习 Go 特性的并发编程之前，先来简单了解一些基础概念，这对理解学习 Go 并发模型会有一些帮助。</p>
-<span id="more"></span>
-
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h3 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h3><p>也被称为内核空间，是系统内核的运行空间，与用户空间隔离。控制计算机的硬件资源。</p>
-<h3 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h3><p>也被称为用户空间，代码运行在较低的特权级别上，不能直接访问内核空间和硬件设备。</p>
-<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户空间不能直接调用系统资源，必须通过调用系统接口，由内核完成相关指令。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p>进程是操作系统分配资源的最小单元。</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>有时也被称为轻量级进程（LWP），是被系统独立调度和分派的基本单位，线程自己不拥有系统资源，只拥有一点儿在运行中必不可少的资源，但它可与同属一个进程的其它线程共享进程所拥有的全部资源。</p>
-<h3 id="KSE"><a href="#KSE" class="headerlink" title="KSE"></a>KSE</h3><p>理论上说 Linux 内核是没有线程这个概念的，只有内核调度实体（Kernal Scheduling Entry）这个概念。</p>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>有时也被称为微线程（Coroutine），只不过这个线程是用户态的，不需要操作系统参与。</p>
-<p>调度过程示例：</p>
-<ol>
-<li>coroutine A 进行 网络I/O，使用 write() 发送数据后调用 read() 等待数据的返回，但是不一定什么时候能够读到数据，所以将 Socket Fd 放入 EventLoop 中。</li>
-<li>coroutine A 让出 CPU 给 其它 coroutine 使用 —— <strong>挂起（yield）</strong></li>
-<li>待 read() 有返回数据后，继续执行 coroutine A  —— <strong>恢复（resume）</strong></li>
-</ol>
-<p><em>EventLoop：无限循环着的事件分发器，一旦有事件发生，它就会回调预先定义好的回调函数，完成事件的处理。</em></p>
-<h3 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p><strong>M:1</strong> 多个用户空间的线程，对应一个内核空间的 KSE。</p>
-<h4 id="系统级线程"><a href="#系统级线程" class="headerlink" title="系统级线程"></a>系统级线程</h4><p><strong>1:1</strong> 1个用户空间的线程，对应1个内核空间的 KSE。</p>
-<h4 id="两级线程模型（混合式线程模型）"><a href="#两级线程模型（混合式线程模型）" class="headerlink" title="两级线程模型（混合式线程模型）"></a>两级线程模型（混合式线程模型）</h4><p><strong>M:N</strong> 多个用户空间的线程，对应多个内核空间的 KSE。</p>
-<h3 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h3><p>并发模型指定了系统中的线程如何通过协作来完成分配给它们的作业。不同的并发模型采用不同的方式拆分作业，同时线程间的协作和交互方式也不相同。</p>
-<p>常见的有：</p>
-<ul>
-<li>线程&amp;锁</li>
-<li>Actor</li>
-<li>CSP</li>
-<li>Lambda 架构</li>
-</ul>
-<h3 id="并发模型—CSP"><a href="#并发模型—CSP" class="headerlink" title="并发模型—CSP"></a>并发模型—CSP</h3><p>Communicating Sequential Processes 通信顺序进程。</p>
-<p>看这个名字就能知道，在CSP模型中主角是<strong>通信</strong>。</p>
-<blockquote>
-<p>channel：进行通信的并发模型。<br>worker：channel 两端的发送者/接收者。</p>
-</blockquote>
-<p>worker 之间不直接彼此联系，而是通过 channel 进行消息发送和接收。</p>
-<p>在并发模型中，经常和 CSP 一起讨论的是 Actor 模型。</p>
-<h3 id="GO-线程模型"><a href="#GO-线程模型" class="headerlink" title="GO 线程模型"></a>GO 线程模型</h3><p>Go 参考了<strong>两级线程模型</strong>，设计出了 MPG 线程模型。</p>
-<h4 id="M"><a href="#M" class="headerlink" title="M"></a>M</h4><p>machine</p>
-<p>用户空间内的线程，与 KSE 一一对应，可以理解为 M 代表了 内核线程。</p>
-<h4 id="P"><a href="#P" class="headerlink" title="P"></a>P</h4><p>processor</p>
-<p>可以理解为用户代码逻辑的处理器，Go 代码片段所必需的上下文环境。</p>
-<h4 id="G"><a href="#G" class="headerlink" title="G"></a>G</h4><p>goroutine</p>
-<p>Go 代码片段的封装。</p>
-<div class="code-wrapper"><pre><code class="hljs actionscript">go <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>&#123;
-<span class="hljs-comment">//  ...</span>
-&#125;()</code></pre></div>
-
-
-<h3 id="GO并发模型"><a href="#GO并发模型" class="headerlink" title="GO并发模型"></a>GO并发模型</h3><h4 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h4><p>参考了 <strong>CSP并发模型</strong>。</p>
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="goroutine-与-coroutine-的区别"><a href="#goroutine-与-coroutine-的区别" class="headerlink" title="goroutine 与 coroutine 的区别"></a>goroutine 与 coroutine 的区别</h3><h4 id="coroutine"><a href="#coroutine" class="headerlink" title="coroutine"></a>coroutine</h4><p>运行机制属于协作式任务处理，始终顺序执行。</p>
-<h4 id="goroutine"><a href="#goroutine" class="headerlink" title="goroutine"></a>goroutine</h4><p>运行机制属于抢占式任务处理，可能发生并行执行。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>Go 的并发模型参考了 CSP并发模型，采用 channel 进行通信。</li>
-<li>Go 的线程模型参考了两级线程模型，设计出了 MPG 模型。</li>
-<li>goroutine 与 coroutine 的区别就是前者可能发生并行执行，后者始终顺序执行。</li>
-</ol>
-<div class="note note-success">
-            <p>并发编程三大特性（并发安全的三个重要指标）——原子性、可见性、有序性</p>
-          </div>
-
-<div class="note note-success">
-            <p>并发、并行不是一回事儿</p>
-          </div>
-
-<h1 id="CPU、内存"><a href="#CPU、内存" class="headerlink" title="CPU、内存"></a>CPU、内存</h1><h2 id="CPU-Cache"><a href="#CPU-Cache" class="headerlink" title="CPU Cache"></a>CPU Cache</h2><p>CPU Cache，是位于 CPU 与 内存 之间的临时存储，要比直接读取内存快；除了速度快，CPU 还会根据一些规则 预热数据，以 Cache line 为单位存储在 CPU Cache 中。<br>CPU Cache 可以分为一级缓存（L1），二级缓存（L2），三级缓存（L3）。</p>
-<h3 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://www.cnblogs.com/cyfonly/p/5800758.html">https://www.cnblogs.com/cyfonly/p/5800758.html</a></p>
-<h3 id="相关问题"><a href="#相关问题" class="headerlink" title="相关问题"></a>相关问题</h3><p>下面的代码有什么问题？<br>没有用到 cpu cache 加速</p>
-<h2 id="可见性：由-CPU-Cache-所带来的问题"><a href="#可见性：由-CPU-Cache-所带来的问题" class="headerlink" title="可见性：由 CPU Cache 所带来的问题"></a>可见性：由 CPU Cache 所带来的问题</h2><p>为了解决 CPU 读取内存速度慢的问题，所以增加了CPU缓存，但这也导致了可见性问题。<br>可见性的意思就是线程A修改了一个东西，要对线程B可见。</p>
-<h3 id="缓存一致性"><a href="#缓存一致性" class="headerlink" title="缓存一致性"></a>缓存一致性</h3><p>由于 CPU Cache 导致内存不一致的问题，叫做 False sharing，为了解决了这个问题，CPU Cache 引入了缓存一致性协议 MESI。</p>
-<h3 id="相关文章-1"><a href="#相关文章-1" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://www.cnblogs.com/cyfonly/p/5800758.html">https://www.cnblogs.com/cyfonly/p/5800758.html</a></p>
-<h2 id="有序性：重排所引发的问题"><a href="#有序性：重排所引发的问题" class="headerlink" title="有序性：重排所引发的问题"></a>有序性：重排所引发的问题</h2><p>重排存在于两种情况，如下：<br>CPU重排：会对读写指令进行重排，也可以说是内存重排。<br>编译器重排：编译器在生成指令序列时和CPU执行指令序列时，有可能重排序。</p>
-<h3 id="相关文章-2"><a href="#相关文章-2" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://segmentfault.com/a/1190000011458941">https://segmentfault.com/a/1190000011458941</a></p>
-<h2 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h2><p>为了解决可见性，提出了 happens-before 原则，来指导多线程内存共享层面的设计。</p>
-<p>下面是原则描述，但具体的规则指定，各个语言不同。</p>
-<ul>
-<li>如果一个操作 happens-before 另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。</li>
-<li>两个操作之间存在 happens-before 关系，并不意味着一定要按照 happens-before 原则制定的顺序来执行。如果重排序之后的执行结果与按照 happens-before 关系来执行的结果一致，那么这种重排序并不非法。</li>
-</ul>
-<h3 id="相关文章-3"><a href="#相关文章-3" class="headerlink" title="相关文章"></a>相关文章</h3><p><a href="https://golang.org/ref/mem">https://golang.org/ref/mem</a><br><a href="https://www.jianshu.com/p/5e44168f47a3">https://www.jianshu.com/p/5e44168f47a3</a><br><a href="https://tiancaiamao.gitbooks.io/go-internals/content/zh/10.1.html">https://tiancaiamao.gitbooks.io/go-internals/content/zh/10.1.html</a><br><a href="https://segmentfault.com/a/1190000021829769">https://segmentfault.com/a/1190000021829769</a><br><a href="https://segmentfault.com/a/1190000011458941">https://segmentfault.com/a/1190000011458941</a><br><a href="https://blog.csdn.net/q5706503/article/details/84994964">https://blog.csdn.net/q5706503/article/details/84994964</a><br><a href="https://www.jianshu.com/p/ba9114542bb7">https://www.jianshu.com/p/ba9114542bb7</a></p>
-<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><p>内存屏障（Memory Barriers、fence）是一种底层原语。</p>
-<p>上面说过，CPU Cache 提高了内存读写性能，但是导致了可见性的相关问题，所以 happens-before 提供了一种原则，提供给编程语言底层在内存管理、并发安全方面的设计。<br>上面还说过，编译器重排、CPU重排，所以，内存屏障也分为编译器屏障和CPU内存屏障。</p>
-<p>CPU 级别的指令支持，它要求：barrier 指令要求所有对内存的操作都必须要“扩散”到 memory 之后才能继续执行其他对 memory 的操作。<br>比如在 Go 语言中，atomic 标准库的 CAS（比较并交换），两个操作合二为一，保证原子且有序。</p>
-<h4 id="相关文章-4"><a href="#相关文章-4" class="headerlink" title="相关文章"></a>相关文章</h4><p><a href="https://www.jianshu.com/p/89b3e128ebd0?utm_campaign=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com">https://www.jianshu.com/p/89b3e128ebd0?utm_campaign=studygolang.com&amp;utm_medium=studygolang.com&amp;utm_source=studygolang.com</a><br><a href="https://lday.me/2017/11/04/0016_what_is_memory_barriers/">https://lday.me/2017/11/04/0016_what_is_memory_barriers/</a></p>
-<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>可以理解为，计算机中最小粒度的操作。</p>
-<p>a = b 是原子操作吗？答案是：非原子操作<br>因为 a = b 实际为两步：先取出 b 的值，再赋值给 a。</p>
-<p>继续讨论<br>在第一步，取出 b 的值，是原子操作吗？<br>如果涉及内存访问，就算只有一条汇编指令的在多核系统上也不一定是原子操作。为啥这么说呢，因为：</p>
-<p>32位系统CPU一次可处理32位数据，即一次处理4个字节(4 * 8 bit)。<br>64位系统CPU一次可处理64位数据，即一次处理8个字节(8 * 8 bit)。</p>
-<p>go的内存模型就是为了解决 single（64位系统处理8字节，确实是原子的，但是不是可见的，因为有cacheline,cpu的应对方法就是mesi，go的方法就是内存屏障）</p>
-<p><a href="https://www.cnblogs.com/yeyang/p/13576636.html">https://www.cnblogs.com/yeyang/p/13576636.html</a></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Go并发编程之终极武器—channel</title>
-    <url>/golang/ipc-channel/</url>
-    <content><![CDATA[<p>三种状态<br>nil，未初始化的状态，只进行了声明，或者手动赋值为nil<br>active，正常的channel，可读或者可写<br>closed，已关闭，千万不要误认为关闭channel后，channel的值是nil</p>
-<p>三种操作<br>读<br>写<br>关闭</p>
-<p>panic的三种操作<br>close()已关闭的channel<br>close()nil的channel<br>写已关闭的channel</p>
-<p>关闭一定要在发送方</p>
-<p>_,ok=ch<br>和 range ch 来判断 通道是否关闭。<br>*注意，看到好多人说关闭之后就会从中返回，其实不太准确，应该说是，把所有数据都读取完之后，才会退出</p>
-<p>使用无缓冲的时候要特别注意，在运行时的逻辑上，向channel发送消息后，后面的逻辑没有接收操作了，那就会报死锁错误。<br>解决办法：</p>
-<ol>
-<li>有缓冲的：加个缓冲就可以了</li>
-<li>无缓冲的：消费最后那次发送</li>
-</ol>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之任务协作—(2)Context</title>
-    <url>/golang/ipc-context/</url>
-    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><ul>
-<li>根 Context：通过 context.Background() 创建</li>
-<li>子 Context: 通过 context.WithCancel(parentContext) 创建<ul>
-<li>ctx, cancel := context.WithCancel(context.Background())</li>
-</ul>
-</li>
-<li>当前 Context 被取消时，其它的子 context 都会被取消</li>
-<li>接收取消通知 &lt;-ctx.Done()</li>
-</ul>
-<p>只执行一次</p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-	timer := time.NewTimer(time.Second * <span class="hljs-number">5</span>)
-	data := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">999</span>, <span class="hljs-number">8</span>, <span class="hljs-number">345</span>, <span class="hljs-number">7</span>, <span class="hljs-number">98</span>, <span class="hljs-number">33</span>, <span class="hljs-number">66</span>, <span class="hljs-number">77</span>, <span class="hljs-number">88</span>, <span class="hljs-number">68</span>, <span class="hljs-number">96</span>&#125;
-	dataLen := <span class="hljs-built_in">len</span>(data)
-	size := <span class="hljs-number">3</span>
-	target := <span class="hljs-number">345</span>
-	ctx, cancel := context.WithCancel(context.Background())
-	resultChan := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">bool</span>)
-	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; dataLen; i += size &#123;
-		end := i + size
-		<span class="hljs-keyword">if</span> end &gt;= dataLen &#123;
-			end = dataLen - <span class="hljs-number">1</span>
-		&#125;
-		<span class="hljs-keyword">go</span> SearchTarget(ctx, data[i:end], target, resultChan)
-	&#125;
-	<span class="hljs-keyword">select</span> &#123;
-	<span class="hljs-keyword">case</span> &lt;-timer.C:
-		fmt.Fprintln(os.Stderr, <span class="hljs-string">&quot;Timeout! Not Found&quot;</span>)
-		cancel()
-	<span class="hljs-keyword">case</span> &lt;- resultChan:
-		fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;Found it!\n&quot;</span>)
-		cancel()
-	&#125;
-
-	time.Sleep(time.Second * <span class="hljs-number">2</span>)
-&#125;
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">SearchTarget</span><span class="hljs-params">(ctx context.Context, data []<span class="hljs-keyword">int</span>, target <span class="hljs-keyword">int</span>, resultChan <span class="hljs-keyword">chan</span> <span class="hljs-keyword">bool</span>)</span></span> &#123;
-	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> data &#123;
-		<span class="hljs-keyword">select</span> &#123;
-		<span class="hljs-keyword">case</span> &lt;- ctx.Done():
-			fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;Task cancelded! \n&quot;</span>)
-			<span class="hljs-keyword">return</span>
-		<span class="hljs-keyword">default</span>:
-		&#125;
-		<span class="hljs-comment">// 模拟一个耗时查找，这里只是比对值，真实开发中可以是其他操作</span>
-		fmt.Fprintf(os.Stdout, <span class="hljs-string">&quot;v: %d \n&quot;</span>, v)
-		time.Sleep(time.Millisecond * <span class="hljs-number">1500</span>)
-		<span class="hljs-keyword">if</span> target == v &#123;
-			resultChan &lt;- <span class="hljs-literal">true</span>
-			<span class="hljs-keyword">return</span>
-		&#125;
-	&#125;
-&#125;</code></pre></div>
-
-<p>gin</p>
-<div class="code-wrapper"><pre><code class="hljs go">
-</code></pre></div>]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之数据共享—(1)Map</title>
-    <url>/golang/ipc-map/</url>
-    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p><code>func (*Map) Delete</code><br><code>func (*Map) Load</code><br><code>func (*Map) LoadAndDelete</code><br><code>func (*Map) LoadOrStore</code><br><code>func (*Map) Range</code><br><code>func (*Map) Store</code></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之任务协作—(1)ErrGroup</title>
-    <url>/golang/ipc-errgroup/</url>
-    <content><![CDATA[<p><code>func WithContext(ctx context.Context) (*Group, context.Context)</code></p>
-<p><code>func (g *Group) Go(f func() error)</code></p>
-<p><code>func (g *Group) Wait() error</code></p>
-<p><code>&lt;-errContext.Done()</code></p>
-<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;
-	g, ctx := errgroup.WithContext(context.Background())
-
-	mux := http.NewServeMux()
-	mux.HandleFunc(<span class="hljs-string">&quot;/ping&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
-		w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">&quot;pong&quot;</span>))
-	&#125;)
-
-	<span class="hljs-comment">// 模拟单个服务错误退出</span>
-	serverOut := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)
-	mux.HandleFunc(<span class="hljs-string">&quot;/shutdown&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;
-		serverOut &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125;
-	&#125;)
-
-	server := http.Server&#123;
-		Handler: mux,
-		Addr:    <span class="hljs-string">&quot;:8080&quot;</span>,
-	&#125;
-
-	<span class="hljs-comment">// g1</span>
-	<span class="hljs-comment">// g1 退出了所有的协程都能退出么？</span>
-	<span class="hljs-comment">// g1 退出后, context 将不再阻塞，g2, g3 都会随之退出</span>
-	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
-	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
-		<span class="hljs-keyword">return</span> server.ListenAndServe()
-	&#125;)
-
-	<span class="hljs-comment">// g2</span>
-	<span class="hljs-comment">// g2 退出了所有的协程都能退出么？</span>
-	<span class="hljs-comment">// g2 退出时，调用了 shutdown，g1 会退出</span>
-	<span class="hljs-comment">// g2 退出后, context 将不再阻塞，g3 会随之退出</span>
-	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
-	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
-		<span class="hljs-keyword">select</span> &#123;
-		<span class="hljs-keyword">case</span> &lt;-ctx.Done():
-			log.Println(<span class="hljs-string">&quot;errgroup exit...&quot;</span>)
-		<span class="hljs-keyword">case</span> &lt;-serverOut:
-			log.Println(<span class="hljs-string">&quot;server will out...&quot;</span>)
-		&#125;
-
-		timeoutCtx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">3</span>*time.Second)
-		<span class="hljs-comment">// 这里不是必须的，但是如果使用 _ 的话静态扫描工具会报错，加上也无伤大雅</span>
-		<span class="hljs-keyword">defer</span> cancel()
-
-		log.Println(<span class="hljs-string">&quot;shutting down server...&quot;</span>)
-		<span class="hljs-keyword">return</span> server.Shutdown(timeoutCtx)
-	&#125;)
-
-	<span class="hljs-comment">// g3</span>
-	<span class="hljs-comment">// g3 捕获到 os 退出信号将会退出</span>
-	<span class="hljs-comment">// g3 退出了所有的协程都能退出么？</span>
-	<span class="hljs-comment">// g3 退出后, context 将不再阻塞，g2 会随之退出</span>
-	<span class="hljs-comment">// g2 退出时，调用了 shutdown，g1 会退出</span>
-	<span class="hljs-comment">// 然后 main 函数中的 g.Wait() 退出，所有协程都会退出</span>
-	g.Go(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span> <span class="hljs-title">error</span></span> &#123;
-		quit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">0</span>)
-		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-		<span class="hljs-keyword">select</span> &#123;
-		<span class="hljs-keyword">case</span> &lt;-ctx.Done():
-			<span class="hljs-keyword">return</span> ctx.Err()
-		<span class="hljs-keyword">case</span> sig := &lt;-quit:
-			<span class="hljs-keyword">return</span> errors.Errorf(<span class="hljs-string">&quot;get os signal: %v&quot;</span>, sig)
-		&#125;
-	&#125;)
-
-	fmt.Printf(<span class="hljs-string">&quot;errgroup exiting: %+v\n&quot;</span>, g.Wait())
-&#125;</code></pre></div>]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之数据共享—(2)Pool</title>
-    <url>/golang/ipc-pool/</url>
-    <content><![CDATA[<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p><code>func (*Pool) Get</code><br><code>func (*Pool) Put</code></p>
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go并发编程之任务协作—(1)WaitGroup、Once</title>
-    <url>/golang/ipc-waitgrouponce/</url>
-    <content><![CDATA[<h1 id="WaitGroup"><a href="#WaitGroup" class="headerlink" title="WaitGroup"></a>WaitGroup</h1><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p><code>func (*WaitGroup) Add</code><br><code>func (*WaitGroup) Done</code><br><code>func (*WaitGroup) Wait</code></p>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> wg sync.WaitGroup
-<span class="hljs-comment">//...</span>
-wg.Add(<span class="hljs-number">1</span>)
-<span class="hljs-comment">//...</span>
-wg.Done()
-<span class="hljs-comment">//...</span>
-wg.Wait()</code></pre></div>
-
-<p>好先统一 Add，再并发 Done，最后 Wait。</p>
-<h1 id="Once"><a href="#Once" class="headerlink" title="Once"></a>Once</h1><h2 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h2><p><code>func (*Once) Do</code></p>
-<h2 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h2><div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> once sync.Once
-once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
-<span class="hljs-comment">//...</span>
-&#125;)</code></pre></div>
-
-
-]]></content>
-      <categories>
-        <category>golang</category>
-      </categories>
-      <tags>
-        <tag>同步</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>分布式系列文章索引</title>
-    <url>/distributed/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://hardcore.feishu.cn/docs/doccngKKrYQWSYu4Rr3puVq20wc">硬核课堂</a><br><a href="http://gk.link/a/10tCq">极客时间《分布式协议与算法实战》</a></p>
-<h2 id="拜占庭将军"><a href="#拜占庭将军" class="headerlink" title="拜占庭将军"></a>拜占庭将军</h2><h2 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h2><h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><h3 id="一致性-ACID"><a href="#一致性-ACID" class="headerlink" title="一致性 ACID"></a>一致性 ACID</h3><h3 id="可用性-BASE"><a href="#可用性-BASE" class="headerlink" title="可用性 BASE"></a>可用性 BASE</h3><h1 id="Paxos"><a href="#Paxos" class="headerlink" title="Paxos"></a>Paxos</h1><h1 id="Raft"><a href="#Raft" class="headerlink" title="Raft"></a>Raft</h1><p>Raft 算法属于 Multi-Paxos 算法，它是在兰伯特 Multi-Paxos 思想的基础上，做了一些简化和限制，比如增加了日志必须是连续的，只支持领导者、跟随者和候选人三种状态，在理解和算法实现上都相对容易许多。</p>
-<p>Raft 算法是现在分布式系统开发首选的共识算法</p>
-<p>如果要用一句话概括 Raft 算法，我觉得是这样的：从本质上说，Raft 算法是通过一切以领导者为准的方式，实现一系列值的共识和各节点日志的一致。</p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><h2 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h2><h3 id="领导者（Leader）"><a href="#领导者（Leader）" class="headerlink" title="领导者（Leader）"></a>领导者（Leader）</h3><p>蛮不讲理的霸道总裁，一切以我为准，平常的主要工作内容就是 3 部分，处理写请求、管理日志复制和不断地发送心跳信息，通知其他节点“我是领导者，我还活着，你们现在不要发起新的选举，找个新领导者来替代我。”</p>
-<h3 id="跟随者（Follower）"><a href="#跟随者（Follower）" class="headerlink" title="跟随者（Follower）"></a>跟随者（Follower）</h3><p>就相当于普通群众，默默地接收和处理来自领导者的消息，当等待领导者心跳信息超时的时候，就主动站出来，推荐自己当候选人。</p>
-<h3 id="候选人（Candidate）"><a href="#候选人（Candidate）" class="headerlink" title="候选人（Candidate）"></a>候选人（Candidate）</h3><p>候选人将向其他节点发送请求投票（RequestVote）RPC 消息，通知其他节点来投票，如果赢得了大多数选票，就晋升当领导者。</p>
-<h2 id="选举"><a href="#选举" class="headerlink" title="选举"></a>选举</h2><h3 id="发送心跳"><a href="#发送心跳" class="headerlink" title="发送心跳"></a>发送心跳</h3><p>Raft 算法实现了随机超时时间的特性。也就是说，每个节点等待领导者节点心跳信息的超时时间间隔是随机的。通过上面的图片你可以看到，集群中没有领导者，而节点 A 的等待超时时间最小（150ms），它会最先因为没有等到领导者的心跳信息，发生超时。<br>这个时候，节点 A 就增加自己的任期编号，并推举自己为候选人，先给自己投上一张选票，然后向其他节点发送请求投票 RPC 消息，请它们选举自己为领导者。</p>
-<h3 id="请求投票（RequestVote）"><a href="#请求投票（RequestVote）" class="headerlink" title="请求投票（RequestVote）"></a>请求投票（RequestVote）</h3><p>RPC，是由候选人在选举期间发起，通知各节点进行投票；</p>
-<h3 id="任期编号（term）"><a href="#任期编号（term）" class="headerlink" title="任期编号（term）"></a>任期编号（term）</h3><p>推举自己为候选人时，会增加自己的任期号；<br>发现自己的任期编号比其他节点小，那么它会立即恢复成跟随者状态，那么它会更新自己的编号到较大的编号值；<br>接收到一个包含较小的任期编号值的请求投票消息，那么它会直接拒绝这个请求；</p>
-<h3 id="日志复制（AppendEntries）"><a href="#日志复制（AppendEntries）" class="headerlink" title="日志复制（AppendEntries）"></a>日志复制（AppendEntries）</h3><p>RPC，是由领导者发起，用来复制日志和提供心跳消息；<br>就算任期编号大的节点，如果最后一条日志项对应的任期编号小于其它节点，请求投票也会被拒绝；</p>
-<h3 id="脑裂"><a href="#脑裂" class="headerlink" title="脑裂"></a>脑裂</h3><p>脑裂情况是无效状态，通过随机超时，来重新选举</p>
-<h3 id="投票"><a href="#投票" class="headerlink" title="投票"></a>投票</h3><p>每个任期（term）只能投票一次</p>
-<h2 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h2><h3 id="日志项"><a href="#日志项" class="headerlink" title="日志项"></a>日志项</h3><p>日志项是一种数据格式，它主要包含用户指定的数据，也就是指令（Command），还包含一些附加信息，比如索引值（Log index）、任期编号（Term）</p>
-<h3 id="第一阶段，日志项预执行：日志复制"><a href="#第一阶段，日志项预执行：日志复制" class="headerlink" title="第一阶段，日志项预执行：日志复制"></a>第一阶段，日志项预执行：日志复制</h3><p>首先，领导者进入第一阶段，通过日志复制（AppendEntries）RPC 消息，将日志项复制到集群其他节点上。<br>接着，如果领导者接收到大多数的“复制成功”响应后，它将日志项应用到它的状态机，并返回成功给客户端。如果领导者没有接收到大多数的“复制成功”响应，那么就返回错误给客户端。</p>
-<h3 id="第二阶段，心跳或者新的日志复制带有日志项索引值：状态机"><a href="#第二阶段，心跳或者新的日志复制带有日志项索引值：状态机" class="headerlink" title="第二阶段，心跳或者新的日志复制带有日志项索引值：状态机"></a>第二阶段，心跳或者新的日志复制带有日志项索引值：状态机</h3><p>这是 Raft 中的一个优化，领导者不直接发送消息通知其他节点应用指定日志项。因为领导者的日志复制 RPC 消息或心跳消息，包含了当前最大的，将会被提交（Commit）的日志项索引值。所以通过日志复制 RPC 消息或心跳消息，跟随者就可以知道领导者的日志提交位置信息。<br>因此，当其他节点接受领导者的心跳消息，或者新的日志复制 RPC 消息后，就会将这条日志项应用到它的状态机。而这个优化，降低了处理客户端请求的延迟，将二阶段提交优化为了一段提交，降低了一半的消息延迟。</p>
-<h3 id="一致性维护"><a href="#一致性维护" class="headerlink" title="一致性维护"></a>一致性维护</h3><p>首先，领导者通过日志复制 RPC 的一致性检查，找到跟随者节点上，与自己相同日志项的最大索引值。也就是说，这个索引值之前的日志，领导者和跟随者是一致的，之后的日志是不一致的了。<br>然后，领导者强制跟随者更新覆盖的不一致日志项，实现日志的一致。</p>
-<h1 id="Gossip"><a href="#Gossip" class="headerlink" title="Gossip"></a>Gossip</h1><h1 id="Quorum"><a href="#Quorum" class="headerlink" title="Quorum"></a>Quorum</h1><h1 id="PBFT"><a href="#PBFT" class="headerlink" title="PBFT"></a>PBFT</h1><h1 id="PoW"><a href="#PoW" class="headerlink" title="PoW"></a>PoW</h1><h1 id="ZAB"><a href="#ZAB" class="headerlink" title="ZAB"></a>ZAB</h1><h1 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h1><h1 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h1><p>拜占庭容错算法<br>口信消息型<br>签名消息型<br>数字货币的区块链技术中</p>
-<p>非拜占庭容错算法<br>解决的是分布式的系统中存在故障，但不存在恶意节点的场景下的共识问题</p>
-]]></content>
-      <categories>
-        <category>分布式</category>
-      </categories>
-      <tags>
-        <tag>文章索引</tag>
       </tags>
   </entry>
   <entry>
@@ -2818,6 +2802,111 @@ once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span 
       </tags>
   </entry>
   <entry>
+    <title>网络编程文章索引</title>
+    <url>/netprogram/a/</url>
+    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10txL">极客时间《网络编程实战》</a><br><a href="">微信公众号《开发内功修炼》</a><br><a href="">PDF《理解了实现再谈网络性能》</a><br><a href="">书籍《TCP/IP网络编程》</a><br><a href="https://u.jd.com/6D6qdVu">书籍《UNIX环境高级编程（第三版）》</a><br><a href="https://app.yinxiang.com/fx/7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b">https://app.yinxiang.com/fx/7e601cad-6501-4fe7-8e4e-f0fbd9d02c4b</a></p>
+<h1 id="进程模型"><a href="#进程模型" class="headerlink" title="进程模型"></a>进程模型</h1><h3 id="PPC"><a href="#PPC" class="headerlink" title="PPC"></a>PPC</h3><h3 id="Prefork"><a href="#Prefork" class="headerlink" title="Prefork"></a>Prefork</h3><h3 id="TPC"><a href="#TPC" class="headerlink" title="TPC"></a>TPC</h3><h3 id="Prethread"><a href="#Prethread" class="headerlink" title="Prethread"></a>Prethread</h3><h3 id="Reactor"><a href="#Reactor" class="headerlink" title="Reactor"></a>Reactor</h3><p>IO多路复用+进程/线程 池</p>
+<h4 id="单-Reactor-单进程-线程"><a href="#单-Reactor-单进程-线程" class="headerlink" title="单 Reactor 单进程/线程"></a>单 Reactor 单进程/线程</h4><h4 id="单-Reactor-多线程"><a href="#单-Reactor-多线程" class="headerlink" title="单 Reactor 多线程**"></a>单 Reactor 多线程**</h4><h4 id="多-Reactor-多进程-线程"><a href="#多-Reactor-多进程-线程" class="headerlink" title="多 Reactor 多进程/线程**"></a>多 Reactor 多进程/线程**</h4><h3 id="Proactor"><a href="#Proactor" class="headerlink" title="Proactor"></a>Proactor</h3><h1 id="IO模型"><a href="#IO模型" class="headerlink" title="IO模型"></a>IO模型</h1><h3 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h3><h4 id="Blocking-IO-阻塞I-O"><a href="#Blocking-IO-阻塞I-O" class="headerlink" title="Blocking IO - 阻塞I O"></a>Blocking IO - 阻塞I O</h4><h4 id="Nonblocking-IO-非阻塞IO"><a href="#Nonblocking-IO-非阻塞IO" class="headerlink" title="Nonblocking IO - 非阻塞IO"></a>Nonblocking IO - 非阻塞IO</h4><h4 id="IO-multiplexing-IO-多路复用"><a href="#IO-multiplexing-IO-多路复用" class="headerlink" title="IO multiplexing - IO 多路复用"></a>IO multiplexing - IO 多路复用</h4><h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><h4 id="Signal-driven-IO-信号驱动式IO（异步阻塞）"><a href="#Signal-driven-IO-信号驱动式IO（异步阻塞）" class="headerlink" title="Signal-driven IO - 信号驱动式IO（异步阻塞）"></a>Signal-driven IO - 信号驱动式IO（异步阻塞）</h4><h4 id="Asynchronous-IO-异步IO"><a href="#Asynchronous-IO-异步IO" class="headerlink" title="Asynchronous IO - 异步IO"></a>Asynchronous IO - 异步IO</h4><h1 id="并发模型"><a href="#并发模型" class="headerlink" title="并发模型"></a>并发模型</h1><h3 id="线程与锁"><a href="#线程与锁" class="headerlink" title="线程与锁"></a>线程与锁</h3><h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><h3 id="Clojure之道——分离标识与状态"><a href="#Clojure之道——分离标识与状态" class="headerlink" title="Clojure之道——分离标识与状态"></a>Clojure之道——分离标识与状态</h3><h3 id="actor"><a href="#actor" class="headerlink" title="actor"></a>actor</h3><h3 id="通信顺序进程-CSP"><a href="#通信顺序进程-CSP" class="headerlink" title="通信顺序进程 CSP"></a>通信顺序进程 CSP</h3><p>CSP vs Actor<br>CSP 通过 channel 进行通信，更松耦合。<br>GO 中的 channel 有容量限制并且独立于处理 goroutine，如 Erlang、Actor 模式中的 mailbox 容量是无限的，接收进程也总是被动的处理消息。</p>
+<h3 id="数据级并行"><a href="#数据级并行" class="headerlink" title="数据级并行"></a>数据级并行</h3><h3 id="Lambda架构"><a href="#Lambda架构" class="headerlink" title="Lambda架构"></a>Lambda架构</h3><h1 id="C语言同步函数"><a href="#C语言同步函数" class="headerlink" title="C语言同步函数"></a>C语言同步函数</h1><h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>int pthread_mutex_init(pthread_mutex_t * __restrict, const pthread_mutexattr_t * _Nullable __restrict);：初始化<br>int pthread_mutex_destroy(pthread_mutex_t *)：销毁<br>int pthread_mutex_lock(pthread_mutex_t *)：加锁<br>int pthread_mutex_unlock(pthread_mutex_t *)：解锁</p>
+<h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>int pthread_cond_init(pthread_cond_t * __restrict, const pthread_condattr_t * _Nullable __restrict)：初始化<br>int pthread_cond_destroy(pthread_cond_t *)：销毁<br>int pthread_cond_wait(pthread_cond_t * __restrict, pthread_mutex_t * __restrict)：等待<br>int pthread_cond_signal(pthread_cond_t *)：发送单发通知<br>int pthread_cond_broadcast(pthread_cond_t *)：发送广播通知</p>
+<h3 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h3><p>int pthread_create(pthread_t _Nullable * _Nonnull __restrict, const pthread_attr_t * _Nullable __restrict, void * _Nullable (* _Nonnull)(void * _Nullable), void * _Nullable __restrict)：创建</p>
+<h1 id="http2"><a href="#http2" class="headerlink" title="http2"></a>http2</h1><p>http2最大的不同就是 服务端可以给客户端发请求，最大的好处就是 少了 很多 客户端对服务端的试探、询问，客户端直接就告诉服务端，应该在什么时间的时候通知我就OK了，仔细想想，这像不像epoll的事件注册中的 边缘触发。</p>
+]]></content>
+      <categories>
+        <category>网络编程</category>
+      </categories>
+      <tags>
+        <tag>文章索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redash Gunicorn 超时</title>
+    <url>/python/gunicorn-timeout/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总有用户反馈说Redash下载比较大的Excel就会出现“失败 - 服务器出现问题”，而且每次从点了下载到出现错误提示时间都是差不多的。我先查看了Nginx的error日志，显示 <code>upstream prematurely closed connection while sending to client</code>，第一反应应该是超时导致的。</p>
+<span id="more"></span>
+
+<h2 id="1-修改Redash配置"><a href="#1-修改Redash配置" class="headerlink" title="1. 修改Redash配置"></a>1. 修改Redash配置</h2><ul>
+<li>.env文件修改log级别为调试 <code>REDASH_LOG_LEVEL=&quot;DEBUG&quot;</code></li>
+<li>.env文件加上超时配置 <code>REDASH_BIGQUERY_HTTP_TIMEOUT=600</code></li>
+<li>Redash的启动命令后面增加 <code>-t 600</code> 参数。<br>10分钟应该够用了！重启redash进程后，进行尝试试，不好使！好吧，也许是配置参数写错了，那改成 <code>--timeout 600</code> 再试一下，发现还不好使！继续。。。</li>
+</ul>
+<h2 id="2-修改Nginx配置"><a href="#2-修改Nginx配置" class="headerlink" title="2. 修改Nginx配置"></a>2. 修改Nginx配置</h2><ul>
+<li>请求超时：keepalive_timeout、client_header_timeout、client_body_timeout</li>
+<li>后端服务器处理请求的时间设置：proxy_connect_timeout、proxy_read_timeout<br>重启Nginx，下载还是失败！！！看来不是超时导致的了？！</li>
+</ul>
+<h2 id="3-查看进程使用的资源"><a href="#3-查看进程使用的资源" class="headerlink" title="3. 查看进程使用的资源"></a>3. 查看进程使用的资源</h2><p>先执行：<br><code>top</code><br>再尝试下载操作，发现名叫<code>gunicorn</code>（Redash的server是用gunicorn启动的）的<code>COMMAND</code>CPU占用CPU到了100%，并且持续一定时间后，进程消失，新的进程启动后，CPU占用恢复正常值。那接下来就看看此进程都执行了哪些操作。</p>
+<h2 id="4-进程跟踪"><a href="#4-进程跟踪" class="headerlink" title="4. 进程跟踪"></a>4. 进程跟踪</h2><p>跟踪CPU占用超高的 <code>gunicorn</code> 进程：</p>
+<div class="code-wrapper"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> strace -T -tt -e trace=<span class="hljs-keyword">all</span> -p 进程ID</code></pre></div>
+<p>显式进程一直在 <code>read</code>、<code>write</code> 的系统调用，最后一行输出<br><code>+++ killed by SIGKILL +++</code><br>后，跟踪就停止了。难道是触发了系统的<code>ulimit</code>限制，然后被系统杀掉了？</p>
+<h2 id="5-设置ulimit参数"><a href="#5-设置ulimit参数" class="headerlink" title="5. 设置ulimit参数"></a>5. 设置ulimit参数</h2><p>设置 <code>gunicorn</code> 运行用户的 <code>ulimit</code>，重新尝试，没有解决。看来也不是这个问题。。。那是被谁 <code>kill</code> 掉的呢？</p>
+<h2 id="6-捕捉kill信号"><a href="#6-捕捉kill信号" class="headerlink" title="6. 捕捉kill信号"></a>6. 捕捉kill信号</h2><p>使用 <code>auditctl</code>，添加捕捉规则：</p>
+<div class="code-wrapper"><pre><code class="hljs awk">$ auditctl -a <span class="hljs-keyword">exit</span>,always -F arch=b64 -S kill -F a1=<span class="hljs-number">9</span></code></pre></div>
+<p>进行下载文件操作，等待进程被杀死之后，显式捕捉到结果：</p>
+<div class="code-wrapper"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> ausearch <span class="hljs-literal">-sc</span> <span class="hljs-built_in">kill</span></code></pre></div>
+<p>输出：</p>
+<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">time</span>-&gt;Fri Dec  <span class="hljs-number">6</span> <span class="hljs-number">16</span>:<span class="hljs-number">13</span>:<span class="hljs-number">26</span> <span class="hljs-number">2019</span>
+<span class="hljs-attribute">type</span>=PROCTITLE msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): proctitle=<span class="hljs-number">2</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">6</span>D<span class="hljs-number">6</span>F<span class="hljs-number">64756</span>C<span class="hljs-number">65732</span>F<span class="hljs-number">7265646173682</span>D<span class="hljs-number">372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">707974686</span>F<span class="hljs-number">6</span>E<span class="hljs-number">322</span>E<span class="hljs-number">37002</span>F<span class="hljs-number">6</span>F<span class="hljs-number">70742</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">7265646173682</span>F<span class="hljs-number">62696</span>E<span class="hljs-number">2</span>F<span class="hljs-number">67756</span>E<span class="hljs-number">69636</span>F<span class="hljs-number">726</span>E<span class="hljs-number">002</span>D<span class="hljs-number">62003132372</span>E<span class="hljs-number">302</span>E<span class="hljs-number">302</span>E<span class="hljs-number">313</span>A<span class="hljs-number">35303030002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>E<span class="hljs-number">616</span>D<span class="hljs-number">6500726564617368002</span>D<span class="hljs-number">770034002</span>D<span class="hljs-number">2</span>D<span class="hljs-number">6</span>D<span class="hljs-number">61782</span>D<span class="hljs-number">726571756573</span>
+<span class="hljs-attribute">type</span>=OBJ_PID msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): opid=<span class="hljs-number">11646</span> oauid=<span class="hljs-number">0</span> ouid=<span class="hljs-number">1001</span> oses=<span class="hljs-number">14406</span> ocomm=<span class="hljs-string">&quot;gunicorn&quot;</span>
+<span class="hljs-attribute">type</span>=SYSCALL msg=audit(<span class="hljs-number">1575620006</span>.<span class="hljs-number">444</span>:<span class="hljs-number">103711</span>): arch=c<span class="hljs-number">000003</span>e syscall=<span class="hljs-number">62</span> success=yes exit=<span class="hljs-number">0</span> a<span class="hljs-number">0</span>=<span class="hljs-number">2</span>d<span class="hljs-number">7</span>e a<span class="hljs-number">1</span>=<span class="hljs-number">9</span> a<span class="hljs-number">2</span>=<span class="hljs-number">0</span> a<span class="hljs-number">3</span>=<span class="hljs-number">0</span> items=<span class="hljs-number">0</span> ppid=<span class="hljs-number">11490</span> pid=<span class="hljs-number">11494</span> auid=<span class="hljs-number">0</span> uid=<span class="hljs-number">1001</span> gid=<span class="hljs-number">1001</span> euid=<span class="hljs-number">1001</span> suid=<span class="hljs-number">1001</span> fsuid=<span class="hljs-number">1001</span> egid=<span class="hljs-number">1001</span> sgid=<span class="hljs-number">1001</span> fsgid=<span class="hljs-number">1001</span> tty=(none) ses=<span class="hljs-number">14406</span> comm=<span class="hljs-string">&quot;gunicorn&quot;</span> exe=<span class="hljs-string">&quot;/opt/modules/redash-7.0.0/redash/bin/python2.7&quot;</span> key=(null)</code></pre></div>
+<p>原来是被父进程搞死了。。。</p>
+<h2 id="7-查看gunicorn日志"><a href="#7-查看gunicorn日志" class="headerlink" title="7. 查看gunicorn日志"></a>7. 查看gunicorn日志</h2><p>进入supervisord控制台，通过<code>tail -f </code> 打印 <code>gunicorn</code>进程的输出。</p>
+<div class="code-wrapper"><pre><code class="hljs less"><span class="hljs-selector-attr">[CRITICAL]</span> <span class="hljs-selector-tag">WORKER</span> <span class="hljs-selector-tag">TIMEOUT</span> (<span class="hljs-attribute">pid</span>:<span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Worker</span> <span class="hljs-selector-tag">exiting</span> (<span class="hljs-attribute">pid</span>: <span class="hljs-number">15577</span>)
+<span class="hljs-selector-attr">[INFO]</span> <span class="hljs-selector-tag">Booting</span> <span class="hljs-selector-tag">worker</span> <span class="hljs-selector-tag">with</span> <span class="hljs-selector-tag">pid</span>: <span class="hljs-selector-tag">15646</span></code></pre></div>
+<p><code>timeout</code>…原因就是最开始猜测的超时问题。</p>
+<p><code>gunicorn</code> 给子进程的执行时间就有30秒，如果超过这个限制就会被父进程kill。可是timeout的超时配置并不生效。。。</p>
+<h2 id="8-最终解决方案"><a href="#8-最终解决方案" class="headerlink" title="8.最终解决方案"></a>8.最终解决方案</h2><p><code>Gunicorn</code> 运行命令增加 <code>-k gevent</code> 配置</p>
+<p><code>Gunicorn</code> 是 <code>pre-fork</code> 模型，<code>worker</code> 默认是 <code>sync</code> 改为 <code>gevent</code></p>
+]]></content>
+      <categories>
+        <category>python</category>
+      </categories>
+      <tags>
+        <tag>gunicorn</tag>
+        <tag>timeout</tag>
+        <tag>redash</tag>
+        <tag>超时</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>方案文章索引</title>
+    <url>/program/a/</url>
+    <content><![CDATA[<ol>
+<li>秒杀</li>
+<li>朋友圈</li>
+<li>聊天系统</li>
+<li>游戏体力与消耗</li>
+<li>定时任务限制</li>
+<li>海量日志</li>
+<li>动态短信发送</li>
+</ol>
+<p>QPS<br><a href="https://segmentfault.com/a/1190000010844969">https://segmentfault.com/a/1190000010844969</a></p>
+]]></content>
+      <categories>
+        <category>方案</category>
+      </categories>
+      <tags>
+        <tag>方案</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redigo</title>
+    <url>/redigo/a/</url>
+    <content><![CDATA[<p>[<a href="https://github.com/zuoshuwen/redigo]">https://github.com/zuoshuwen/redigo]</a>(github: <a href="https://github.com/zuoshuwen/redigo">https://github.com/zuoshuwen/redigo</a>)</p>
+<ol>
+<li>翻译</li>
+<li>增加定时维护连接池空闲连接功能</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Redigo</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+        <tag>go</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Redis文章索引</title>
     <url>/redis/a/</url>
     <content><![CDATA[<p>总结=&gt;背</p>
@@ -2884,58 +2973,14 @@ once.Do(<span class="hljs-function"><span class="hljs-keyword">func</span><span 
       </tags>
   </entry>
   <entry>
-    <title>分布式共识算法Raft实现之Etcd</title>
-    <url>/etcd/a/</url>
-    <content><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://etcd.io/docs/">etcd doc</a><br><a href="https://hardcore.feishu.cn/docs/doccnMRVFcMWn1zsEYBrbsDf8De#">Raft -论文导读 与 ETCD源码解读</a><br><a href="https://www.zhihu.com/column/c_1382353468817117184">etcd-源码学习</a><br><a href="https://lessisbetter.site/tags/Raft/">Etcd Raft架构设计和源码剖析</a></p>
-<h2 id="raft"><a href="#raft" class="headerlink" title="raft"></a>raft</h2><h2 id="node"><a href="#node" class="headerlink" title="node"></a>node</h2><h2 id="log"><a href="#log" class="headerlink" title="log"></a>log</h2><h2 id="docker-image"><a href="#docker-image" class="headerlink" title="docker image"></a>docker image</h2><p><a href="https://registry.hub.docker.com/r/bitnami/etcd">https://registry.hub.docker.com/r/bitnami/etcd</a></p>
-<h2 id="安装使用"><a href="#安装使用" class="headerlink" title="安装使用"></a>安装使用</h2><p><a href="https://www.huweihuang.com/kubernetes-notes/etcd/etcdctl-v3.html">www.huweihuang.com</a><br><a href="https://segmentfault.com/a/1190000040203666">GO 中 ETCD 的编码案例分享</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/configuration">配置</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/container">在容器内运行 etcd 集群</a><br><a href="https://doczhcn.gitbook.io/etcd/index/index-1/clustering">搭建 etcd 集群</a><br><a href="https://zhuanlan.zhihu.com/p/260019277">ubuntu+docker搭建etcd集群</a><br><a href="https://github.com/zuoshuwen/example/etcd">docker example etcd</a></p>
-]]></content>
+    <title>Redis配置</title>
+    <url>/redis/config/</url>
+    <content><![CDATA[]]></content>
       <categories>
-        <category>分布式</category>
+        <category>redis</category>
       </categories>
       <tags>
-        <tag>etcd</tag>
-        <tag>raft</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>iOS</title>
-    <url>/ios/a/</url>
-    <content><![CDATA[<p><a href="http://gk.link/a/10tyZ">极客时间《从0开发一款iOS App》</a></p>
-]]></content>
-      <categories>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>文章索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>学习资源索引</title>
-    <url>/index/</url>
-    <content><![CDATA[<h2 id="综合"><a href="#综合" class="headerlink" title="综合"></a>综合</h2><p><a href="https://hardcore.feishu.cn/docs/doccngKKrYQWSYu4Rr3puVq20wc">硬核课堂</a><br><a href="https://strikefreedom.top/">strikefreedom</a></p>
-<h2 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h2><p><a href="https://lessisbetter.site/">Go语言充电站</a><br><a href="https://eddycjy.com/">煎鱼</a><br><a href="https://lailin.xyz/">mohuishou</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>方案文章索引</title>
-    <url>/program/a/</url>
-    <content><![CDATA[<ol>
-<li>秒杀</li>
-<li>朋友圈</li>
-<li>聊天系统</li>
-<li>游戏体力与消耗</li>
-<li>定时任务限制</li>
-<li>海量日志</li>
-<li>动态短信发送</li>
-</ol>
-<p>QPS<br><a href="https://segmentfault.com/a/1190000010844969">https://segmentfault.com/a/1190000010844969</a></p>
-]]></content>
-      <categories>
-        <category>方案</category>
-      </categories>
-      <tags>
-        <tag>方案</tag>
+        <tag>配置</tag>
       </tags>
   </entry>
   <entry>
@@ -4709,34 +4754,6 @@ DO THINGS</code></pre></div>
       </categories>
       <tags>
         <tag>使用</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis配置</title>
-    <url>/redis/config/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>redis</category>
-      </categories>
-      <tags>
-        <tag>配置</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redigo</title>
-    <url>/redigo/a/</url>
-    <content><![CDATA[<p>[<a href="https://github.com/zuoshuwen/redigo]">https://github.com/zuoshuwen/redigo]</a>(github: <a href="https://github.com/zuoshuwen/redigo">https://github.com/zuoshuwen/redigo</a>)</p>
-<ol>
-<li>翻译</li>
-<li>增加定时维护连接池空闲连接功能</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Redigo</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-        <tag>go</tag>
       </tags>
   </entry>
 </search>

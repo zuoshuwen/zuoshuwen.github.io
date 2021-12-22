@@ -13,26 +13,24 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="后端技术、笔记、教程">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="数据结构动态字符串、SDS总结1因此这节课，你需要重点关注三个要点，分别是：  C 语言中使用 char* 实现字符串的不足，主要是因为使用“\0”表示字符串结束，操作时需遍历字符串，效率不高，并且无法完整表示包含“\0”的数据，因而这就无法满足 Redis 的需求。 Redis 中字符串的设计思想与实现方法。Redis 专门设计了 SDS 数据结构，在字符数组的基础上，增加了字符数组长度和分配空">
+  
+    <meta name="description" content="数据结构动态字符串、SDS总结1因此这节课，你需要重点关注三个要点，分别是：  C 语言中使用 char* 实现字符串的不足，主要是因为使用“\0”表示字符串结束，操作时需遍历字符串，效率不高，并且无法完整表示包含“\0”的数据，因而这就无法满足 Redis 的需求。 Redis 中字符串的设计思想与实现方法。Redis 专门设计了 SDS 数据结构，在字符数组的基础上，增加了字符数组长度和分配空">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis源码剖析与实战">
 <meta property="og:url" content="https://ilifes.com/redis/source-code/index.html">
 <meta property="og:site_name" content="Sown">
 <meta property="og:description" content="数据结构动态字符串、SDS总结1因此这节课，你需要重点关注三个要点，分别是：  C 语言中使用 char* 实现字符串的不足，主要是因为使用“\0”表示字符串结束，操作时需遍历字符串，效率不高，并且无法完整表示包含“\0”的数据，因而这就无法满足 Redis 的需求。 Redis 中字符串的设计思想与实现方法。Redis 专门设计了 SDS 数据结构，在字符数组的基础上，增加了字符数组长度和分配空">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ilifes.com/images/redis/io-epoll-02.png">
-<meta property="og:image" content="https://ilifes.com/images/redis/process-model-01.png">
-<meta property="og:image" content="https://ilifes.com/images/redis/event-model-01.png">
-<meta property="og:image" content="https://ilifes.com/images/redis/sentinel-02.png">
+<meta property="og:image" content="https://ilifes.com/images/design-pattern/a-cover.png">
 <meta property="article:published_time" content="2021-06-16T00:00:00.000Z">
 <meta property="article:modified_time" content="2021-10-27T05:58:51.109Z">
 <meta property="article:author" content="sown">
 <meta property="article:tag" content="源码">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://ilifes.com/images/redis/io-epoll-02.png">
+<meta name="twitter:image" content="https://ilifes.com/images/design-pattern/a-cover.png">
+  
   
   <title>Redis源码剖析与实战 - Sown</title>
 
@@ -71,7 +69,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -418,7 +416,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      138 分钟
+      369 分钟
     </span>
   
 
@@ -1411,9 +1409,9 @@ dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</code></pre></div>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/redis/a/">
+                      <a href="/redis/config/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis文章索引</span>
+                        <span class="hidden-mobile">Redis配置</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -1619,7 +1617,7 @@ dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)</code></pre></div>
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

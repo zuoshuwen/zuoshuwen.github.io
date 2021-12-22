@@ -13,17 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="前言回顾上篇文章 Go并发编程之传统同步—(1)互斥锁 其中说到，同步最终是为了达到以下两种目的：
-
-
-维持共享数据一致性，并发安全
-控制流程管理，更好的协同工作
-
-
-示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="前言回顾上篇文章 Go并发编程之传统同步—(1)互斥锁 其中说到，同步最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？">
+  
+    <meta name="description" content="前言回顾上篇文章 Go并发编程之传统同步—(1)互斥锁 其中说到，同步最终是为了达到以下两种目的：   维持共享数据一致性，并发安全 控制流程管理，更好的协同工作   示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go并发编程之传统同步—(2)条件变量">
 <meta property="og:url" content="https://ilifes.com/golang/ipc-cond/index.html">
@@ -38,6 +31,7 @@
 <meta property="article:tag" content="条件变量">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://ilifes.com/images/golang/ipc-cond-01.jpg">
+  
   
   <title>Go并发编程之传统同步—(2)条件变量 - Sown</title>
 
@@ -76,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -414,7 +408,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      undefined 字
+      7k 字
     </span>
   
 
@@ -423,7 +417,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      NaN 分钟
+      59 分钟
     </span>
   
 
@@ -471,7 +465,7 @@
 </ul>
 </blockquote>
 <p>示例程序通过使用互斥锁，达到了数据一致性目的，那么流程管理应该怎么做呢？</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="传统同步"><a href="#传统同步" class="headerlink" title="传统同步"></a>传统同步</h2><h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>上篇文章的示例程序，仅仅实现了累加功能，但在现实的工作场景中，需求往往不可能这么简单，现在扩展一下这个程序，给它加上累减的功能。</p>
 <p>加上了累减的示例程序，可以抽象的理解为一个固定容量的“储水池”，可以注水、排水。</p>
@@ -751,6 +745,7 @@
 <span class="hljs-function"><span class="hljs-title">Broadcast</span><span class="hljs-params">()</span></span><span class="hljs-comment">// Signal()</span>
 
 <span class="hljs-comment">// 两种写法都不会报错 </span></code></pre></div>
+
 <p>在 go 的发送通知方法（Broadcast、Signal）上有这么一段话：</p>
 <blockquote>
 <p>// It is allowed but not required for the caller to hold c.L<br>// during the call.</p>
@@ -1020,7 +1015,7 @@ pthread<span class="hljs-constructor">_mutex_unlock(&amp;<span class="hljs-param
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>

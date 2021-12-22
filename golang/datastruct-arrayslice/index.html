@@ -13,11 +13,10 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="前言数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。
-切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。">
   <meta name="author" content="sown">
   <meta name="keywords" content="go,golang,技术,后端,php,linux,redis,kubernetes,k8s,nginx,docker,网络,算法,">
-  <meta name="description" content="前言数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。 切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。">
+  
+    <meta name="description" content="前言数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。 切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go数据结构之数组与切片">
 <meta property="og:url" content="https://ilifes.com/golang/datastruct-arrayslice/index.html">
@@ -30,6 +29,7 @@
 <meta property="article:tag" content="数组">
 <meta property="article:tag" content="切片">
 <meta name="twitter:card" content="summary_large_image">
+  
   
   <title>Go数据结构之数组与切片 - Sown</title>
 
@@ -68,7 +68,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"ilifes.com","root":"/","version":"1.8.13","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"97f60cea7055dca81a77d34bd50655bf","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"ButetqzXxYeinA3YL6tt2SI5-gzGzoHsz","app_key":"IQfQbzCDGqirp6rGE7bmsnzS","server_url":"https://butetqzx.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -406,7 +406,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      undefined 字
+      8.5k 字
     </span>
   
 
@@ -415,7 +415,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      NaN 分钟
+      71 分钟
     </span>
   
 
@@ -457,7 +457,7 @@
             <div class="markdown-body">
               <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>数组的长度是声明的时候就固定好的，后面不可能变大，而且长度和容量相等。</p>
 <p>切片的长度和容量后面可以随着元素增多而增长，但是容量不可能小于长度。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="声明-amp-初始化"><a href="#声明-amp-初始化" class="headerlink" title="声明&amp;初始化"></a>声明&amp;初始化</h3><p>在 Go 中声明即初始化，如果在声明的时候没有初始化值，那么就会赋值为声明类型的「零值」。</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo1(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
@@ -491,6 +491,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 len:&quot;</span>, <span class="hljs-params">len</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 &#125;</code></pre></div>
+
 <p>在声明的时候就初始化：</p>
 <div class="code-wrapper"><pre><code class="hljs reasonml">func <span class="hljs-constructor">TestDemo2(<span class="hljs-params">t</span> <span class="hljs-operator">*</span><span class="hljs-params">testing</span>.T)</span> &#123;
 	<span class="hljs-comment">// 数组</span>
@@ -524,6 +525,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice2 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice2</span>)</span>) <span class="hljs-comment">// 5</span>
 &#125;</code></pre></div>
 
+
 <h3 id="添加-amp-更新元素值"><a href="#添加-amp-更新元素值" class="headerlink" title="添加&amp;更新元素值"></a>添加&amp;更新元素值</h3><p>数组因为长度固定，且的值都是初始化好了的，所以只有更新。</p>
 <p>切片更新操作和数据一样，只不过新增元素只能通过 append() 方法。</p>
 <blockquote>
@@ -551,6 +553,7 @@
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice1 len:&quot;</span>, <span class="hljs-params">len</span>(<span class="hljs-params">slice1</span>)</span>) <span class="hljs-comment">// 6</span>
 	t.<span class="hljs-constructor">Log(<span class="hljs-string">&quot;slice1 cap:&quot;</span>, <span class="hljs-params">cap</span>(<span class="hljs-params">slice1</span>)</span>) <span class="hljs-comment">// 10</span>
 &#125;</code></pre></div>
+
 
 <h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>数组与切片，都可以使用表达式截取，截取之后的数据它的类型为切片。</p>
 <div class="code-wrapper"><pre><code class="hljs awk"><span class="hljs-keyword">func</span> TestDemo4(t *testing.T) &#123;
@@ -582,6 +585,7 @@
 	t.Log(<span class="hljs-string">&quot;slice4 len:&quot;</span>, len(slice4)) <span class="hljs-regexp">//</span> <span class="hljs-number">3</span>
 	t.Log(<span class="hljs-string">&quot;slice4 cap:&quot;</span>, cap(slice4)) <span class="hljs-regexp">//</span> <span class="hljs-number">6</span>
 &#125;</code></pre></div>
+
 <h3 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h3><p>使用 for、range</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo5</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	array1 := [...]<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">9</span>, <span class="hljs-number">1</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">2</span>, <span class="hljs-number">8</span>, <span class="hljs-number">4</span>&#125;
@@ -594,6 +598,7 @@
 		fmt.Println(k, <span class="hljs-string">&quot;-&quot;</span>, v)
 	&#125;
 &#125;</code></pre></div>
+
 <h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p>数组与数组可以使用 == 比较，不能与 nil 比较</p>
 <p>切片与切片不能使用 == 比较，可以使用 reflect.DeepEqual 比较，可以与 nil 比较</p>
 <div class="code-wrapper"><pre><code class="hljs jboss-cli">func TestDemo6<span class="hljs-params">(t *testing.T)</span> &#123;
@@ -619,12 +624,14 @@
 	t.Logf<span class="hljs-params">(&quot;<span class="hljs-attr">slice1</span> == slice3 %t\n&quot;, reflect.DeepEqual(slice1, slice3)</span>) <span class="hljs-string">//</span> <span class="hljs-literal">true</span>
 &#125;</code></pre></div>
 
+
 <h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>需使用 append()、切片表达式 结合来完成</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestDemo7</span><span class="hljs-params">(t *testing.T)</span></span> &#123;
 	slice1 := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">9</span>, <span class="hljs-number">1</span>, <span class="hljs-number">7</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">2</span>, <span class="hljs-number">8</span>, <span class="hljs-number">4</span>&#125;
 	slice1 = <span class="hljs-built_in">append</span>(slice1[:<span class="hljs-number">2</span>], slice1[<span class="hljs-number">3</span>:]...)
 	t.Log(slice1)
 &#125;</code></pre></div>
+
 
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="数组与切片的关系"><a href="#数组与切片的关系" class="headerlink" title="数组与切片的关系"></a>数组与切片的关系</h3><p><strong>数组为值类型，切片为引用类型</strong>，他们又有何关系呢？</p>
 <p>程序示例：</p>
@@ -693,6 +700,7 @@
 	t.Log(<span class="hljs-string">&quot;array1 len:&quot;</span>, <span class="hljs-built_in">len</span>(array1)) <span class="hljs-comment">// 10</span>
 	t.Log(<span class="hljs-string">&quot;array1 cap:&quot;</span>, <span class="hljs-built_in">cap</span>(array1)) <span class="hljs-comment">// 10</span>
 &#125;</code></pre></div>
+
 
 <h3 id="传递"><a href="#传递" class="headerlink" title="传递"></a>传递</h3><p>切片，如果不使用 copy() 进行深复制出一个新的切片，直接传递过去的切片底层还是同一个数组，当然，append() 发生了扩容之后，就不会是同一个数组了。</p>
 <p>数组，直接传递会变成两个数组，如果运用了指针，会指向同一个。</p>
@@ -764,6 +772,7 @@
 	t.Log(<span class="hljs-string">&quot;slice1&quot;</span>, slice1) <span class="hljs-comment">// slice1 [999 1 7 3 0 5 6 2 8 4]</span>
 	t.Log(<span class="hljs-string">&quot;slice2&quot;</span>, slice2) <span class="hljs-comment">// slice2 [999 1 7 3 0 5 6 2 8 4]</span>
 &#125;</code></pre></div>
+
 
 <h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p>一段连续的内存空间。</p>
 <h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><p>make 只能用于 slice、map、channel，返回的初始化后的（非零）值。</p>
@@ -1029,7 +1038,7 @@
       var typing = Fluid.plugins.typing;
       var title = document.getElementById('subtitle').title;
       
-      typing(title)
+        typing(title);
       
     })(window, document);
   </script>
