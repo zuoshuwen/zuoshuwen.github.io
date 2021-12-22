@@ -152,6 +152,7 @@
 <h1 id="编程模式"><a href="#编程模式" class="headerlink" title="编程模式"></a>编程模式</h1><p>选项模式</p>
 <h1 id="go-module"><a href="#go-module" class="headerlink" title="go module"></a>go module</h1><p><a href="https://colobu.com/2019/09/23/review-go-module-again/">https://colobu.com/2019/09/23/review-go-module-again/</a></p>
 <h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>1.无锁编程<br>2. <a href="https://www.jianshu.com/p/1390dbf87471">Go语言学习之——if else</a></p>
+<p><a href="https://github.com/zuoshuwen/go-example">https://github.com/zuoshuwen/go-example</a></p>
 ]]></content>
       <categories>
         <category>golang</category>
