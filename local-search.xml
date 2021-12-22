@@ -463,16 +463,16 @@
   
   
   <entry>
-    <title>iOS</title>
-    <link href="/ios/a/"/>
-    <url>/ios/a/</url>
+    <title>微服务系列文章索引</title>
+    <link href="/microservices/a/"/>
+    <url>/microservices/a/</url>
     
-    <content type="html"><![CDATA[<p><a href="http://gk.link/a/10tyZ">极客时间《从0开发一款iOS App》</a></p>]]></content>
+    <content type="html"><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10sIo">极客时间《go进阶训练营》</a><br><a href="http://gk.link/a/10tCs">极客时间《从0开始学架构》</a><br><a href="http://gk.link/a/10tCC">极客时间《Service Mesh实战》</a><br>DDD</p><h1 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h1><ol><li>gRPC</li></ol><h1 id="基础设施建设"><a href="#基础设施建设" class="headerlink" title="基础设施建设"></a>基础设施建设</h1><ol><li>部署与测试多集群，多租户</li><li>服务注册、发现、负载均衡</li><li>API网关</li></ol><h1 id="高可用设计"><a href="#高可用设计" class="headerlink" title="高可用设计"></a>高可用设计</h1><ol><li>隔离</li></ol><p><strong>参考</strong><br><a href="https://lailin.xyz/post/go-training-week6-usability-1-bulkhe.html">Go可用性(一) 隔离设计</a></p><ol start="2"><li><a href="/microservices/ha-limit/" title="限流">限流</a><input type="checkbox" disabled ></li><li>降级</li><li>熔断</li><li>超时</li><li>重试</li></ol><h1 id="设计方案"><a href="#设计方案" class="headerlink" title="设计方案"></a>设计方案</h1><p>CQRS<br>海量评论</p><h1 id="架构模式"><a href="#架构模式" class="headerlink" title="架构模式"></a>架构模式</h1><p>CQRS<br>Pipeline</p>]]></content>
     
     
     <categories>
       
-      <category>iOS</category>
+      <category>微服务</category>
       
     </categories>
     
@@ -488,16 +488,16 @@
   
   
   <entry>
-    <title>微服务系列文章索引</title>
-    <link href="/microservices/a/"/>
-    <url>/microservices/a/</url>
+    <title>iOS</title>
+    <link href="/ios/a/"/>
+    <url>/ios/a/</url>
     
-    <content type="html"><![CDATA[<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="http://gk.link/a/10sIo">极客时间《go进阶训练营》</a><br><a href="http://gk.link/a/10tCs">极客时间《从0开始学架构》</a><br><a href="http://gk.link/a/10tCC">极客时间《Service Mesh实战》</a><br>DDD</p><h1 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h1><ol><li>gRPC</li></ol><h1 id="基础设施建设"><a href="#基础设施建设" class="headerlink" title="基础设施建设"></a>基础设施建设</h1><ol><li>部署与测试多集群，多租户</li><li>服务注册、发现、负载均衡</li><li>API网关</li></ol><h1 id="高可用设计"><a href="#高可用设计" class="headerlink" title="高可用设计"></a>高可用设计</h1><ol><li>隔离</li></ol><p><strong>参考</strong><br><a href="https://lailin.xyz/post/go-training-week6-usability-1-bulkhe.html">Go可用性(一) 隔离设计</a></p><ol start="2"><li><a href="/microservices/ha-limit/" title="限流">限流</a><input type="checkbox" disabled ></li><li>降级</li><li>熔断</li><li>超时</li><li>重试</li></ol><h1 id="设计方案"><a href="#设计方案" class="headerlink" title="设计方案"></a>设计方案</h1><p>CQRS<br>海量评论</p><h1 id="架构模式"><a href="#架构模式" class="headerlink" title="架构模式"></a>架构模式</h1><p>CQRS<br>Pipeline</p>]]></content>
+    <content type="html"><![CDATA[<p><a href="http://gk.link/a/10tyZ">极客时间《从0开发一款iOS App》</a></p>]]></content>
     
     
     <categories>
       
-      <category>微服务</category>
+      <category>iOS</category>
       
     </categories>
     
